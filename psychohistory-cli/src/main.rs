@@ -12,11 +12,6 @@ fn main() {
 
     app.run(12);
 
-    println!("[core] Final state keys:");
-    for key in app.state.keys() {
-        println!("  - {}", key);
-    }
-
     app.summarize_state();
 
     let econ = app.state.get_mut::<EconState>("econ");
