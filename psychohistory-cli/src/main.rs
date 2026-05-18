@@ -1,4 +1,4 @@
-use psychohistory_core::{App};
+use psychohistory_core::App;
 use psychohistory_econ::{EconPlugin, EconState};
 
 use num_format::{Locale, ToFormattedString};

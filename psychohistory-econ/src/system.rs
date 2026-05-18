@@ -1,5 +1,5 @@
 use crate::EconState;
-use psychohistory_core::{state::SimulationState, system::System, time::SimulationTime};
+use psychohistory_core::{state::DomainRegistry, system::System, time::SimulationTime};
 
 pub struct EconSystem;
 
@@ -12,7 +12,7 @@ impl System for EconSystem {
         &[]
     }
 
-    fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
+    fn run(&mut self, state: &mut DomainRegistry, _time: SimulationTime) {
         let econ = state.get_mut::<EconState>("econ");
 
         econ.gdp *= 1.001;

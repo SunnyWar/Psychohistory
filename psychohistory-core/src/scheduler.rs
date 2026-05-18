@@ -1,5 +1,5 @@
 use crate::{
-    state::SimulationState,
+    state::DomainRegistry,
     system::System,
     time::{SimulationTime, TimeGranularity},
 };
@@ -19,7 +19,7 @@ impl Scheduler {
         self.systems.push(sys);
     }
 
-    pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
+    pub fn run(&mut self, state: &mut DomainRegistry, steps: u64) {
         for step in 0..steps {
             let time = SimulationTime {
                 step,

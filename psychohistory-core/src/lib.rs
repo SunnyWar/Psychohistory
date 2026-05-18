@@ -1,10 +1,10 @@
-pub mod time;
+pub mod app;
+pub mod experiment;
+pub mod plugin;
+pub mod scheduler;
 pub mod state;
 pub mod system;
-pub mod scheduler;
-pub mod experiment;
-pub mod app;
-pub mod plugin;
+pub mod time;
 
 pub use app::App;
 pub use plugin::Plugin;

@@ -1,15 +1,15 @@
-use crate::{scheduler::Scheduler, state::SimulationState};
 use crate::plugin::Plugin;
+use crate::{scheduler::Scheduler, state::DomainRegistry};
 
 pub struct App {
-    pub state: SimulationState,
+    pub state: DomainRegistry,
     pub scheduler: Scheduler,
 }
 
 impl App {
     pub fn new() -> Self {
         Self {
-            state: SimulationState::new(),
+            state: DomainRegistry::new(),
             scheduler: Scheduler::new(),
         }
     }
