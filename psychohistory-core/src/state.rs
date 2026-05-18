@@ -6,7 +6,9 @@ pub struct SimulationState {
 
 impl SimulationState {
     pub fn new() -> Self {
-        Self { data: HashMap::new() }
+        Self {
+            data: HashMap::new(),
+        }
     }
 
     pub fn insert<T: 'static>(&mut self, key: &'static str, value: T) {
@@ -14,9 +16,6 @@ impl SimulationState {
     }
 
     pub fn get_mut<T: 'static>(&mut self, key: &'static str) -> &mut T {
-        self.data.get_mut(key)
-            .unwrap()
-            .downcast_mut::<T>()
-            .unwrap()
+        self.data.get_mut(key).unwrap().downcast_mut::<T>().unwrap()
     }
 }

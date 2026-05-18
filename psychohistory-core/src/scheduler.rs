@@ -1,4 +1,8 @@
-use crate::{state::SimulationState, system::{self, System}, time::{SimulationTime, TimeGranularity}};
+use crate::{
+    state::SimulationState,
+    system::{self, System},
+    time::{SimulationTime, TimeGranularity},
+};
 
 pub struct Scheduler {
     systems: Vec<Box<dyn System>>,
