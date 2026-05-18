@@ -494,3 +494,6 @@ Status
 
 Psychohistory is in early development.
 
+This project is licensed under the PolyForm Noncommercial License 1.0.0.
+Commercial use is strictly prohibited. See LICENSE for details.
+
