@@ -1,14 +1,17 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#[derive(Debug, Clone, Default)]
+   pub struct EconState {
+       pub gdp: f64,
+       pub inflation: f64,
+   }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+   #[derive(Debug, Clone, Default)]
+   pub struct DemogState {
+       pub population: u64,
+       pub birth_rate: f64,
+   }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+   #[derive(Debug, Clone, Default)]
+   pub struct GovState {
+       pub tax_rate: f64,
+       pub budget: f64,
+   }
