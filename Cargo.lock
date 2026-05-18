@@ -274,6 +274,7 @@ dependencies = [
  "num-format",
  "psychohistory-core",
  "psychohistory-econ",
+ "psychohistory-gov",
  "rust_decimal",
  "rust_decimal_macros",
 ]
