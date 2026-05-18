@@ -205,14 +205,6 @@ All contributions must be licensed under **PolyForm Noncommercial License 1.0.0.
 
 ---
 
-## **License**
-
-**AGPL‑3.0**
-
-This ensures that all modifications, including network‑served versions, remain open.
-
----
-
 ## **Roadmap**
 
 ### **Phase 1 — Core Engine**
@@ -261,13 +253,3 @@ This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 Commercial use is strictly prohibited. See `LICENSE` for details.
 
 ---
-
-If you want, I can also generate:
-
-- a shorter “front‑page” README version  
-- a logo/header block  
-- badges (build, license, crates.io, docs.rs)  
-- a contributor guide  
-- a domain‑specific example walkthrough  
-
-Just tell me what direction you want.
