@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 core = { path = "../../core" }
+models = { workspace = true }
+sdk = { workspace = true }

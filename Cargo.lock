@@ -141,12 +141,18 @@ dependencies = [
 [[package]]
 name = "demog"
 version = "0.1.0"
+dependencies = [
+ "models",
+ "sdk",
+]
 
 [[package]]
 name = "econ"
 version = "0.1.0"
 dependencies = [
  "core",
+ "models",
+ "sdk",
 ]
 
 [[package]]
@@ -207,6 +213,8 @@ name = "gov"
 version = "0.1.0"
 dependencies = [
  "core",
+ "models",
+ "sdk",
 ]
 
 [[package]]
