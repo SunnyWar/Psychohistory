@@ -29,23 +29,18 @@ New systems, models, and data sources can be added without modifying the core en
 - Clear APIs  
 - Python bindings for Jupyter/R workflows  
 
-### **5. Open source & copyleft**
-
-Licensed under **AGPL‑3.0** to ensure that improvements remain open.
-
----
-
 ## **Workspace Structure**
 
 ```text
-psychohistory/                # Workspace root
-├── psychohistory-core/       # Simulation kernel
-├── psychohistory-econ/       # Economic domain
-├── psychohistory-gov/        # Governance & political stability domain
-├── psychohistory-demog/      # Demography domain
-├── psychohistory-models/     # NN evaluators (ONNX/Burn/tch)
-├── psychohistory-cli/        # CLI for running experiments
-└── psychohistory-lab/        # Python bindings (pyo3)
+psychohistory/           # Workspace root
+├── core/                # Simulation kernel
+├── models/              # NN evaluators (ONNX/Burn/tch)
+├── cli/                 # CLI for running experiments
+├── lab/                 # Python bindings (pyo3)
+├── sdk/                 # common code for plugins
+├── plugins/demog        # Demography domain
+├── plugins/gov          # Governance & political stability domain
+└── plugins/econ         # Economic domain
 ```
 
 ---
