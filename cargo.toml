@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "psychohistory-core",
+    "psychohistory-econ",
+    "psychohistory-gov",
+    "psychohistory-demog",
+    "psychohistory-models",
+    "psychohistory-cli",
+    "psychohistory-lab",
+]
+resolver = "2"
