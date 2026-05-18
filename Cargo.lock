@@ -296,6 +296,9 @@ dependencies = [
 [[package]]
 name = "psychohistory-gov"
 version = "0.1.0"
+dependencies = [
+ "psychohistory-core",
+]
 
 [[package]]
 name = "psychohistory-lab"

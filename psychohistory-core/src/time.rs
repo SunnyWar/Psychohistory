@@ -6,6 +6,7 @@ pub struct SimulationTime {
 
 #[derive(Clone, Copy, Debug)]
 pub enum TimeGranularity {
+    Step,
     Monthly,
     Quarterly,
     Yearly,

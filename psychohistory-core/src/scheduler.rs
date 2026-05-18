@@ -1,5 +1,5 @@
 use crate::{
-    state::DomainRegistry,
+    state::SimulationState,
     system::System,
     time::{SimulationTime, TimeGranularity},
 };
@@ -15,18 +15,23 @@ impl Scheduler {
         }
     }
 
-    pub fn add_system(&mut self, sys: Box<dyn System>) {
-        self.systems.push(sys);
+    pub fn add_system(&mut self, system: Box<dyn System>) {
+        println!("[core] Registering system: {}", system.name());
+        self.systems.push(system);
     }
 
-    pub fn run(&mut self, state: &mut DomainRegistry, steps: u64) {
+    pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
         for step in 0..steps {
+            println!("[core] === Tick {} ===", step);
+
             let time = SimulationTime {
                 step,
-                granularity: TimeGranularity::Monthly,
+                granularity: TimeGranularity::Step,
             };
-            for sys in self.systems.iter_mut() {
-                sys.run(state, time);
+
+            for system in &mut self.systems {
+                println!("  -> Running system: {}", system.name());
+                system.run(state, time);
             }
         }
     }

@@ -1,11 +1,11 @@
-use crate::EconState;
+use crate::GovState;
 use psychohistory_core::{state::SimulationState, system::System, time::SimulationTime};
 
-pub struct EconSystem;
+pub struct GovSystem;
 
-impl System for EconSystem {
+impl System for GovSystem {
     fn name(&self) -> &'static str {
-        "econ"
+        "gov"
     }
 
     fn dependencies(&self) -> &'static [&'static str] {
@@ -13,9 +13,9 @@ impl System for EconSystem {
     }
 
     fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
-        let econ = state.get_mut::<EconState>("econ");
+        let gov = state.get_mut::<GovState>("gov");
 
-        econ.gdp *= 1.001;
-        econ.inflation *= 0.999;
+        // placeholder update
+        gov.stability = (gov.stability + 0.001).min(1.0);
     }
 }
