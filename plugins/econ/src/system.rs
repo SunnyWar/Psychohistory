@@ -1,5 +1,5 @@
 use crate::EconState;
-use psychohistory_core::{state::SimulationState, system::System, time::SimulationTime};
+use core::{state::SimulationState, system::System, time::SimulationTime};
 
 pub struct EconSystem;
 

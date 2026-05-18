@@ -1,7 +1,6 @@
 [package]
-name = "psychohistory-core"
+name = "demog"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-indicatif = "0.18.4"

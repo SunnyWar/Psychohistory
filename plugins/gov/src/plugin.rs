@@ -1,5 +1,5 @@
 use crate::{GovState, GovSystem};
-use psychohistory_core::{App, Plugin};
+use core::{App, Plugin};
 
 pub struct GovPlugin;
 

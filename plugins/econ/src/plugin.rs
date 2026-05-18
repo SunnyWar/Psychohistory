@@ -1,5 +1,5 @@
 use crate::{EconState, EconSystem};
-use psychohistory_core::{App, Plugin};
+use core::{App, Plugin};
 
 pub struct EconPlugin;
 

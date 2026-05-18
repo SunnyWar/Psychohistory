@@ -1,11 +1,16 @@
 [workspace]
-members = [
-    "psychohistory-core",
-    "psychohistory-econ",
-    "psychohistory-gov",
-    "psychohistory-demog",
-    "psychohistory-models",
-    "psychohistory-cli",
-    "psychohistory-lab",
-]
 resolver = "2"
+members = [
+    "cli",
+    "core",
+    "sdk",
+    "models",
+    "lab",
+    "plugins/demog",
+    "plugins/econ",
+    "plugins/gov",
+]
+
+[workspace.dependencies]
+models = { path = "models" }
+sdk = { path = "sdk" }

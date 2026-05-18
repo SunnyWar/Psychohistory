@@ -1,5 +1,5 @@
 use crate::GovState;
-use psychohistory_core::{state::SimulationState, system::System, time::SimulationTime};
+use core::{state::SimulationState, system::System, time::SimulationTime};
 
 pub struct GovSystem;
 

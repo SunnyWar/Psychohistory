@@ -1,6 +1,6 @@
-use psychohistory_core::App;
-use psychohistory_econ::{EconPlugin, EconState};
-use psychohistory_gov::{GovPlugin, GovState};
+use core::App;
+use econ::{EconPlugin, EconState};
+use gov::{GovPlugin, GovState};
 
 mod util;
 use util::fmt_currency;
@@ -21,4 +21,3 @@ fn main() {
     let gov = app.state.get_mut::<GovState>("gov");
     println!("Final stability: {:.2}%", gov.stability * 100.0);
 }
-
