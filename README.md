@@ -37,38 +37,16 @@ Licensed under **AGPL‑3.0** to ensure that improvements remain open.
 
 ## **Workspace Structure**
 
-psychohistory/
-│
-├── Cargo.toml                # Workspace root
-├── README.md                 # This file
-│
+```text
+psychohistory/                # Workspace root
 ├── psychohistory-core/       # Simulation kernel
-│   ├── src/
-│   └── Cargo.toml
-│
 ├── psychohistory-econ/       # Economic domain
-│   ├── src/
-│   └── Cargo.toml
-│
 ├── psychohistory-gov/        # Governance & political stability domain
-│   ├── src/
-│   └── Cargo.toml
-│
 ├── psychohistory-demog/      # Demography domain
-│   ├── src/
-│   └── Cargo.toml
-│
 ├── psychohistory-models/     # NN evaluators (ONNX/Burn/tch)
-│   ├── src/
-│   └── Cargo.toml
-│
 ├── psychohistory-cli/        # CLI for running experiments
-│   ├── src/
-│   └── Cargo.toml
-│
 └── psychohistory-lab/        # Python bindings (pyo3)
-    ├── src/
-    └── Cargo.toml
+```
 
 ---
 
