@@ -201,7 +201,7 @@ Provides:
    - Model versioning  
    - Example experiments  
 
-All contributions must be licensed under **AGPL‑3.0**.
+All contributions must be licensed under **PolyForm Noncommercial License 1.0.0.**.
 
 ---
 
