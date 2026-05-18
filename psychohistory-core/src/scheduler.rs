@@ -1,6 +1,6 @@
 use crate::{
     state::SimulationState,
-    system::{self, System},
+    system::System,
     time::{SimulationTime, TimeGranularity},
 };
 
