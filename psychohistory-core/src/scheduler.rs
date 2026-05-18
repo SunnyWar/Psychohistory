@@ -4,6 +4,8 @@ use crate::{
     time::{SimulationTime, TimeGranularity},
 };
 
+use indicatif::{ProgressBar, ProgressStyle};
+
 pub struct Scheduler {
     systems: Vec<Box<dyn System>>,
 }
@@ -21,18 +23,28 @@ impl Scheduler {
     }
 
     pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
-        for step in 0..steps {
-            println!("[core] === Tick {} ===", step);
+        let pb = ProgressBar::new(steps);
+        pb.set_style(
+            ProgressStyle::with_template(
+                "[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} ticks ({eta})",
+            )
+            .unwrap()
+            .progress_chars("##-"),
+        );
 
+        for step in 0..steps {
             let time = SimulationTime {
                 step,
                 granularity: TimeGranularity::Step,
             };
 
             for system in &mut self.systems {
-                println!("  -> Running system: {}", system.name());
                 system.run(state, time);
             }
+
+            pb.inc(1);
         }
+
+        pb.finish_with_message("Simulation complete");
     }
 }
