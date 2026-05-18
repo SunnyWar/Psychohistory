@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 psychohistory-core = { path = "../psychohistory-core" }
+psychohistory-econ = { path = "../psychohistory-econ" }

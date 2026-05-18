@@ -1,11 +1,22 @@
+use std::collections::HashMap;
+
 pub struct SimulationState {
-    pub econ: Option<Box<dyn std::any::Any>>,
-    pub gov: Option<Box<dyn std::any::Any>>,
-    pub demog: Option<Box<dyn std::any::Any>>,
+    pub data: HashMap<&'static str, Box<dyn std::any::Any>>,
 }
 
 impl SimulationState {
     pub fn new() -> Self {
-        Self { econ: None, gov: None, demog: None }
+        Self { data: HashMap::new() }
+    }
+
+    pub fn insert<T: 'static>(&mut self, key: &'static str, value: T) {
+        self.data.insert(key, Box::new(value));
+    }
+
+    pub fn get_mut<T: 'static>(&mut self, key: &'static str) -> &mut T {
+        self.data.get_mut(key)
+            .unwrap()
+            .downcast_mut::<T>()
+            .unwrap()
     }
 }

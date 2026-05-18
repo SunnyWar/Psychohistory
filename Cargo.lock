@@ -7,6 +7,7 @@ name = "psychohistory-cli"
 version = "0.1.0"
 dependencies = [
  "psychohistory-core",
+ "psychohistory-econ",
 ]
 
 [[package]]
@@ -20,6 +21,9 @@ version = "0.1.0"
 [[package]]
 name = "psychohistory-econ"
 version = "0.1.0"
+dependencies = [
+ "psychohistory-core",
+]
 
 [[package]]
 name = "psychohistory-gov"
