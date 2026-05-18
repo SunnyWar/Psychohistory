@@ -5,6 +5,9 @@ version = 4
 [[package]]
 name = "psychohistory-cli"
 version = "0.1.0"
+dependencies = [
+ "psychohistory-core",
+]
 
 [[package]]
 name = "psychohistory-core"
