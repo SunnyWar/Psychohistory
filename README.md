@@ -47,7 +47,7 @@ psychohistory/           # Workspace root
 
 ## **Core Concepts**
 
-### **Simulation Kernel (`psychohistory-core`)**
+### **Simulation Kernel (`core`)**
 
 #### **SimulationState**
 
@@ -110,7 +110,7 @@ Domains communicate only through the shared `SimulationState`.
 
 ---
 
-## **Model Crate (`psychohistory-models`)**
+## **Model Crate (`models`)**
 
 A unified trait for neural network evaluators:
 
@@ -173,7 +173,7 @@ Outputs can be written as:
 
 ---
 
-## **Python Integration (`psychohistory-lab`)**
+## **Python Integration (`lab`)**
 
 Provides:
 
