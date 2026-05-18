@@ -1,5 +1,7 @@
+use crate::{state::SimulationState, system::{self, System}, time::{SimulationTime, TimeGranularity}};
+
 pub struct Scheduler {
-    systems: Vec<Box<dyn crate::system::System>>,
+    systems: Vec<Box<dyn System>>,
 }
 
 impl Scheduler {
@@ -9,15 +11,15 @@ impl Scheduler {
         }
     }
 
-    pub fn add_system(&mut self, sys: Box<dyn crate::system::System>) {
+    pub fn add_system(&mut self, sys: Box<dyn System>) {
         self.systems.push(sys);
     }
 
-    pub fn run(&mut self, state: &mut crate::state::SimulationState, steps: u64) {
+    pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
         for step in 0..steps {
-            let time = crate::time::SimulationTime {
+            let time = SimulationTime {
                 step,
-                granularity: crate::time::TimeGranularity::Monthly,
+                granularity: TimeGranularity::Monthly,
             };
             for sys in self.systems.iter_mut() {
                 sys.run(state, time);

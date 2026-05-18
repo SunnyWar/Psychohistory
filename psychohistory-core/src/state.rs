@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::{any, collections::HashMap};
 
 pub struct SimulationState {
-    pub data: HashMap<&'static str, Box<dyn std::any::Any>>,
+    pub data: HashMap<&'static str, Box<dyn any::Any>>,
 }
 
 impl SimulationState {
