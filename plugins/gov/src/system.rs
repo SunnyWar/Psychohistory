@@ -1,6 +1,8 @@
 // plugins/gov/src/system.rs
 use core::{state::SimulationState, system::System, time::SimulationTime};
 use models::GovState;
+use sdk::{ReadSnapshot, SimulationPlugin};
+use crate::plugin::GovPlugin;
 
 pub struct GovSystem;
 
@@ -22,10 +24,11 @@ impl System for GovSystem {
 
     fn run_system(
         &self,
-        _snapshot: &sdk::ReadSnapshot,
-        _bucket: &mut Box<dyn std::any::Any + Send + Sync>,
+        snapshot: &ReadSnapshot,
+        bucket: &mut Box<dyn std::any::Any + Send + Sync>,
         _time: SimulationTime,
     ) {
-        // Not implemented for GovSystem
+        // Dispatch directly into the parallel simulation execution block
+        GovPlugin.step(snapshot, bucket);
     }
 }

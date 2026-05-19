@@ -1,6 +1,7 @@
 use core::{system::System, time::SimulationTime};
-use sdk::ReadSnapshot;
+use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
+use crate::plugin::EconPlugin;
 
 pub struct EconSystem;
 
@@ -10,16 +11,17 @@ impl System for EconSystem {
     }
 
     fn run(&mut self, _state: &mut core::state::SimulationState, _time: SimulationTime) {
-        // Not implemented
+        // Legacy single-threaded fallback loop - intentionally left blank
     }
 
     fn run_system(
         &self,
-        _snapshot: &ReadSnapshot,
-        _bucket: &mut Box<dyn Any + Send + Sync>,
+        snapshot: &ReadSnapshot,
+        bucket: &mut Box<dyn Any + Send + Sync>,
         _time: SimulationTime,
     ) {
-        // Not implemented for EconSystem
+        // Dispatch directly into the parallel simulation execution block
+        EconPlugin.step(snapshot, bucket);
     }
 }
 // plugins/econ/src/system.rs
