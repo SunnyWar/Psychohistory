@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "description": "Global multi-tier macro-scenario baseline"
+  },
+  "archetypes": {
+    "sovereign_developed": {
+      "execution_mode": "heuristic",
+      "model_weights_path": null
+    },
+    "urban_metropolitan": {
+      "execution_mode": "heuristic",
+      "model_weights_path": null
+    }
+  },
+  "regions": {
+    "us": {
+      "archetype": "sovereign_developed",
+      "components": {
+        "econ": { "gdp": 27000000000000.0, "inflation": 0.024 },
+        "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.82 },
+        "demog": { "population": 334000000, "birth_rate": 0.012 }
+      },
+      "sub_regions": {
+        "los_angeles": {
+          "archetype": "urban_metropolitan",
+          "components": {
+            "econ": { "gdp": 1000000000000.0, "inflation": 0.026 },
+            "gov": { "tax_rate": 0.08, "budget": 0.0, "stability": 0.78 },
+            "demog": { "population": 3800000, "birth_rate": 0.011 }
+          }
+        }
+      }
+    },
+    "cn": {
+      "archetype": "sovereign_developed",
+      "components": {
+        "econ": { "gdp": 18500000000000.0, "inflation": 0.015 },
+        "gov": { "tax_rate": 0.28, "budget": 0.0, "stability": 0.88 },
+        "demog": { "population": 1412000000, "birth_rate": 0.010 }
+      }
+    }
+  }
+}

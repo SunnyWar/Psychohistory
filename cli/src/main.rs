@@ -8,83 +8,70 @@ use models::{DemogState, EconState, GovState};
 mod util;
 use util::fmt_currency;
 
+use serde_json::Value;
+use std::fs::File;
+use std::io::Read;
+
 fn main() {
     let mut app = App::new();
 
-    // 1. Load your core system plugins
+    // 1. Load system plugin rules once
     app.add_plugin(&EconPlugin);
     app.add_plugin(&GovPlugin);
     app.add_plugin(&DemogPlugin);
 
-    // 2. Register distinct parallel runners for each country-component block
-    let countries = vec!["us", "cn", "de"];
+    // 2. Register system archetypes precisely ONCE into the scheduler
+    app.scheduler.add_system("econ", Box::new(EconSystem));
+    app.scheduler.add_system("gov", Box::new(GovSystem));
+    app.scheduler.add_system("demog", Box::new(DemogSystem));
 
-    for country in &countries {
-        let econ_key = Box::leak(format!("{}:econ", country).into_boxed_str());
-        let gov_key = Box::leak(format!("{}:gov", country).into_boxed_str());
-        let demog_key = Box::leak(format!("{}:demog", country).into_boxed_str());
+    // 3. Open and ingest hierarchical simulation configuration asset
+    let mut file = File::open("simulation_config.json").expect("Failed to locate simulation_config.json");
+    let mut json_str = String::new();
+    file.read_to_string(&mut json_str).unwrap();
 
-        app.state.insert(econ_key, EconState::default());
-        app.state.insert(gov_key, GovState::default());
-        app.state.insert(demog_key, DemogState::default());
+    let root_data: Value = serde_json::from_str(&json_str).expect("Failed to parse config schema");
 
-        app.scheduler.add_system(econ_key, Box::new(EconSystem));
-        app.scheduler.add_system(gov_key, Box::new(GovSystem));
-        app.scheduler.add_system(demog_key, Box::new(DemogSystem));
+    // Helper macro to generate static leaking string identifiers for nested keys safely
+    fn intern_key(prefix: &str, component: &str) -> &'static str {
+        Box::leak(format!("{}:{}", prefix, component).into_boxed_str())
     }
 
-    // 3. Seed distinct geopolitical profiles using the dual-buffer update tool
-    app.update_state::<EconState>("us:econ", |econ| {
-        econ.gdp = 27_000_000_000_000.0; // $27 Trillion
-        econ.inflation = 0.024;
-    });
-    app.update_state::<GovState>("us:gov", |gov| {
-        gov.tax_rate = 0.21;
-        gov.stability = 0.82;
-    });
-    app.update_state::<DemogState>("us:demog", |demog| {
-        demog.population = 334_000_000;
-        demog.birth_rate = 0.012;
-    });
+    // Recursive function to step down through nested regional geographical branches
+    fn parse_region_node(app: &mut App, current_prefix: &str, node: &Value) {
+        if let Some(components) = node.get("components") {
+            if let Some(econ_val) = components.get("econ") {
+                let state: EconState = serde_json::from_value(econ_val.clone()).unwrap();
+                app.state.insert(intern_key(current_prefix, "econ"), state);
+            }
+            if let Some(gov_val) = components.get("gov") {
+                let state: GovState = serde_json::from_value(gov_val.clone()).unwrap();
+                app.state.insert(intern_key(current_prefix, "gov"), state);
+            }
+            if let Some(demog_val) = components.get("demog") {
+                let state: DemogState = serde_json::from_value(demog_val.clone()).unwrap();
+                app.state.insert(intern_key(current_prefix, "demog"), state);
+            }
+        }
 
-    app.update_state::<EconState>("cn:econ", |econ| {
-        econ.gdp = 18_500_000_000_000.0; // $18.5 Trillion
-        econ.inflation = 0.015;
-    });
-    app.update_state::<GovState>("cn:gov", |gov| {
-        gov.tax_rate = 0.28;
-        gov.stability = 0.88;
-    });
-    app.update_state::<DemogState>("cn:demog", |demog| {
-        demog.population = 1_412_000_000;
-        demog.birth_rate = 0.010;
-    });
+        // Parse child geographies recursively (e.g., "us" -> "us:los_angeles")
+        if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
+            for (sub_name, sub_node) in sub_regions {
+                let next_prefix = format!("{}:{}", current_prefix, sub_name);
+                parse_region_node(app, &next_prefix, sub_node);
+            }
+        }
+    }
 
-    app.update_state::<EconState>("de:econ", |econ| {
-        econ.gdp = 4_200_000_000_000.0; // $4.2 Trillion
-        econ.inflation = 0.017;
-    });
-    app.update_state::<GovState>("de:gov", |gov| {
-        gov.tax_rate = 0.30;
-        gov.stability = 0.90;
-    });
-    app.update_state::<DemogState>("de:demog", |demog| {
-        demog.population = 83_000_000;
-        demog.birth_rate = 0.009;
-    });
+    if let Some(regions) = root_data.get("regions").and_then(|r| r.as_object()) {
+        for (region_name, region_node) in regions {
+            parse_region_node(&mut app, region_name, region_node);
+        }
+    }
 
-    println!("[cli] Launching parallel macro-simulation engine...");
+    println!("[cli] Geographical tree inflated into Double-Buffered parallel states.");
+    println!("[cli] Launching execution loops...");
     app.run(12, sdk::TimeGranularity::Yearly);
 
     app.summarize_state();
-
-    // Print final evaluations
-    let econ = app.state.get::<EconState>("econ");
-    println!("Final GDP: {}", fmt_currency(econ.gdp));
-
-    let gov = app.state.get::<GovState>("gov");
-    println!("Final stability: {:.2}%", gov.stability * 100.0);
-
-    let demog = app.state.get::<DemogState>("demog");
-    println!("Final population: {}", demog.population);
 }

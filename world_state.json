@@ -1,0 +1,17 @@
+{
+  "us": {
+    "econ": { "gdp": 27000000000000.0, "inflation": 0.024 },
+    "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.82 },
+    "demog": { "population": 334000000, "birth_rate": 0.012 }
+  },
+  "cn": {
+    "econ": { "gdp": 18500000000000.0, "inflation": 0.015 },
+    "gov": { "tax_rate": 0.28, "budget": 0.0, "stability": 0.88 },
+    "demog": { "population": 1412000000, "birth_rate": 0.010 }
+  },
+  "de": {
+    "econ": { "gdp": 42000000000000.0, "inflation": 0.017 },
+    "gov": { "tax_rate": 0.30, "budget": 0.0, "stability": 0.90 },
+    "demog": { "population": 83000000, "birth_rate": 0.009 }
+  }
+}
