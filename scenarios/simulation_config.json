@@ -1,10 +1,18 @@
 {
   "meta": {
-    "version": "1.0.0",
-    "description": "Global multi-tier macro-scenario baseline"
+    "version": "1.1.0",
+    "description": "Expanded global multi-tier macro-scenario baseline for sovereign powers, regional states, and metropolises."
   },
   "archetypes": {
     "sovereign_developed": {
+      "execution_mode": "heuristic",
+      "model_weights_path": null
+    },
+    "sovereign_developing": {
+      "execution_mode": "heuristic",
+      "model_weights_path": null
+    },
+    "regional_subdivision": {
       "execution_mode": "heuristic",
       "model_weights_path": null
     },
@@ -17,27 +25,103 @@
     "us": {
       "archetype": "sovereign_developed",
       "components": {
-        "econ": { "gdp": 27000000000000.0, "inflation": 0.024 },
-        "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.82 },
-        "demog": { "population": 334000000, "birth_rate": 0.012 }
+        "econ": { "gdp": 27360000000000.0, "inflation": 0.024 },
+        "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.85 },
+        "demog": { "population": 336000000, "birth_rate": 0.012 }
       },
       "sub_regions": {
-        "los_angeles": {
-          "archetype": "urban_metropolitan",
+        "california": {
+          "archetype": "regional_subdivision",
           "components": {
-            "econ": { "gdp": 1000000000000.0, "inflation": 0.026 },
-            "gov": { "tax_rate": 0.08, "budget": 0.0, "stability": 0.78 },
-            "demog": { "population": 3800000, "birth_rate": 0.011 }
+            "econ": { "gdp": 3860000000000.0, "inflation": 0.026 },
+            "gov": { "tax_rate": 0.088, "budget": 0.0, "stability": 0.88 },
+            "demog": { "population": 39000000, "birth_rate": 0.011 }
+          },
+          "sub_regions": {
+            "los_angeles": {
+              "archetype": "urban_metropolitan",
+              "components": {
+                "econ": { "gdp": 1120000000000.0, "inflation": 0.027 },
+                "gov": { "tax_rate": 0.012, "budget": 0.0, "stability": 0.82 },
+                "demog": { "population": 3820000, "birth_rate": 0.010 }
+              }
+            },
+            "san_francisco": {
+              "archetype": "urban_metropolitan",
+              "components": {
+                "econ": { "gdp": 620000000000.0, "inflation": 0.029 },
+                "gov": { "tax_rate": 0.015, "budget": 0.0, "stability": 0.80 },
+                "demog": { "population": 810000, "birth_rate": 0.009 }
+              }
+            }
+          }
+        },
+        "texas": {
+          "archetype": "regional_subdivision",
+          "components": {
+            "econ": { "gdp": 2560000000000.0, "inflation": 0.023 },
+            "gov": { "tax_rate": 0.062, "budget": 0.0, "stability": 0.91 },
+            "demog": { "population": 30500000, "birth_rate": 0.013 }
           }
         }
       }
     },
     "cn": {
+      "archetype": "sovereign_developing",
+      "components": {
+        "econ": { "gdp": 18560000000000.0, "inflation": 0.015 },
+        "gov": { "tax_rate": 0.28, "budget": 0.0, "stability": 0.89 },
+        "demog": { "population": 1412000000, "birth_rate": 0.009 }
+      },
+      "sub_regions": {
+        "guangdong": {
+          "archetype": "regional_subdivision",
+          "components": {
+            "econ": { "gdp": 1920000000000.0, "inflation": 0.014 },
+            "gov": { "tax_rate": 0.24, "budget": 0.0, "stability": 0.92 },
+            "demog": { "population": 127000000, "birth_rate": 0.010 }
+          }
+        }
+      }
+    },
+    "de": {
       "archetype": "sovereign_developed",
       "components": {
-        "econ": { "gdp": 18500000000000.0, "inflation": 0.015 },
-        "gov": { "tax_rate": 0.28, "budget": 0.0, "stability": 0.88 },
-        "demog": { "population": 1412000000, "birth_rate": 0.010 }
+        "econ": { "gdp": 4430000000000.0, "inflation": 0.021 },
+        "gov": { "tax_rate": 0.31, "budget": 0.0, "stability": 0.92 },
+        "demog": { "population": 84300000, "birth_rate": 0.009 }
+      }
+    },
+    "fr": {
+      "archetype": "sovereign_developed",
+      "components": {
+        "econ": { "gdp": 3050000000000.0, "inflation": 0.022 },
+        "gov": { "tax_rate": 0.34, "budget": 0.0, "stability": 0.84 },
+        "demog": { "population": 68000000, "birth_rate": 0.011 }
+      }
+    },
+    "jp": {
+      "archetype": "sovereign_developed",
+      "components": {
+        "econ": { "gdp": 4210000000000.0, "inflation": 0.018 },
+        "gov": { "tax_rate": 0.26, "budget": 0.0, "stability": 0.94 },
+        "demog": { "population": 124000000, "birth_rate": 0.007 }
+      }
+    },
+    "in": {
+      "archetype": "sovereign_developing",
+      "components": {
+        "econ": { "gdp": 3940000000000.0, "inflation": 0.048 },
+        "gov": { "tax_rate": 0.18, "budget": 0.0, "stability": 0.79 },
+        "demog": { "population": 1440000000, "birth_rate": 0.016 }
+      }
+    },
+    "gb": {
+      "archetype": "sovereign_developed",
+      "components": {
+        "econ": { "gdp": 3340000000000.0, "inflation": 0.025 },
+        "gov": { "tax_rate": 0.29, "budget": 0.0, "stability": 0.81 },
+        "demog": { "population": 68200000, "birth_rate": 0.010 }
       }
     }
   }

@@ -32,7 +32,11 @@ impl App {
 
     pub fn summarize_state(&self) {
         println!("[core] Final state keys:");
-        for key in self.state.keys() {
+
+        let mut keys: Vec<_> = self.state.keys().cloned().collect();
+        keys.sort();
+
+        for key in keys {
             println!("  - {}", key);
         }
     }
