@@ -114,6 +114,47 @@ cargo run --bin cli
 
 ---
 
+## TODO
+
+### Core Engine
+
+- Add `GovType` and `EconSystemType` enums to `models` and propagate through `SimulationState`.
+- Implement a transition system in `core` to support mid-simulation switching of government and economic types.
+- Extend the scheduler to allow dynamic system registration/deregistration at runtime.
+- Add cross-domain coupling hooks in `SimulationState` to enable direct econ ↔ gov ↔ demog interactions.
+- Refactor state diffing to track and report system transitions and cross-domain effects.
+
+### Plugins
+
+- Update `gov` plugin to support multiple government types using the new `GovType` enum.
+- Update `econ` plugin to support multiple economic systems using the new `EconSystemType` enum.
+- Implement plugin logic for handling mid-simulation transitions (e.g., democracy → autocracy, market → planned).
+- Add cross-domain effect handlers in each plugin to respond to changes in other domains.
+
+### Scenario Format
+
+- Extend scenario JSON schema to accept `gov_type` and `econ_system_type` fields for each region/component.
+- Add support for specifying scheduled or conditional system transitions in scenario files.
+- Allow cross-domain coupling parameters (e.g., tax policy impact on demography) in scenario JSON.
+
+### CLI/UX
+
+- Update CLI to validate and display new scenario schema fields (`gov_type`, `econ_system_type`, transitions).
+- Add CLI options to trigger or schedule system transitions during simulation runs.
+- Enhance output to clearly show when and where system transitions and cross-domain effects occur.
+
+### Labs
+
+- support for Python bindings (pyo3)
+
+### Testing
+
+- Add unit and integration tests for government and economic system transitions.
+- Add tests for scenario parsing with new fields and transition logic.
+- Add regression tests for cross-domain coupling to ensure deterministic and reproducible results.
+
+---
+
 ## License
 
 PolyForm Noncommercial License 1.0.0 — see LICENSE.md for details.
