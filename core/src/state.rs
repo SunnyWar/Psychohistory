@@ -1,4 +1,26 @@
+// core/src/state.rs
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use sdk::ReadSnapshot;
+use std::any::Any;
+use std::collections::HashMap;
+
+type ClonerFn = Box<
+    dyn Fn(
+            &Box<dyn Any + Send + Sync>,
+            Option<&mut Box<dyn Any + Send + Sync>>,
+        ) -> Option<Box<dyn Any + Send + Sync>>
+        + Send
+        + Sync,
+>;
+
+type ClonerMap = HashMap<&'static str, ClonerFn>;
+
+pub struct SimulationState {
+    pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    cloners: ClonerMap,
+}
+
 impl SimulationState {
     /// Mutates a component state across both the current and next data planes.
     /// Essential for seeding initial baselines prior to running the simulation loop.
@@ -35,26 +57,6 @@ impl SimulationState {
             f(snapshot_ref, key, val);
         });
     }
-}
-// core/src/state.rs
-use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
-use std::any::Any;
-use std::collections::HashMap;
-
-type ClonerFn = Box<
-    dyn Fn(
-            &Box<dyn Any + Send + Sync>,
-            Option<&mut Box<dyn Any + Send + Sync>>,
-        ) -> Option<Box<dyn Any + Send + Sync>>
-        + Send
-        + Sync,
->;
-type ClonerMap = HashMap<&'static str, ClonerFn>;
-
-pub struct SimulationState {
-    pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    cloners: ClonerMap,
 }
 
 impl SimulationState {

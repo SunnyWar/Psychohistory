@@ -15,6 +15,10 @@ pub struct SimulationTime {
     pub granularity: TimeGranularity,
 }
 
+pub struct ReadSnapshot<'a> {
+    inner: &'a HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+}
+
 impl SimulationTime {
     /// Returns the fractional portion of a calendar year represented by a single simulation step.
     pub fn delta_years(&self) -> f64 {
@@ -24,10 +28,6 @@ impl SimulationTime {
             TimeGranularity::Monthly => 1.0 / 12.0,
         }
     }
-}
-
-pub struct ReadSnapshot<'a> {
-    inner: &'a HashMap<&'static str, Box<dyn Any + Send + Sync>>,
 }
 
 impl<'a> ReadSnapshot<'a> {

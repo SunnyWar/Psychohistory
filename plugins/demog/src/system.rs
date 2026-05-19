@@ -21,4 +21,3 @@ impl System for DemogSystem {
         DemogPlugin.step(snapshot, bucket, time);
     }
 }
-// plugins/demog/src/system.rs

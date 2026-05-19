@@ -4,13 +4,12 @@ use demog::{DemogPlugin, DemogSystem};
 use econ::{EconPlugin, EconSystem};
 use gov::{GovPlugin, GovSystem};
 use models::{DemogState, EconState, GovState};
-
-mod util;
-use util::fmt_currency;
-
 use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
+use util::fmt_currency;
+
+mod util;
 
 fn main() {
     let mut app = App::new();
@@ -26,7 +25,8 @@ fn main() {
     app.scheduler.add_system("demog", Box::new(DemogSystem));
 
     // 3. Open and ingest hierarchical simulation configuration asset
-    let mut file = File::open("simulation_config.json").expect("Failed to locate simulation_config.json");
+    let mut file =
+        File::open("simulation_config.json").expect("Failed to locate simulation_config.json");
     let mut json_str = String::new();
     file.read_to_string(&mut json_str).unwrap();
 
@@ -71,7 +71,7 @@ fn main() {
 
     println!("[cli] Geographical tree inflated into Double-Buffered parallel states.");
     println!("[cli] Launching execution loops...");
-    app.run(12, sdk::TimeGranularity::Yearly);
+    app.run(20, sdk::TimeGranularity::Yearly);
 
     app.summarize_state();
 }

@@ -1,7 +1,7 @@
-use sdk::TimeGranularity;
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
+use sdk::TimeGranularity;
 
 pub struct App {
     pub state: SimulationState,

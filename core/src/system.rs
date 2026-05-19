@@ -4,18 +4,6 @@ use sdk::ReadSnapshot;
 use sdk::SimulationTime;
 use std::any::Any;
 
-pub trait System {
-    fn name(&self) -> &'static str;
-    /// Parallel bucket execution for Scheduler
-    fn run_system(
-        &self,
-        snapshot: &ReadSnapshot,
-        bucket: &mut Box<dyn Any + Send + Sync>,
-        time: SimulationTime,
-        _key: &'static str,
-    );
-}
-
 type SystemRunner = Box<dyn Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>) + Send + Sync>;
 
 pub struct ParallelSystem {
@@ -65,4 +53,16 @@ impl System for ParallelSystem {
     ) {
         (self.runner)(snapshot, bucket);
     }
+}
+
+pub trait System {
+    fn name(&self) -> &'static str;
+    /// Parallel bucket execution for Scheduler
+    fn run_system(
+        &self,
+        snapshot: &ReadSnapshot,
+        bucket: &mut Box<dyn Any + Send + Sync>,
+        time: SimulationTime,
+        _key: &'static str,
+    );
 }

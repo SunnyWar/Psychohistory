@@ -1,5 +1,3 @@
-// models/src/lib.rs
-
 /// Economic state engine configuration.
 /// Aligned to 64 bytes to match standard CPU cache line layout,
 /// preventing cross-core cache invalidation when threads process distinct domains.

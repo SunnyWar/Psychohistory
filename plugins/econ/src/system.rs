@@ -2,6 +2,8 @@ use crate::plugin::EconPlugin;
 use core::system::System;
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
+// plugins/econ/src/system.rs
+use models::{DemogState, EconState};
 
 pub struct EconSystem;
 
@@ -21,8 +23,6 @@ impl System for EconSystem {
         EconPlugin.step(snapshot, bucket, time);
     }
 }
-// plugins/econ/src/system.rs
-use models::{DemogState, EconState};
 
 pub fn run_econ_system(world: &ReadSnapshot, my_state: &mut Box<dyn std::any::Any + Send + Sync>) {
     // 1. Downcast your own mutable slice directly from the passed-in block

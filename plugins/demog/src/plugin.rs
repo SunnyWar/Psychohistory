@@ -1,5 +1,13 @@
 use core::app::App;
 use core::plugin::Plugin;
+// plugins/demog/src/plugin.rs
+use models::{DemogState, GovState};
+use sdk::ReadSnapshot;
+use sdk::SimulationPlugin;
+use std::any::Any;
+
+pub struct DemogPlugin;
+
 // --- Plugin Registration ---
 impl Plugin for DemogPlugin {
     const NAME: &'static str = "demog";
@@ -12,13 +20,6 @@ impl Plugin for DemogPlugin {
         println!("[demog] Plugin build called");
     }
 }
-// plugins/demog/src/plugin.rs
-use models::{DemogState, GovState};
-use sdk::ReadSnapshot;
-use sdk::SimulationPlugin;
-use std::any::Any;
-
-pub struct DemogPlugin;
 
 impl SimulationPlugin for DemogPlugin {
     fn name(&self) -> &'static str {
