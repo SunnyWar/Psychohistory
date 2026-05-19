@@ -1,17 +1,28 @@
 // models/src/lib.rs
-#[derive(Debug, Clone, Default)]
+
+/// Economic state engine configuration.
+/// Aligned to 64 bytes to match standard CPU cache line layout, 
+/// preventing cross-core cache invalidation when threads process distinct domains.
+#[repr(align(64))]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct EconState {
     pub gdp: f64,
     pub inflation: f64,
 }
 
-#[derive(Debug, Clone, Default)]
+
+/// Demographic state component tracking macro population metrics.
+#[repr(align(64))]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct DemogState {
     pub population: u64,
     pub birth_rate: f64,
 }
 
-#[derive(Debug, Clone, Default)]
+
+/// Governance state metrics managing fiscal rules and societal stability.
+#[repr(align(64))]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct GovState {
     pub tax_rate: f64,
     pub budget: f64,
