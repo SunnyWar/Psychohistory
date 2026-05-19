@@ -1,7 +1,7 @@
-use core::{system::System, time::SimulationTime};
+use crate::plugin::DemogPlugin;
+use core::{SimulationState, SimulationTime, System};
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
-use crate::plugin::DemogPlugin;
 
 pub struct DemogSystem;
 
@@ -10,7 +10,7 @@ impl System for DemogSystem {
         "demog"
     }
 
-    fn run(&mut self, _state: &mut core::state::SimulationState, _time: SimulationTime) {
+    fn run(&mut self, _state: &mut SimulationState, _time: SimulationTime) {
         // Obsolete legacy sequential hook—can remain empty or log a warning
     }
 

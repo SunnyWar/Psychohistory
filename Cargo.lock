@@ -112,6 +112,7 @@ name = "cli"
 version = "0.1.0"
 dependencies = [
  "core",
+ "demog",
  "econ",
  "gov",
  "models",
@@ -171,6 +172,7 @@ checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 name = "demog"
 version = "0.1.0"
 dependencies = [
+ "core",
  "models",
  "sdk",
 ]

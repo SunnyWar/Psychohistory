@@ -1,8 +1,8 @@
 // plugins/gov/src/system.rs
+use crate::plugin::GovPlugin;
 use core::{state::SimulationState, system::System, time::SimulationTime};
 use models::GovState;
 use sdk::{ReadSnapshot, SimulationPlugin};
-use crate::plugin::GovPlugin;
 
 pub struct GovSystem;
 

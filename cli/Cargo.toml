@@ -11,5 +11,6 @@ rust_decimal_macros = "1.40.0"
 core = { path = "../core" }
 econ = { path = "../plugins/econ" }
 gov = { path = "../plugins/gov" }
+demog = { path = "../plugins/demog" }
 models = { path = "../models" }
 

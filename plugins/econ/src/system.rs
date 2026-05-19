@@ -1,7 +1,7 @@
+use crate::plugin::EconPlugin;
 use core::{system::System, time::SimulationTime};
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
-use crate::plugin::EconPlugin;
 
 pub struct EconSystem;
 
