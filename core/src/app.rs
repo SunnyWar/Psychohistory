@@ -3,8 +3,9 @@ use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
 use sdk::TimeGranularity;
 
+use models::{DemogState, EconState, GovState};
 use std::collections::HashMap;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
 #[derive(Clone, PartialEq)]
 pub enum DomainState {
@@ -12,6 +13,120 @@ pub enum DomainState {
     Gov(models::GovState),
     Demog(models::DemogState),
     Unknown(String),
+}
+// Color helpers
+const GREEN: &str = "\x1b[32m";
+const RED: &str = "\x1b[31m";
+const YELLOW: &str = "\x1b[33m";
+const RESET: &str = "\x1b[0m";
+
+fn colorize_change_f64(before: f64, after: f64) -> Option<String> {
+    if (before - after).abs() < std::f64::EPSILON {
+        None
+    } else if after > before {
+        Some(format!("{GREEN}{}{RESET}", after))
+    } else {
+        Some(format!("{RED}{}{RESET}", after))
+    }
+}
+
+fn colorize_change_u64(before: u64, after: u64) -> Option<String> {
+    if before == after {
+        None
+    } else if after > before {
+        Some(format!("{GREEN}{}{RESET}", after))
+    } else {
+        Some(format!("{RED}{}{RESET}", after))
+    }
+}
+
+fn colorize_change_str(before: &str, after: &str) -> Option<String> {
+    if before == after {
+        None
+    } else {
+        Some(format!("{YELLOW}{}{RESET}", after))
+    }
+}
+
+fn print_field_diff<T: Display>(
+    label: &str,
+    before: T,
+    after: T,
+    colorized: Option<String>,
+) -> bool {
+    if let Some(colored) = colorized {
+        println!("  {:15} {} → {}", label, before, colored);
+        true
+    } else {
+        false
+    }
+}
+
+trait StateDiff {
+    fn print_diff(&self, after: &Self) -> bool;
+}
+
+impl StateDiff for DemogState {
+    fn print_diff(&self, after: &Self) -> bool {
+        let mut changed = false;
+        changed |= print_field_diff(
+            "population",
+            self.population,
+            after.population,
+            colorize_change_u64(self.population, after.population),
+        );
+        changed |= print_field_diff(
+            "birth_rate",
+            self.birth_rate,
+            after.birth_rate,
+            colorize_change_f64(self.birth_rate, after.birth_rate),
+        );
+        changed
+    }
+}
+
+impl StateDiff for EconState {
+    fn print_diff(&self, after: &Self) -> bool {
+        let mut changed = false;
+        changed |= print_field_diff(
+            "gdp",
+            self.gdp,
+            after.gdp,
+            colorize_change_f64(self.gdp, after.gdp),
+        );
+        changed |= print_field_diff(
+            "inflation",
+            self.inflation,
+            after.inflation,
+            colorize_change_f64(self.inflation, after.inflation),
+        );
+        changed
+    }
+}
+
+impl StateDiff for GovState {
+    fn print_diff(&self, after: &Self) -> bool {
+        let mut changed = false;
+        changed |= print_field_diff(
+            "tax_rate",
+            self.tax_rate,
+            after.tax_rate,
+            colorize_change_f64(self.tax_rate, after.tax_rate),
+        );
+        changed |= print_field_diff(
+            "budget",
+            self.budget,
+            after.budget,
+            colorize_change_f64(self.budget, after.budget),
+        );
+        changed |= print_field_diff(
+            "stability",
+            self.stability,
+            after.stability,
+            colorize_change_f64(self.stability, after.stability),
+        );
+        changed
+    }
 }
 
 impl Debug for DomainState {
@@ -90,10 +205,17 @@ impl App {
         for key in &keys {
             let before = self.initial_state.get(key);
             let after = final_snapshot.get(key);
-            if let (Some(before), Some(after)) = (before, after) {
-                if let Some(diff) = diff_states(before, after) {
-                    println!("{}: {}", key, diff);
-                }
+            let mut any_change = false;
+            if let (Some(DomainState::Demog(b)), Some(DomainState::Demog(a))) = (before, after) {
+                any_change = b.print_diff(a);
+            } else if let (Some(DomainState::Econ(b)), Some(DomainState::Econ(a))) = (before, after)
+            {
+                any_change = b.print_diff(a);
+            } else if let (Some(DomainState::Gov(b)), Some(DomainState::Gov(a))) = (before, after) {
+                any_change = b.print_diff(a);
+            }
+            if any_change {
+                println!("\n[{}]", key);
             }
         }
     }
