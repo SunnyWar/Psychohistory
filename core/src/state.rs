@@ -3,7 +3,7 @@ use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use std::any::Any;
 use std::collections::HashMap;
 
-type ClonerFn = Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>;
+type ClonerFn = Box<dyn Fn(&Box<dyn Any + Send + Sync>, Option<&mut Box<dyn Any + Send + Sync>>) -> Option<Box<dyn Any + Send + Sync>> + Send + Sync>;
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
 pub struct SimulationState {
@@ -39,12 +39,18 @@ impl SimulationState {
         self.current.insert(key, Box::new(value.clone()));
         self.next.insert(key, Box::new(value));
 
-        // Capture how to clone this concrete type T dynamically
+        // Capture how to clone this concrete type T dynamically, in-place
         self.cloners.insert(
             key,
-            Box::new(|boxed_any| {
-                let concrete = boxed_any.downcast_ref::<T>().unwrap();
-                Box::new(concrete.clone())
+            Box::new(|src_boxed, target| {
+                let src_concrete = src_boxed.downcast_ref::<T>().unwrap();
+                if let Some(target_boxed) = target {
+                    let dst_concrete = target_boxed.downcast_mut::<T>().unwrap();
+                    dst_concrete.clone_from(src_concrete);
+                    None
+                } else {
+                    Some(Box::new(src_concrete.clone()))
+                }
             }),
         );
     }
@@ -90,14 +96,26 @@ impl SimulationState {
         // Swap the current and next maps efficiently
         std::mem::swap(&mut self.current, &mut self.next);
 
-        // Repopulate self.next to mirror self.current for the next tick, reusing allocations
-        // Remove any keys from self.next that are not in self.current
-        self.next.retain(|key, _| self.current.contains_key(key));
+        // Unify retention and in-place update: retain only keys present in current, and update them in-place
+        self.next.retain(|key, existing_box| {
+            if let Some(val) = self.current.get(key) {
+                if let Some(cloner) = self.cloners.get(key) {
+                    cloner(val, Some(existing_box));
+                }
+                true
+            } else {
+                false
+            }
+        });
 
-        // For each key in self.current, update or insert the cloned value into self.next
+        // Insert any new keys from current that are missing in next
         for (key, val) in &self.current {
-            if let Some(cloner) = self.cloners.get(key) {
-                self.next.insert(*key, cloner(val));
+            if !self.next.contains_key(key) {
+                if let Some(cloner) = self.cloners.get(key) {
+                    if let Some(new_box) = cloner(val, None) {
+                        self.next.insert(*key, new_box);
+                    }
+                }
             }
         }
     }

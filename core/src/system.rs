@@ -40,7 +40,7 @@ impl SimulationState {
             .iter()
             .map(|(&k, v)| {
                 let cloner = self.cloners().get(&k).expect("Cloner not found");
-                (k, cloner(v))
+                (k, cloner(v, None).expect("Cloner must return Some(Box) for snapshot"))
             })
             .collect();
         let snapshot = ReadSnapshot::new(&temp_map);
@@ -65,7 +65,7 @@ impl System for ParallelSystem {
             .iter()
             .map(|(&k, v)| {
                 let cloner = state.cloners().get(&k).expect("Cloner not found");
-                (k, cloner(v))
+                (k, cloner(v, None).expect("Cloner must return Some(Box) for snapshot"))
             })
             .collect();
         let world_snapshot = ReadSnapshot::new(&temp_map);
