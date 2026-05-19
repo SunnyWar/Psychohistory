@@ -71,7 +71,7 @@ fn main() {
 
     println!("[cli] Geographical tree inflated into Double-Buffered parallel states.");
     println!("[cli] Launching execution loops...");
-    app.run(20, sdk::TimeGranularity::Yearly);
+    app.run(20 * 12, sdk::TimeGranularity::Monthly);
 
     app.summarize_state();
 }
