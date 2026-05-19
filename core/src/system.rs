@@ -7,10 +7,12 @@ pub trait System {
     fn run(&mut self, state: &mut SimulationState, time: SimulationTime);
 }
 
+type SystemRunner = Box<dyn Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>) + Send + Sync>;
+
 pub struct ParallelSystem {
     name: &'static str,
     key: &'static str,
-    runner: Box<dyn Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>) + Send + Sync>,
+    runner: SystemRunner,
 }
 
 impl ParallelSystem {

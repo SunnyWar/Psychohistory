@@ -3,23 +3,19 @@ use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use std::any::Any;
 use std::collections::HashMap;
 
+type ClonerFn =
+    Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>;
+type ClonerMap = HashMap<&'static str, ClonerFn>;
+
 pub struct SimulationState {
     current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    cloners: HashMap<
-        &'static str,
-        Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>,
-    >,
+    cloners: ClonerMap,
 }
 
 impl SimulationState {
     /// Public accessor for the cloners map (for snapshotting)
-    pub fn cloners(
-        &self,
-    ) -> &HashMap<
-        &'static str,
-        Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>,
-    > {
+    pub fn cloners(&self) -> &ClonerMap {
         &self.cloners
     }
     pub fn new() -> Self {
@@ -33,15 +29,15 @@ impl SimulationState {
     /// Inserts a new component state. Requires `Clone + Send + Sync` to support multi-threading.
     pub fn insert<T: 'static + Clone + Send + Sync>(&mut self, key: &'static str, value: T) {
         // Prevent type mismatch for existing keys
-        if let Some(existing) = self.current.get(key) {
-            if existing.type_id() != std::any::TypeId::of::<T>() {
-                panic!(
-                    "Type mismatch for key '{}': tried to insert {} but existing type is {:?}",
-                    key,
-                    std::any::type_name::<T>(),
-                    existing.type_id()
-                );
-            }
+        if let Some(existing) = self.current.get(key)
+            && (**existing).type_id() != std::any::TypeId::of::<T>()
+        {
+            panic!(
+                "Type mismatch for key '{}': tried to insert {} but existing type is {:?}",
+                key,
+                std::any::type_name::<T>(),
+                (**existing).type_id()
+            );
         }
         self.current.insert(key, Box::new(value.clone()));
         self.next.insert(key, Box::new(value));
