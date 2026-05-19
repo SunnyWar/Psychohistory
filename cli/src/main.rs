@@ -1,4 +1,3 @@
-use sdk::TimeGranularity;
 // cli/src/main.rs
 use core::App;
 use demog::{DemogPlugin, DemogSystem};
