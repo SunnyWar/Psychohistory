@@ -1,6 +1,5 @@
 use crate::plugin::EconPlugin;
 use core::system::System;
-use sdk::SimulationTime;
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
@@ -9,10 +8,6 @@ pub struct EconSystem;
 impl System for EconSystem {
     fn name(&self) -> &'static str {
         "econ"
-    }
-
-    fn run(&mut self, _state: &mut core::state::SimulationState, _time: SimulationTime) {
-        // Legacy single-threaded fallback loop - intentionally left blank
     }
 
     fn run_system(
