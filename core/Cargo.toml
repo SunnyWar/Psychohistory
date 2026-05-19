@@ -4,4 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+models = { workspace = true }
+sdk = { workspace = true }
 indicatif = "0.18.4"
+rayon = "1.12.0"

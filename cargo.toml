@@ -3,9 +3,9 @@ resolver = "2"
 members = [
     "cli",
     "core",
-    "sdk",
-    "models",
     "lab",
+    "models",
+    "sdk",
     "plugins/demog",
     "plugins/econ",
     "plugins/gov",
@@ -14,3 +14,4 @@ members = [
 [workspace.dependencies]
 models = { path = "models" }
 sdk = { path = "sdk" }
+core = { path = "core" }

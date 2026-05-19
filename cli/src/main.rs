@@ -15,9 +15,9 @@ fn main() {
 
     app.summarize_state();
 
-    let econ = app.state.get_mut::<EconState>("econ");
+    let econ = app.state.get::<EconState>("econ");
     println!("Final GDP: {}", fmt_currency(econ.gdp));
 
-    let gov = app.state.get_mut::<GovState>("gov");
+    let gov = app.state.get::<GovState>("gov");
     println!("Final stability: {:.2}%", gov.stability * 100.0);
 }

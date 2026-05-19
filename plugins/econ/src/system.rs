@@ -1,21 +1,16 @@
-use crate::EconState;
-use core::{state::SimulationState, system::System, time::SimulationTime};
+use models::{DemogState, EconState};
+use sdk::ReadSnapshot;
 
-pub struct EconSystem;
+pub fn run_econ_system(world: &ReadSnapshot, my_state: &mut Box<dyn std::any::Any + Send + Sync>) {
+    // 1. Downcast your own mutable slice directly from the passed-in block
+    let econ = my_state
+        .downcast_mut::<EconState>()
+        .expect("Failed to downcast to EconState");
 
-impl System for EconSystem {
-    fn name(&self) -> &'static str {
-        "econ"
-    }
-
-    fn dependencies(&self) -> &'static [&'static str] {
-        &[]
-    }
-
-    fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
-        let econ = state.get_mut::<EconState>("econ");
-
-        econ.gdp *= 1.001;
-        econ.inflation *= 0.999;
+    // 2. Read safely from other states using the snapshot
+    if let Some(demog) = world.get::<DemogState>("demog") {
+        if demog.population > 10_000_000 {
+            econ.gdp += 500_000.0;
+        }
     }
 }
