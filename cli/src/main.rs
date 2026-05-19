@@ -10,8 +10,8 @@ use util::fmt_currency;
 fn main() {
     let mut app = App::new();
 
-    app.add_plugin(EconPlugin);
-    app.add_plugin(GovPlugin);
+    app.add_plugin(&EconPlugin);
+    app.add_plugin(&GovPlugin);
 
     app.run(12);
 

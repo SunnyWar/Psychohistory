@@ -14,7 +14,7 @@ impl App {
         }
     }
 
-    pub fn add_plugin<P: Plugin>(&mut self, plugin: P) {
+    pub fn add_plugin<P: Plugin>(&mut self, plugin: &P) {
         println!("[core] Loading plugin: {}", P::NAME);
         plugin.build(self);
     }
