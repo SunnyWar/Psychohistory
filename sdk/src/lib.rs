@@ -47,6 +47,5 @@ pub trait SimulationPlugin: Send + Sync {
         world: &ReadSnapshot,
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: SimulationTime,
-        key: &'static str,
     );
 }

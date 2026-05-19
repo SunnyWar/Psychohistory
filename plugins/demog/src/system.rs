@@ -15,10 +15,10 @@ impl System for DemogSystem {
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
-        key: &'static str,
+        _key: &'static str,
     ) {
         // Forward execution to the thread-safe plugin step function
-        DemogPlugin.step(snapshot, bucket, time, key);
+        DemogPlugin.step(snapshot, bucket, time);
     }
 }
 // plugins/demog/src/system.rs

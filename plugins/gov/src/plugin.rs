@@ -32,7 +32,6 @@ impl SimulationPlugin for GovPlugin {
         world: &ReadSnapshot,
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
-        key: &'static str,
     ) {
         let gov = my_state
             .downcast_mut::<GovState>()
@@ -40,11 +39,7 @@ impl SimulationPlugin for GovPlugin {
 
         let dt = time.delta_years();
 
-        // Extract country prefix (e.g., "us:gov" -> "us")
-        let prefix = key.split(':').next().unwrap_or("");
-        let econ_key = format!("{}:econ", prefix);
-
-        if let Some(econ) = world.get::<EconState>(Box::leak(econ_key.into_boxed_str())) {
+        if let Some(econ) = world.get::<EconState>("econ") {
             // Tax collection increments the treasury budget
             let tax_revenue = econ.gdp * gov.tax_rate * dt;
             gov.budget += tax_revenue;

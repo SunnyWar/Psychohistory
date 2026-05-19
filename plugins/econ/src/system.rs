@@ -15,10 +15,10 @@ impl System for EconSystem {
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
-        key: &'static str,
+        _key: &'static str,
     ) {
         // Dispatch directly into the parallel simulation execution block
-        EconPlugin.step(snapshot, bucket, time, key);
+        EconPlugin.step(snapshot, bucket, time);
     }
 }
 // plugins/econ/src/system.rs

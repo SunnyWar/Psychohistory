@@ -33,7 +33,6 @@ impl SimulationPlugin for EconPlugin {
         world: &ReadSnapshot,
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
-        key: &'static str,
     ) {
         let econ = my_state
             .downcast_mut::<EconState>()
@@ -41,19 +40,14 @@ impl SimulationPlugin for EconPlugin {
 
         let dt = time.delta_years();
 
-        // Extract country prefix (e.g., "us:econ" -> "us")
-        let prefix = key.split(':').next().unwrap_or("");
-
-        // Contextual lookups for this country
-        let demog_key = format!("{}:demog", prefix);
-        let gov_key = format!("{}:gov", prefix);
-
+        // If you need the key, pass it via the system runner or store in state.
+        // For now, fallback to single-country logic or refactor as needed.
         let population = world
-            .get::<DemogState>(Box::leak(demog_key.into_boxed_str()))
+            .get::<DemogState>("demog")
             .map(|d| d.population)
             .unwrap_or(0);
         let stability = world
-            .get::<GovState>(Box::leak(gov_key.into_boxed_str()))
+            .get::<GovState>("gov")
             .map(|g| g.stability)
             .unwrap_or(1.0);
 

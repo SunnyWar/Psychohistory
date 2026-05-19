@@ -31,7 +31,6 @@ impl SimulationPlugin for DemogPlugin {
         world: &ReadSnapshot,
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
-        key: &'static str,
     ) {
         let demog = my_state
             .downcast_mut::<DemogState>()
@@ -39,16 +38,13 @@ impl SimulationPlugin for DemogPlugin {
 
         let dt = time.delta_years();
 
-        // Extract country prefix (e.g., "us:demog" -> "us")
-        let prefix = key.split(':').next().unwrap_or("");
-        let gov_key = format!("{}:gov", prefix);
-
-        let stability_modifier =
-            if let Some(gov) = world.get::<GovState>(Box::leak(gov_key.into_boxed_str())) {
-                gov.tax_rate.min(0.5)
-            } else {
-                0.0
-            };
+        // If you need the key, pass it via the system runner or store in state.
+        // For now, fallback to single-country logic or refactor as needed.
+        let stability_modifier = if let Some(gov) = world.get::<GovState>("gov") {
+            gov.tax_rate.min(0.5)
+        } else {
+            0.0
+        };
 
         demog.birth_rate = 0.015 - stability_modifier * 0.01;
         demog.population = (demog.population as f64 * (1.0 + demog.birth_rate * dt)) as u64;
