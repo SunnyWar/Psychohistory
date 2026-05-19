@@ -3,8 +3,7 @@ use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use std::any::Any;
 use std::collections::HashMap;
 
-type ClonerFn =
-    Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>;
+type ClonerFn = Box<dyn Fn(&Box<dyn Any + Send + Sync>) -> Box<dyn Any + Send + Sync> + Send + Sync>;
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
 pub struct SimulationState {
@@ -29,9 +28,7 @@ impl SimulationState {
     /// Inserts a new component state. Requires `Clone + Send + Sync` to support multi-threading.
     pub fn insert<T: 'static + Clone + Send + Sync>(&mut self, key: &'static str, value: T) {
         // Prevent type mismatch for existing keys
-        if let Some(existing) = self.current.get(key)
-            && (**existing).type_id() != std::any::TypeId::of::<T>()
-        {
+        if let Some(existing) = self.current.get(key) && (**existing).type_id() != std::any::TypeId::of::<T>() {
             panic!(
                 "Type mismatch for key '{}': tried to insert {} but existing type is {:?}",
                 key,
@@ -90,13 +87,14 @@ impl SimulationState {
 
     /// Swaps buffers by copying changes from the `next` working space into the `current` state.
     pub fn advance_tick(&mut self) {
-        for (key, next_val) in &self.next {
-            if let Some(cloner) = self.cloners.get(key) {
-                self.current.insert(key, cloner(next_val));
-            }
-        }
-        self.next.clear();
-        // Repopulate next for the next tick
+        // Swap the current and next maps efficiently
+        std::mem::swap(&mut self.current, &mut self.next);
+
+        // Repopulate self.next to mirror self.current for the next tick, reusing allocations
+        // Remove any keys from self.next that are not in self.current
+        self.next.retain(|key, _| self.current.contains_key(key));
+
+        // For each key in self.current, update or insert the cloned value into self.next
         for (key, val) in &self.current {
             if let Some(cloner) = self.cloners.get(key) {
                 self.next.insert(*key, cloner(val));
