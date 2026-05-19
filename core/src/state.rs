@@ -118,3 +118,9 @@ impl SimulationState {
         &mut self.next
     }
 }
+
+impl Default for SimulationState {
+    fn default() -> Self {
+        Self::new()
+    }
+}

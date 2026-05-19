@@ -9,7 +9,8 @@ pub fn run_econ_system(world: &ReadSnapshot, my_state: &mut Box<dyn std::any::An
 
     // 2. Read safely from other states using the snapshot
     if let Some(demog) = world.get::<DemogState>("demog")
-        && demog.population > 10_000_000 {
-            econ.gdp += 500_000.0;
-        }
+        && demog.population > 10_000_000
+    {
+        econ.gdp += 500_000.0;
+    }
 }

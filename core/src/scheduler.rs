@@ -48,3 +48,9 @@ impl Scheduler {
         pb.finish_with_message("Simulation complete");
     }
 }
+
+impl Default for Scheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
