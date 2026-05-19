@@ -20,6 +20,7 @@ impl Plugin for EconPlugin {
         println!("[econ] Plugin build called");
     }
 }
+// --- End Plugin Registration ---
 
 // --- Simulation Logic ---
 impl SimulationPlugin for EconPlugin {
@@ -32,6 +33,7 @@ impl SimulationPlugin for EconPlugin {
         world: &ReadSnapshot,
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: sdk::SimulationTime,
+        key: &'static str,
     ) {
         let econ = my_state
             .downcast_mut::<EconState>()
@@ -39,13 +41,19 @@ impl SimulationPlugin for EconPlugin {
 
         let dt = time.delta_years();
 
-        // Fetch cross-cutting variables from the frozen read snapshot
+        // Extract country prefix (e.g., "us:econ" -> "us")
+        let prefix = key.split(':').next().unwrap_or("");
+
+        // Contextual lookups for this country
+        let demog_key = format!("{}:demog", prefix);
+        let gov_key = format!("{}:gov", prefix);
+
         let population = world
-            .get::<DemogState>("demog")
+            .get::<DemogState>(Box::leak(demog_key.into_boxed_str()))
             .map(|d| d.population)
             .unwrap_or(0);
         let stability = world
-            .get::<GovState>("gov")
+            .get::<GovState>(Box::leak(gov_key.into_boxed_str()))
             .map(|g| g.stability)
             .unwrap_or(1.0);
 
@@ -57,11 +65,16 @@ impl SimulationPlugin for EconPlugin {
             // High stability maximizes growth; inflation acts as a drag
             let stability_drag = stability.clamp(0.1, 1.0);
             let inflation_drag = 1.0 - econ.inflation;
-
             econ.gdp += growth_potential * stability_drag * inflation_drag;
         }
 
         // Inflation tracks dynamically based on economic heating
         econ.inflation = 0.015 + (econ.gdp * 0.000_000_000_01 * dt);
+
+        // Example: cross-country lookup (e.g., US econ can read China econ)
+        // if let Some(china_econ) = world.get::<EconState>("cn:econ") {
+        //     let import_drag = china_econ.inflation * 0.05;
+        //     econ.gdp -= econ.gdp * import_drag;
+        // }
     }
 }

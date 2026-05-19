@@ -15,8 +15,9 @@ impl System for GovSystem {
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn std::any::Any + Send + Sync>,
         time: sdk::SimulationTime,
+        key: &'static str,
     ) {
         // Dispatch directly into the parallel simulation execution block
-        GovPlugin.step(snapshot, bucket, time);
+        GovPlugin.step(snapshot, bucket, time, key);
     }
 }

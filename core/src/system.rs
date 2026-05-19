@@ -12,6 +12,7 @@ pub trait System {
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
         time: SimulationTime,
+        _key: &'static str,
     );
 }
 
@@ -25,11 +26,11 @@ pub struct ParallelSystem {
 impl ParallelSystem {
     pub fn new<F>(name: &'static str, runner: F) -> Self
     where
-        F: Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>) + Send + Sync + 'static,
+        F: Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>, &'static str) + Send + Sync + 'static,
     {
         Self {
             name,
-            runner: Box::new(runner),
+            runner: Box::new(move |snapshot, bucket| runner(snapshot, bucket, name)),
         }
     }
 }
@@ -60,6 +61,7 @@ impl System for ParallelSystem {
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
         _time: SimulationTime,
+        _key: &'static str,
     ) {
         (self.runner)(snapshot, bucket);
     }

@@ -43,7 +43,7 @@ impl Scheduler {
             let systems_ref = &self.systems;
             state.par_execute_systems(|snapshot, key, data_bucket| {
                 if let Some(system) = systems_ref.get(key) {
-                    system.run_system(snapshot, data_bucket, time);
+                    system.run_system(snapshot, data_bucket, time, key);
                 }
             });
 

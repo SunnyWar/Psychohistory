@@ -7,15 +7,15 @@ impl SimulationState {
         key: &'static str,
         mutator: &mut impl FnMut(&mut T),
     ) {
-        if let Some(boxed) = self.current.get_mut(key) {
-            if let Some(concrete) = boxed.downcast_mut::<T>() {
-                mutator(concrete);
-            }
+        if let Some(boxed) = self.current.get_mut(key)
+            && let Some(concrete) = boxed.downcast_mut::<T>()
+        {
+            mutator(concrete);
         }
-        if let Some(boxed) = self.next.get_mut(key) {
-            if let Some(concrete) = boxed.downcast_mut::<T>() {
-                mutator(concrete);
-            }
+        if let Some(boxed) = self.next.get_mut(key)
+            && let Some(concrete) = boxed.downcast_mut::<T>()
+        {
+            mutator(concrete);
         }
     }
     /// Executes registered systems across the parallel data planes.
@@ -145,10 +145,10 @@ impl SimulationState {
 
         // Unify retention and in-place update: retain only keys present in current, and update them in-place
         self.next.retain(|key, existing_box| {
-            if let Some(val) = self.current.get(key) {
-                if let Some(cloner) = self.cloners.get(key) {
-                    cloner(val, Some(existing_box));
-                }
+            if let Some(val) = self.current.get(key)
+                && let Some(cloner) = self.cloners.get(key)
+            {
+                cloner(val, Some(existing_box));
                 true
             } else {
                 false
@@ -157,12 +157,11 @@ impl SimulationState {
 
         // Insert any new keys from current that are missing in next
         for (key, val) in &self.current {
-            if !self.next.contains_key(key) {
-                if let Some(cloner) = self.cloners.get(key) {
-                    if let Some(new_box) = cloner(val, None) {
-                        self.next.insert(*key, new_box);
-                    }
-                }
+            if !self.next.contains_key(key)
+                && let Some(cloner) = self.cloners.get(key)
+                && let Some(new_box) = cloner(val, None)
+            {
+                self.next.insert(*key, new_box);
             }
         }
     }
