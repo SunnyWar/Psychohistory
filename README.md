@@ -32,15 +32,20 @@ New systems, models, and data sources can be added without modifying the core en
 ## **Workspace Structure**
 
 ```text
-psychohistory/           # Workspace root
-├── core/                # Simulation kernel
-├── models/              # NN evaluators (ONNX/Burn/tch)
+Psychohistory/           # Workspace root
+├── Cargo.toml           # Workspace manifest
+├── LICENSE.md           # License file
+├── README.md            # Project documentation
 ├── cli/                 # CLI for running experiments
+├── core/                # Simulation kernel
 ├── lab/                 # Python bindings (pyo3)
-├── sdk/                 # common code for plugins
-├── plugins/demog        # Demography domain
-├── plugins/gov          # Governance & political stability domain
-└── plugins/econ         # Economic domain
+├── models/              # NN evaluators (ONNX/Burn/tch)
+├── plugins/             # Domain plugins
+│   ├── demog/
+│   ├── econ/
+│   └── gov/
+├── sdk/                 # Common code for plugins
+└── target/              # Build output (generated)
 ```
 
 ---
