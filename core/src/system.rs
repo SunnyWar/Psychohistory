@@ -33,14 +33,14 @@ impl SimulationState {
         F: FnOnce(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>),
     {
         // 1. Clone references for snapshot to break borrow dependency
-        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> =
-            self.as_raw_map()
-                .iter()
-                .map(|(&k, v)| {
-                    let cloner = self.cloners().get(&k).expect("Cloner not found");
-                    (k, cloner(v))
-                })
-                .collect();
+        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> = self
+            .as_raw_map()
+            .iter()
+            .map(|(&k, v)| {
+                let cloner = self.cloners().get(&k).expect("Cloner not found");
+                (k, cloner(v))
+            })
+            .collect();
         let snapshot = ReadSnapshot::new(&temp_map);
 
         // 2. Now only mutable borrow is active
@@ -58,14 +58,14 @@ impl System for ParallelSystem {
     }
 
     fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
-        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> =
-            state.as_raw_map()
-                .iter()
-                .map(|(&k, v)| {
-                    let cloner = state.cloners().get(&k).expect("Cloner not found");
-                    (k, cloner(v))
-                })
-                .collect();
+        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> = state
+            .as_raw_map()
+            .iter()
+            .map(|(&k, v)| {
+                let cloner = state.cloners().get(&k).expect("Cloner not found");
+                (k, cloner(v))
+            })
+            .collect();
         let world_snapshot = ReadSnapshot::new(&temp_map);
         let runner_fn = &self.runner;
         let target_key = self.key;

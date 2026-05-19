@@ -1,6 +1,6 @@
 use models::{DemogState, GovState};
+use sdk::ReadSnapshot;
 use sdk::SimulationPlugin;
-use sdk::{ReadSnapshot};
 use std::any::Any;
 
 pub struct DemogPlugin;

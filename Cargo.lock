@@ -114,6 +114,7 @@ dependencies = [
  "core",
  "econ",
  "gov",
+ "models",
  "num-format",
  "rust_decimal",
  "rust_decimal_macros",

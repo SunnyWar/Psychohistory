@@ -5,8 +5,11 @@ edition = "2024"
 
 [dependencies]
 num-format = "0.4.4"
+rust_decimal = "1.42.0"
+rust_decimal_macros = "1.40.0"
+
 core = { path = "../core" }
 econ = { path = "../plugins/econ" }
 gov = { path = "../plugins/gov" }
-rust_decimal = "1.42.0"
-rust_decimal_macros = "1.40.0"
+models = { path = "../models" }
+

@@ -1,5 +1,5 @@
-use core::plugin::Plugin;
 use core::app::App;
+use core::plugin::Plugin;
 impl Plugin for EconPlugin {
     const NAME: &'static str = "econ";
     fn build(&self, app: &mut App) {

@@ -14,4 +14,5 @@ pub struct DemogState {
 pub struct GovState {
     pub tax_rate: f64,
     pub budget: f64,
+    pub stability: f64,
 }
