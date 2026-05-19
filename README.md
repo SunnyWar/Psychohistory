@@ -1,234 +1,119 @@
-# **Psychohistory**
+# Psychohistory
 
-A modular, open‑source, Rust‑based simulation framework for global economic, political, demographic, and institutional dynamics.
-
-Psychohistory is a workspace‑structured Rust project designed to simulate interacting world systems at scale. It is not a monolithic “world model.” Instead, it follows a **kernel → domains → models** architecture that allows researchers to plug in new systems, swap evaluators, run experiments, and explore counterfactuals.
-
-The goal is to provide a scientifically useful, extensible, and computationally efficient platform for studying macro‑scale human systems.
+A modular, open-source, Rust-based simulation framework for global economic, political, demographic, and institutional dynamics.
 
 ---
 
-## **Project Goals**
+## Features & Capabilities
 
-### **1. Modular simulation of world systems**
+- **Multi-domain simulation**: Economy, governance, and demography as independent plugins
+- **Hierarchical, multi-country scenarios**: Load and simulate nested regions (e.g., US, California, Los Angeles)
+- **Double-buffered state**: Deterministic, parallel-safe updates
+- **Plugin architecture**: Add new domains or swap evaluators without touching the core
+- **Automated scenario loading**: Ingests JSON scenario trees from `scenarios/`
+- **Per-field, colorized state diffing**: Human-readable, colorized before/after diffs for every entity
+- **Deterministic output**: Stable, reproducible results
+- **CLI runner**: Run, diff, and report simulations from the command line
+- **Ready for extension**: Add new plugins, models, or scenario files easily
 
-Each domain (economy, governance, demography, climate, etc.) is implemented as an independent crate with its own state, update systems, and models.
+---
 
-### **2. Neural‑network‑driven evaluators**
+## Workspace Structure
 
-Instead of hand‑coding every mechanism, Psychohistory uses neural network evaluators trained on real data to approximate system transitions.
-
-### **3. Extensible architecture**
-
-New systems, models, and data sources can be added without modifying the core engine.
-
-### **4. Academic‑friendly**
-
-- Reproducible experiments  
-- Versioned models  
-- Clear APIs  
-- Python bindings for Jupyter/R workflows  
-
-## **Workspace Structure**
-
-```text
-Psychohistory/           # Workspace root
-├── Cargo.toml           # Workspace manifest
-├── LICENSE.md           # License file
-├── README.md            # Project documentation
-├── cli/                 # CLI for running experiments
-├── core/                # Simulation kernel
-├── lab/                 # Python bindings (pyo3)
-├── models/              # NN evaluators (ONNX/Burn/tch)
-├── plugins/             # Domain plugins
+```
+Psychohistory/
+├── Cargo.toml         # Workspace manifest
+├── AGENTS.md          # Agent instructions
+├── LICENSE.md         # License
+├── README.md          # Project documentation
+├── cli/               # Command-line runner
+│   ├── src/
+│   │   ├── main.rs    # Entrypoint, scenario loader, runner
+│   │   └── util.rs    # Formatting helpers
+├── core/              # Simulation kernel
+│   └── src/
+│       ├── app.rs     # App struct, state diffing/reporting
+│       ├── scheduler.rs
+│       ├── state.rs
+│       ├── plugin.rs
+│       └── system.rs
+├── lab/               # Python bindings (pyo3)
+│   └── src/lib.rs
+├── models/            # Domain state structs
+│   └── src/lib.rs
+├── plugins/           # Domain plugins
 │   ├── demog/
 │   ├── econ/
 │   └── gov/
-├── sdk/                 # Common code for plugins
-└── target/              # Build output (generated)
+├── scenarios/         # Scenario JSON files
+│   ├── simulation_config.json
+│   ├── world_state.json
+│   └── countries.json
+├── sdk/               # Shared SDK for plugins
+│   └── src/lib.rs
+├── target/            # Build output
+└── timebase/          # (Reserved for future time series features)
 ```
 
 ---
 
-## **Core Concepts**
+## How It Works
 
-### **Simulation Kernel (`core`)**
-
-#### **SimulationState**
-
-A typed registry of domain states:
-
-```rust
-pub struct SimulationState {
-    pub econ: EconState,
-    pub gov: GovState,
-    pub demog: DemogState,
-    // more domains as added
-}
-```
-
-#### **System Trait**
-
-Each domain implements one or more systems:
-
-```rust
-pub trait System {
-    fn name(&self) -> &'static str;
-    fn dependencies(&self) -> &'static [&'static str];
-    fn run(&mut self, state: &mut SimulationState, time: SimulationTime, ctx: &mut SystemContext);
-}
-```
-
-#### **Scheduler**
-
-- Topologically sorts systems  
-- Executes them each tick  
-- Allows enabling/disabling systems per experiment  
-
-#### **Experiment Runner**
-
-Loads a config file, instantiates systems, runs scenarios, and writes results.
+- **Scenario loading**: The CLI loads a hierarchical JSON scenario (see `scenarios/simulation_config.json`), recursively inflating all regions and their domain states.
+- **Plugin registration**: Each domain (econ, gov, demog) registers its plugin and system with the core engine.
+- **Simulation loop**: The scheduler runs all registered systems in parallel for a fixed number of steps.
+- **State diffing**: At the end, the engine prints a colorized, per-field diff for every entity, showing exactly what changed.
 
 ---
 
-## **Domain Crates**
+## Example Scenario JSON
 
-Each domain crate defines:
-
-- Its state struct  
-- Its systems  
-- Feature extraction for evaluators  
-- Output metrics  
-
-Example (econ):
-
-```rust
-pub struct EconState {
-    pub gdp: f64,
-    pub inflation: f64,
-    pub unemployment: f64,
-    pub trade_balance: f64,
+```json
+{
+  "regions": {
+    "us": {
+      "components": {
+        "econ": { "gdp": 27360000000000.0, "inflation": 0.024 },
+        "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.85 },
+        "demog": { "population": 336000000, "birth_rate": 0.012 }
+      },
+      "sub_regions": {
+        "california": {
+          "components": {
+            "econ": { "gdp": 3860000000000.0, "inflation": 0.026 },
+            "gov": { "tax_rate": 0.088, "budget": 0.0, "stability": 0.88 },
+            "demog": { "population": 39000000, "birth_rate": 0.011 }
+          }
+        }
+      }
+    }
+  }
 }
-```
-
-Domains communicate only through the shared `SimulationState`.
-
----
-
-## **Model Crate (`models`)**
-
-A unified trait for neural network evaluators:
-
-```rust
-pub trait Evaluator<I, O> {
-    fn evaluate(&self, input: &I) -> O;
-}
-```
-
-Supported backends:
-
-- ONNX Runtime  
-- tch‑rs (PyTorch)  
-- Burn  
-
-Models are versioned and loaded from:
-
-```
-models/
-    econ_v1.onnx
-    gov_stability_v2.onnx
-    demog_growth_v1.onnx
 ```
 
 ---
 
-## **Experimentation**
-
-Experiments are defined in TOML:
-
-```toml
-[meta]
-name = "carbon_tax_vs_no_tax"
-
-[time]
-start_step = 0
-end_step = 480
-
-[systems]
-enabled = ["econ", "gov", "demog"]
-
-[scenarios.base]
-policies.carbon_tax = false
-
-[scenarios.carbon_tax]
-policies.carbon_tax = true
-```
-
-Run via CLI:
+## Running a Simulation
 
 ```bash
-psychohistory run experiments/carbon_tax.toml
+cargo run --bin cli
 ```
 
-Outputs can be written as:
-
-- Arrow / Parquet  
-- CSV  
-- JSON  
+- Loads scenario from `scenarios/simulation_config.json`
+- Runs all systems for 20 yearly steps
+- Prints colorized, per-field diffs for all entities
 
 ---
 
-## **Python Integration (`lab`)**
+## Extending Psychohistory
 
-Provides:
-
-- `run_experiment(config_path)`
-- `load_state_snapshot(step)`
-- `plot_timeseries(metric)`
-- Ability to plug in Python‑based evaluators for rapid prototyping
+- Add new plugins in `plugins/`
+- Add new domain state structs in `models/`
+- Add new scenario files in `scenarios/`
+- Implement new systems and register them in `cli/src/main.rs`
 
 ---
 
-## **Contributing**
+## License
 
-1. Fork the repository  
-2. Add a new crate for your domain or model  
-3. Implement the required traits  
-4. Add tests  
-5. Submit a PR including:
-   - Description of the domain  
-   - Data sources  
-   - Model versioning  
-   - Example experiments  
-
-All contributions must be licensed under **PolyForm Noncommercial License 1.0.0.**.
-
----
-
-## **Roadmap**
-
-### **Phase 4 — Demography**
-
-- Migration  
-- Age structure  
-
-### **Phase 5 — Cross‑domain Coupling**
-
-- Econ ↔ Demog  
-- Gov ↔ Demog  
-
-### **Phase 6 — Python Lab**
-
-- Jupyter integration  
-- Visualization tools  
-
----
-
-## **Status**
-
-Psychohistory is in **early development**.
-
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**.  
-Commercial use is strictly prohibited. See `LICENSE` for details.
-
----
+PolyForm Noncommercial License 1.0.0 — see LICENSE.md for details.
