@@ -25,8 +25,8 @@ fn main() {
     app.scheduler.add_system("demog", Box::new(DemogSystem));
 
     // 3. Open and ingest hierarchical simulation configuration asset
-    let mut file =
-        File::open("simulation_config.json").expect("Failed to locate simulation_config.json");
+        let mut file =
+            File::open("scenarios/simulation_config.json").expect("Failed to locate simulation_config.json");
     let mut json_str = String::new();
     file.read_to_string(&mut json_str).unwrap();
 
