@@ -202,34 +202,13 @@ All contributions must be licensed under **PolyForm Noncommercial License 1.0.0.
 
 ## **Roadmap**
 
-### **Phase 1 — Core Engine**
-
-- Simulation kernel  
-- Scheduler  
-- Experiment runner  
-- Basic CLI  
-
-### **Phase 2 — Economic Domain**
-
-- Macro indicators  
-- First NN evaluator  
-- Policy inputs  
-
-### **Phase 3 — Governance Domain**
-
-- Political stability  
-- Institutional quality  
-- Regime transitions  
-
 ### **Phase 4 — Demography**
 
-- Population dynamics  
 - Migration  
 - Age structure  
 
 ### **Phase 5 — Cross‑domain Coupling**
 
-- Econ ↔ Gov  
 - Econ ↔ Demog  
 - Gov ↔ Demog  
 
