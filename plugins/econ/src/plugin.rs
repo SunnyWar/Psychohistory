@@ -32,11 +32,10 @@ impl SimulationPlugin for EconPlugin {
             .downcast_mut::<EconState>()
             .expect("Failed to downcast to EconState");
 
-        if let Some(demog) = world.get::<DemogState>("demog") {
-            if demog.population > 10_000_000 {
+        if let Some(demog) = world.get::<DemogState>("demog")
+            && demog.population > 10_000_000 {
                 econ.gdp += 500_000.0;
             }
-        }
 
         econ.inflation = 0.025;
     }

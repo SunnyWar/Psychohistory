@@ -8,9 +8,8 @@ pub fn run_econ_system(world: &ReadSnapshot, my_state: &mut Box<dyn std::any::An
         .expect("Failed to downcast to EconState");
 
     // 2. Read safely from other states using the snapshot
-    if let Some(demog) = world.get::<DemogState>("demog") {
-        if demog.population > 10_000_000 {
+    if let Some(demog) = world.get::<DemogState>("demog")
+        && demog.population > 10_000_000 {
             econ.gdp += 500_000.0;
         }
-    }
 }
