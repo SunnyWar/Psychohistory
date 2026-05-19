@@ -8,6 +8,11 @@ pub struct App {
 }
 
 impl App {
+    /// Safely modifies an initialized component state across both data planes before a run execution.
+    pub fn update_state<T: 'static>(&mut self, key: &'static str, mutator: impl FnMut(&mut T)) {
+        let mut mutator = mutator;
+        self.state.update_initial_state::<T>(key, &mut mutator);
+    }
     pub fn new() -> Self {
         Self {
             state: SimulationState::new(),

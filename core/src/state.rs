@@ -1,4 +1,22 @@
 impl SimulationState {
+    /// Mutates a component state across both the current and next data planes.
+    /// Essential for seeding initial baselines prior to running the simulation loop.
+    pub fn update_initial_state<T: 'static>(
+        &mut self,
+        key: &'static str,
+        mutator: &mut impl FnMut(&mut T),
+    ) {
+        if let Some(boxed) = self.current.get_mut(key) {
+            if let Some(concrete) = boxed.downcast_mut::<T>() {
+                mutator(concrete);
+            }
+        }
+        if let Some(boxed) = self.next.get_mut(key) {
+            if let Some(concrete) = boxed.downcast_mut::<T>() {
+                mutator(concrete);
+            }
+        }
+    }
     /// Executes registered systems across the parallel data planes.
     /// By building the ReadSnapshot internally from `self.current`, we cleanly split
     /// the borrow from `self.next` so Rayon workers can access both simultaneously.
