@@ -1,3 +1,4 @@
+// cli/src/main.rs
 use core::App;
 use econ::EconPlugin;
 use gov::GovPlugin;

@@ -1,3 +1,4 @@
+// core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
 

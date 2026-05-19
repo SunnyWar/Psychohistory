@@ -1,3 +1,4 @@
+// core/src/lib.rs
 pub mod app;
 pub mod experiment;
 pub mod plugin;

@@ -1,3 +1,4 @@
+// models/src/lib.rs
 #[derive(Debug, Clone, Default)]
 pub struct EconState {
     pub gdp: f64,

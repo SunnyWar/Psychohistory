@@ -1,3 +1,4 @@
+// plugins/econ/src/system.rs
 use models::{DemogState, EconState};
 use sdk::ReadSnapshot;
 

@@ -1,4 +1,4 @@
-// --- Imports ---
+// plugins/gov/src/plugin.rs
 use core::app::App;
 use core::plugin::Plugin;
 use models::{EconState, GovState};

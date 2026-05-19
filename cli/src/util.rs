@@ -1,3 +1,4 @@
+// cli/src/util.rs
 use num_format::{Locale, ToFormattedString};
 
 pub fn fmt_currency(value: f64) -> String {

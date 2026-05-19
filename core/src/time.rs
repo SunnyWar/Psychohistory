@@ -1,3 +1,4 @@
+// core/src/time.rs
 #[derive(Clone, Copy, Debug)]
 pub struct SimulationTime {
     pub step: u64,
