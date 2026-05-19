@@ -7,8 +7,8 @@ type ClonerFn = Box<dyn Fn(&Box<dyn Any + Send + Sync>, Option<&mut Box<dyn Any 
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
 pub struct SimulationState {
-    current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     cloners: ClonerMap,
 }
 

@@ -30,28 +30,18 @@ impl ParallelSystem {
 }
 
 impl SimulationState {
-    /// Safely run one system with correct borrow ordering
+    /// Safely run one system using safe disjoint field borrowing
     pub fn run_system<F>(&mut self, key: &'static str, runner: F)
     where
         F: FnOnce(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>),
     {
-        // 1. Clone references for snapshot to break borrow dependency
-        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> = self
-            .as_raw_map()
-            .iter()
-            .map(|(&k, v)| {
-                let cloner = self.cloners().get(&k).expect("Cloner not found");
-                (k, cloner(v, None).expect("Cloner must return Some(Box) for snapshot"))
-            })
-            .collect();
-        let snapshot = ReadSnapshot::new(&temp_map);
+        // Accessing fields directly allows the borrow checker to split the borrow.
+        // `self.current` is borrowed immutably, while `self.next` is borrowed mutably.
+        let snapshot = ReadSnapshot::new(&self.current);
 
-        // 2. Now only mutable borrow is active
-        if let Some(my_next_space) = self.mut_workspace().get_mut(key) {
+        if let Some(my_next_space) = self.next.get_mut(key) {
             runner(&snapshot, my_next_space);
         }
-
-        // No advance_tick here - caller should do it
     }
 }
 
@@ -61,22 +51,13 @@ impl System for ParallelSystem {
     }
 
     fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
-        let temp_map: std::collections::HashMap<&'static str, Box<dyn Any + Send + Sync>> = state
-            .as_raw_map()
-            .iter()
-            .map(|(&k, v)| {
-                let cloner = state.cloners().get(&k).expect("Cloner not found");
-                (k, cloner(v, None).expect("Cloner must return Some(Box) for snapshot"))
-            })
-            .collect();
-        let world_snapshot = ReadSnapshot::new(&temp_map);
+        // Access fields directly here as well to avoid locking the entire `state` struct
+        let world_snapshot = ReadSnapshot::new(&state.current);
         let runner_fn = &self.runner;
         let target_key = self.key;
 
-        if let Some(my_next_space) = state.mut_workspace().get_mut(target_key) {
+        if let Some(my_next_space) = state.next.get_mut(target_key) {
             (runner_fn)(&world_snapshot, my_next_space);
         }
-
-        state.advance_tick();
     }
 }
