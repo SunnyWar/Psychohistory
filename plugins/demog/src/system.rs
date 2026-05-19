@@ -1,5 +1,5 @@
 use crate::plugin::DemogPlugin;
-use core::{System};
+use core::System;
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
