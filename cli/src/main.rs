@@ -1,3 +1,4 @@
+use sdk::TimeGranularity;
 // cli/src/main.rs
 use core::App;
 use demog::{DemogPlugin, DemogSystem};
@@ -39,7 +40,7 @@ fn main() {
     });
 
     println!("[cli] Launching parallel macro-simulation engine...");
-    app.run(12);
+    app.run(12, sdk::TimeGranularity::Yearly);
 
     app.summarize_state();
 

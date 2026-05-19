@@ -27,10 +27,17 @@ impl SimulationPlugin for EconPlugin {
         "econ"
     }
 
-    fn step(&self, world: &ReadSnapshot, my_state: &mut Box<dyn Any + Send + Sync>) {
+    fn step(
+        &self,
+        world: &ReadSnapshot,
+        my_state: &mut Box<dyn Any + Send + Sync>,
+        time: sdk::SimulationTime,
+    ) {
         let econ = my_state
             .downcast_mut::<EconState>()
             .expect("Failed to downcast to EconState");
+
+        let dt = time.delta_years();
 
         // Fetch cross-cutting variables from the frozen read snapshot
         let population = world
@@ -45,7 +52,7 @@ impl SimulationPlugin for EconPlugin {
         if population > 10_000_000 {
             // GDP growth scales with population size and societal stability
             let base_per_capita_productivity = 50.0;
-            let growth_potential = (population as f64) * base_per_capita_productivity * 0.001;
+            let growth_potential = (population as f64) * base_per_capita_productivity * 0.001 * dt;
 
             // High stability maximizes growth; inflation acts as a drag
             let stability_drag = stability.clamp(0.1, 1.0);
@@ -55,6 +62,6 @@ impl SimulationPlugin for EconPlugin {
         }
 
         // Inflation tracks dynamically based on economic heating
-        econ.inflation = 0.015 + (econ.gdp * 0.000_000_000_01);
+        econ.inflation = 0.015 + (econ.gdp * 0.000_000_000_01 * dt);
     }
 }

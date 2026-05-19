@@ -1,5 +1,6 @@
 use crate::plugin::DemogPlugin;
-use core::{SimulationState, SimulationTime, System};
+use core::{SimulationState, System};
+use sdk::SimulationTime;
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
@@ -18,10 +19,10 @@ impl System for DemogSystem {
         &self,
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
-        _time: SimulationTime,
+        time: sdk::SimulationTime,
     ) {
         // Forward execution to the thread-safe plugin step function
-        DemogPlugin.step(snapshot, bucket);
+        DemogPlugin.step(snapshot, bucket, time);
     }
 }
 // plugins/demog/src/system.rs

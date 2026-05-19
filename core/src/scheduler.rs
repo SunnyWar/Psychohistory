@@ -1,9 +1,6 @@
 // core/src/scheduler.rs
-use crate::{
-    state::SimulationState,
-    system::System,
-    time::{SimulationTime, TimeGranularity},
-};
+use crate::{state::SimulationState, system::System};
+use sdk::{SimulationTime, TimeGranularity};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use std::collections::HashMap;
@@ -30,7 +27,7 @@ impl Scheduler {
         self.systems.insert(key, system);
     }
 
-    pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
+    pub fn run(&mut self, state: &mut SimulationState, steps: u64, granularity: TimeGranularity) {
         let pb = ProgressBar::new(steps);
         pb.set_style(
             ProgressStyle::with_template(
@@ -41,10 +38,7 @@ impl Scheduler {
         );
 
         for step in 0..steps {
-            let time = SimulationTime {
-                step,
-                granularity: TimeGranularity::Step,
-            };
+            let time = SimulationTime { step, granularity };
 
             let systems_ref = &self.systems;
             state.par_execute_systems(|snapshot, key, data_bucket| {

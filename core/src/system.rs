@@ -1,6 +1,7 @@
 // core/src/system.rs
-use crate::{state::SimulationState, time::SimulationTime};
+use crate::state::SimulationState;
 use sdk::ReadSnapshot;
+use sdk::SimulationTime;
 use std::any::Any;
 
 pub trait System {

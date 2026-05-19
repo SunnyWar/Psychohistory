@@ -119,6 +119,7 @@ dependencies = [
  "num-format",
  "rust_decimal",
  "rust_decimal_macros",
+ "sdk",
 ]
 
 [[package]]

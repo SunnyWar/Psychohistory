@@ -1,3 +1,4 @@
+use sdk::TimeGranularity;
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
@@ -25,8 +26,8 @@ impl App {
         plugin.build(self);
     }
 
-    pub fn run(&mut self, steps: u64) {
-        self.scheduler.run(&mut self.state, steps);
+    pub fn run(&mut self, steps: u64, granularity: TimeGranularity) {
+        self.scheduler.run(&mut self.state, steps, granularity);
     }
 
     pub fn summarize_state(&self) {

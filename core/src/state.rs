@@ -1,3 +1,4 @@
+use sdk::ReadSnapshot;
 impl SimulationState {
     /// Mutates a component state across both the current and next data planes.
     /// Essential for seeding initial baselines prior to running the simulation loop.
@@ -22,11 +23,11 @@ impl SimulationState {
     /// the borrow from `self.next` so Rayon workers can access both simultaneously.
     pub fn par_execute_systems<F>(&mut self, f: F)
     where
-        F: Fn(&sdk::ReadSnapshot, &'static str, &mut Box<dyn Any + Send + Sync>) + Send + Sync,
+        F: Fn(&ReadSnapshot, &'static str, &mut Box<dyn Any + Send + Sync>) + Send + Sync,
     {
         // 1. Create the immutable read plane snapshot.
         // Because it only wraps an immutable reference, it is safely `Sync` and shared across threads.
-        let snapshot = sdk::ReadSnapshot::new(&self.current);
+        let snapshot = ReadSnapshot::new(&self.current);
         let snapshot_ref = &snapshot;
 
         // 2. Drive mutations strictly over the disjoint mutable write-plane

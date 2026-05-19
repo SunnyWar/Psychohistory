@@ -1,5 +1,6 @@
 use crate::plugin::EconPlugin;
-use core::{system::System, time::SimulationTime};
+use core::system::System;
+use sdk::SimulationTime;
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
@@ -18,10 +19,10 @@ impl System for EconSystem {
         &self,
         snapshot: &ReadSnapshot,
         bucket: &mut Box<dyn Any + Send + Sync>,
-        _time: SimulationTime,
+        time: sdk::SimulationTime,
     ) {
         // Dispatch directly into the parallel simulation execution block
-        EconPlugin.step(snapshot, bucket);
+        EconPlugin.step(snapshot, bucket, time);
     }
 }
 // plugins/econ/src/system.rs

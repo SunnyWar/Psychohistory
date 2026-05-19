@@ -8,7 +8,7 @@ members = [
     "sdk",
     "plugins/demog",
     "plugins/econ",
-    "plugins/gov",
+    "plugins/gov"
 ]
 
 [workspace.dependencies]

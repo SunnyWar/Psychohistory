@@ -1,14 +1,33 @@
-// sdk/src/lib.rs
 use std::any::Any;
 use std::collections::HashMap;
 
-pub struct ReadSnapshot<'a> {
-    inner: &'a HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TimeGranularity {
+    Step,
+    Monthly,
+    Quarterly,
+    Yearly,
 }
 
-pub trait SimulationPlugin {
-    fn name(&self) -> &'static str;
-    fn step(&self, world: &ReadSnapshot, my_state: &mut Box<dyn Any + Send + Sync>);
+#[derive(Clone, Copy, Debug)]
+pub struct SimulationTime {
+    pub step: u64,
+    pub granularity: TimeGranularity,
+}
+
+impl SimulationTime {
+    /// Returns the fractional portion of a calendar year represented by a single simulation step.
+    pub fn delta_years(&self) -> f64 {
+        match self.granularity {
+            TimeGranularity::Step | TimeGranularity::Yearly => 1.0,
+            TimeGranularity::Quarterly => 0.25,
+            TimeGranularity::Monthly => 1.0 / 12.0,
+        }
+    }
+}
+
+pub struct ReadSnapshot<'a> {
+    inner: &'a HashMap<&'static str, Box<dyn Any + Send + Sync>>,
 }
 
 impl<'a> ReadSnapshot<'a> {
@@ -19,4 +38,14 @@ impl<'a> ReadSnapshot<'a> {
     pub fn get<T: 'static>(&self, key: &'static str) -> Option<&T> {
         self.inner.get(key)?.downcast_ref::<T>()
     }
+}
+
+pub trait SimulationPlugin: Send + Sync {
+    fn name(&self) -> &'static str;
+    fn step(
+        &self,
+        world: &ReadSnapshot,
+        my_state: &mut Box<dyn Any + Send + Sync>,
+        time: SimulationTime,
+    );
 }
