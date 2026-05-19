@@ -6,6 +6,13 @@ use std::any::Any;
 pub trait System {
     fn name(&self) -> &'static str;
     fn run(&mut self, state: &mut SimulationState, time: SimulationTime);
+    /// Parallel bucket execution for Scheduler
+    fn run_system(
+        &self,
+        snapshot: &ReadSnapshot,
+        bucket: &mut Box<dyn Any + Send + Sync>,
+        time: SimulationTime,
+    );
 }
 
 type SystemRunner = Box<dyn Fn(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>) + Send + Sync>;
@@ -51,7 +58,6 @@ impl System for ParallelSystem {
     }
 
     fn run(&mut self, state: &mut SimulationState, _time: SimulationTime) {
-        // Access fields directly here as well to avoid locking the entire `state` struct
         let world_snapshot = ReadSnapshot::new(&state.current);
         let runner_fn = &self.runner;
         let target_key = self.key;
@@ -59,5 +65,14 @@ impl System for ParallelSystem {
         if let Some(my_next_space) = state.next.get_mut(target_key) {
             (runner_fn)(&world_snapshot, my_next_space);
         }
+    }
+
+    fn run_system(
+        &self,
+        snapshot: &ReadSnapshot,
+        bucket: &mut Box<dyn Any + Send + Sync>,
+        _time: SimulationTime,
+    ) {
+        (self.runner)(snapshot, bucket);
     }
 }

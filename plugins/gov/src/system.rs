@@ -19,4 +19,13 @@ impl System for GovSystem {
         // placeholder update
         gov.stability = (gov.stability + 0.001).min(1.0);
     }
+
+    fn run_system(
+        &self,
+        _snapshot: &sdk::ReadSnapshot,
+        _bucket: &mut Box<dyn std::any::Any + Send + Sync>,
+        _time: SimulationTime,
+    ) {
+        // Not implemented for GovSystem
+    }
 }

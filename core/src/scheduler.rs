@@ -6,21 +6,28 @@ use crate::{
 };
 
 use indicatif::{ProgressBar, ProgressStyle};
+use std::collections::HashMap;
 
 pub struct Scheduler {
-    systems: Vec<Box<dyn System>>,
+    // Group systems by the state key they are responsible for modifying
+    systems: HashMap<&'static str, Box<dyn System + Send + Sync>>,
 }
 
 impl Scheduler {
     pub fn new() -> Self {
         Self {
-            systems: Vec::new(),
+            systems: HashMap::new(),
         }
     }
 
-    pub fn add_system(&mut self, system: Box<dyn System>) {
-        println!("[core] Registering system: {}", system.name());
-        self.systems.push(system);
+    // Accept key for O(1) dispatch
+    pub fn add_system(&mut self, key: &'static str, system: Box<dyn System + Send + Sync>) {
+        println!(
+            "[core] Registering system for key '{}': {}",
+            key,
+            system.name()
+        );
+        self.systems.insert(key, system);
     }
 
     pub fn run(&mut self, state: &mut SimulationState, steps: u64) {
@@ -39,10 +46,14 @@ impl Scheduler {
                 granularity: TimeGranularity::Step,
             };
 
-            for system in &mut self.systems {
-                system.run(state, time);
-            }
+            let systems_ref = &self.systems;
+            state.par_execute_systems(|snapshot, key, data_bucket| {
+                if let Some(system) = systems_ref.get(key) {
+                    system.run_system(snapshot, data_bucket, time);
+                }
+            });
 
+            state.advance_tick();
             pb.inc(1);
         }
 

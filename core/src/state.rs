@@ -1,9 +1,35 @@
+impl SimulationState {
+    /// Executes registered systems across the parallel data planes.
+    /// By building the ReadSnapshot internally from `self.current`, we cleanly split
+    /// the borrow from `self.next` so Rayon workers can access both simultaneously.
+    pub fn par_execute_systems<F>(&mut self, f: F)
+    where
+        F: Fn(&sdk::ReadSnapshot, &'static str, &mut Box<dyn Any + Send + Sync>) + Send + Sync,
+    {
+        // 1. Create the immutable read plane snapshot.
+        // Because it only wraps an immutable reference, it is safely `Sync` and shared across threads.
+        let snapshot = sdk::ReadSnapshot::new(&self.current);
+        let snapshot_ref = &snapshot;
+
+        // 2. Drive mutations strictly over the disjoint mutable write-plane
+        self.next.par_iter_mut().for_each(|(&key, val)| {
+            f(snapshot_ref, key, val);
+        });
+    }
+}
 // core/src/state.rs
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use std::any::Any;
 use std::collections::HashMap;
 
-type ClonerFn = Box<dyn Fn(&Box<dyn Any + Send + Sync>, Option<&mut Box<dyn Any + Send + Sync>>) -> Option<Box<dyn Any + Send + Sync>> + Send + Sync>;
+type ClonerFn = Box<
+    dyn Fn(
+            &Box<dyn Any + Send + Sync>,
+            Option<&mut Box<dyn Any + Send + Sync>>,
+        ) -> Option<Box<dyn Any + Send + Sync>>
+        + Send
+        + Sync,
+>;
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
 pub struct SimulationState {
@@ -28,7 +54,9 @@ impl SimulationState {
     /// Inserts a new component state. Requires `Clone + Send + Sync` to support multi-threading.
     pub fn insert<T: 'static + Clone + Send + Sync>(&mut self, key: &'static str, value: T) {
         // Prevent type mismatch for existing keys
-        if let Some(existing) = self.current.get(key) && (**existing).type_id() != std::any::TypeId::of::<T>() {
+        if let Some(existing) = self.current.get(key)
+            && (**existing).type_id() != std::any::TypeId::of::<T>()
+        {
             panic!(
                 "Type mismatch for key '{}': tried to insert {} but existing type is {:?}",
                 key,
