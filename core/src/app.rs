@@ -24,9 +24,9 @@ fn colorize_change_f64(before: f64, after: f64) -> Option<String> {
     if (before - after).abs() < std::f64::EPSILON {
         None
     } else if after > before {
-        Some(format!("{GREEN}{}{RESET}", after))
+        Some(format!("{GREEN}{:.2}{RESET}", after))
     } else {
-        Some(format!("{RED}{}{RESET}", after))
+        Some(format!("{RED}{:.2}{RESET}", after))
     }
 }
 
@@ -55,11 +55,21 @@ fn print_field_diff<T: Display>(
     colorized: Option<String>,
 ) -> bool {
     if let Some(colored) = colorized {
-        println!("  {:15} {} → {}", label, before, colored);
+        // If T is f64, format before value to 2 decimals as well
+        if let (Some(b), Some(_)) = (any_as_f64(&before), any_as_f64(&after)) {
+            println!("  {:15} {:.2} → {}", label, b, colored);
+        } else {
+            println!("  {:15} {} → {}", label, before, colored);
+        }
         true
     } else {
         false
     }
+}
+
+// Helper to format any Display as f64 if possible
+fn any_as_f64<T: Display>(v: &T) -> Option<f64> {
+    v.to_string().parse::<f64>().ok()
 }
 
 trait StateDiff {
@@ -218,20 +228,5 @@ impl App {
                 println!("\n[{}]", key);
             }
         }
-    }
-}
-
-/// Returns None if equal, or Some("before → after") if different
-fn diff_states<T: Debug + PartialEq>(before: &T, after: &T) -> Option<String> {
-    if before == after {
-        None
-    } else {
-        Some(format!("{:?} → {:?}", before, after))
-    }
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self::new()
     }
 }
