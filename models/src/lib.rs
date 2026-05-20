@@ -8,6 +8,67 @@ pub struct EconState {
     pub inflation: f64,
 }
 
+impl EconState {
+    /// Print field-level diff between self and another EconState. Returns true if any field changed.
+    pub fn print_diff(&self, other: &Self) -> bool {
+        let mut changed = false;
+        if (self.gdp - other.gdp).abs() > f64::EPSILON {
+            println!("  gdp: {:.2} → {:.2}", self.gdp, other.gdp);
+            changed = true;
+        }
+        if (self.inflation - other.inflation).abs() > f64::EPSILON {
+            println!(
+                "  inflation: {:.4} → {:.4}",
+                self.inflation, other.inflation
+            );
+            changed = true;
+        }
+        changed
+    }
+}
+
+impl DemogState {
+    /// Print field-level diff between self and another DemogState. Returns true if any field changed.
+    pub fn print_diff(&self, other: &Self) -> bool {
+        let mut changed = false;
+        if self.population != other.population {
+            println!("  population: {} → {}", self.population, other.population);
+            changed = true;
+        }
+        if (self.birth_rate - other.birth_rate).abs() > f64::EPSILON {
+            println!(
+                "  birth_rate: {:.4} → {:.4}",
+                self.birth_rate, other.birth_rate
+            );
+            changed = true;
+        }
+        changed
+    }
+}
+
+impl GovState {
+    /// Print field-level diff between self and another GovState. Returns true if any field changed.
+    pub fn print_diff(&self, other: &Self) -> bool {
+        let mut changed = false;
+        if (self.tax_rate - other.tax_rate).abs() > f64::EPSILON {
+            println!("  tax_rate: {:.4} → {:.4}", self.tax_rate, other.tax_rate);
+            changed = true;
+        }
+        if (self.budget - other.budget).abs() > f64::EPSILON {
+            println!("  budget: {:.2} → {:.2}", self.budget, other.budget);
+            changed = true;
+        }
+        if (self.stability - other.stability).abs() > f64::EPSILON {
+            println!(
+                "  stability: {:.4} → {:.4}",
+                self.stability, other.stability
+            );
+            changed = true;
+        }
+        changed
+    }
+}
+
 /// Economic system type (market, planned, mixed, etc.)
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum EconSystemType {

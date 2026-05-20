@@ -119,7 +119,7 @@ cargo run --bin cli
 ### 🔥 Priority 1 — Core Architectural Primitives
 
 - [x] Add `GovType` and `EconSystemType` enums to `models` and propagate through `SimulationState`.
-- Implement a transition system in `core` to support mid‑simulation switching of government and economic types.
+- [x] Implement a transition system in `core` to support mid‑simulation switching of government and economic types.
 - Add cross-domain coupling hooks in `SimulationState` to enable direct econ ↔ gov ↔ demog interactions.
 - Refactor state diffing to track and report system transitions and cross-domain effects.
 

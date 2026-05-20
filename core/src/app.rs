@@ -30,126 +30,6 @@ fn colorize_change_f64(before: f64, after: f64) -> Option<String> {
     }
 }
 
-fn colorize_change_u64(before: u64, after: u64) -> Option<String> {
-    if before == after {
-        None
-    } else if after > before {
-        Some(format!("{GREEN}{}{RESET}", after))
-    } else {
-        Some(format!("{RED}{}{RESET}", after))
-    }
-}
-
-fn colorize_change_str(before: &str, after: &str) -> Option<String> {
-    if before == after {
-        None
-    } else {
-        Some(format!("{YELLOW}{}{RESET}", after))
-    }
-}
-
-fn print_field_diff<T: Display>(
-    label: &str,
-    before: T,
-    after: T,
-    colorized: Option<String>,
-) -> bool {
-    if let Some(colored) = colorized {
-        // If T is f64, format before value to 2 decimals as well
-        if let (Some(b), Some(_)) = (any_as_f64(&before), any_as_f64(&after)) {
-            println!("  {:15} {:.2} → {}", label, b, colored);
-        } else {
-            println!("  {:15} {} → {}", label, before, colored);
-        }
-        true
-    } else {
-        false
-    }
-}
-
-// Helper to format any Display as f64 if possible
-fn any_as_f64<T: Display>(v: &T) -> Option<f64> {
-    v.to_string().parse::<f64>().ok()
-}
-
-trait StateDiff {
-    fn print_diff(&self, after: &Self) -> bool;
-}
-
-impl StateDiff for DemogState {
-    fn print_diff(&self, after: &Self) -> bool {
-        let mut changed = false;
-        changed |= print_field_diff(
-            "population",
-            self.population,
-            after.population,
-            colorize_change_u64(self.population, after.population),
-        );
-        changed |= print_field_diff(
-            "birth_rate",
-            self.birth_rate,
-            after.birth_rate,
-            colorize_change_f64(self.birth_rate, after.birth_rate),
-        );
-        changed
-    }
-}
-
-impl StateDiff for EconState {
-    fn print_diff(&self, after: &Self) -> bool {
-        let mut changed = false;
-        changed |= print_field_diff(
-            "gdp",
-            self.gdp,
-            after.gdp,
-            colorize_change_f64(self.gdp, after.gdp),
-        );
-        changed |= print_field_diff(
-            "inflation",
-            self.inflation,
-            after.inflation,
-            colorize_change_f64(self.inflation, after.inflation),
-        );
-        changed
-    }
-}
-
-impl StateDiff for GovState {
-    fn print_diff(&self, after: &Self) -> bool {
-        let mut changed = false;
-        changed |= print_field_diff(
-            "tax_rate",
-            self.tax_rate,
-            after.tax_rate,
-            colorize_change_f64(self.tax_rate, after.tax_rate),
-        );
-        changed |= print_field_diff(
-            "budget",
-            self.budget,
-            after.budget,
-            colorize_change_f64(self.budget, after.budget),
-        );
-        changed |= print_field_diff(
-            "stability",
-            self.stability,
-            after.stability,
-            colorize_change_f64(self.stability, after.stability),
-        );
-        changed
-    }
-}
-
-impl Debug for DomainState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DomainState::Econ(e) => write!(f, "{:?}", e),
-            DomainState::Gov(g) => write!(f, "{:?}", g),
-            DomainState::Demog(d) => write!(f, "{:?}", d),
-            DomainState::Unknown(s) => write!(f, "{:?}", s),
-        }
-    }
-}
-
 pub struct App {
     pub state: SimulationState,
     pub scheduler: Scheduler,
@@ -203,7 +83,6 @@ impl App {
     }
 
     pub fn summarize_state(&self) {
-        // (removed unused import)
         println!("[core] Final state keys:");
         let mut keys: Vec<_> = self.state.keys().map(|k| k.to_string()).collect();
         keys.sort();

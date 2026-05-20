@@ -1,4 +1,5 @@
 // core/src/state.rs
+use models::{EconSystemType, GovType};
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use sdk::ReadSnapshot;
 use std::any::Any;
@@ -15,8 +16,6 @@ type ClonerFn = Box<
 
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
-use models::{EconSystemType, GovType};
-
 pub struct SimulationState {
     pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
@@ -26,6 +25,16 @@ pub struct SimulationState {
 }
 
 impl SimulationState {
+    /// Change the government type mid-simulation.
+    pub fn set_gov_type(&mut self, new_type: GovType) {
+        self.gov_type = new_type;
+    }
+
+    /// Change the economic system type mid-simulation.
+    pub fn set_econ_system(&mut self, new_type: EconSystemType) {
+        self.econ_system = new_type;
+    }
+
     /// Mutates a component state across both the current and next data planes.
     /// Essential for seeding initial baselines prior to running the simulation loop.
     pub fn update_initial_state<T: 'static>(
@@ -61,9 +70,7 @@ impl SimulationState {
             f(snapshot_ref, key, val);
         });
     }
-}
 
-impl SimulationState {
     /// Public accessor for the cloners map (for snapshotting)
     pub fn cloners(&self) -> &ClonerMap {
         &self.cloners
@@ -180,6 +187,7 @@ impl SimulationState {
 
     /// Exposes exclusive mutable access *only* to the write-plane map.
     /// This allows splitting the borrow so `current` can be read simultaneously.
+
     pub fn mut_workspace(&mut self) -> &mut HashMap<&'static str, Box<dyn Any + Send + Sync>> {
         &mut self.next
     }
