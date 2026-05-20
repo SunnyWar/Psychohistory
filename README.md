@@ -125,9 +125,6 @@ cargo run --bin cli
 ```
 
 - Loads scenario from `scenarios/simulation_config.json`
-- Runs all systems for 20 yearly steps
-- Prints colorized, per-field diffs for all entities
-
 ---
 
 ## Extending Psychohistory
@@ -136,6 +133,10 @@ cargo run --bin cli
 - Add new domain state structs in `models/`
 - Add new scenario files in `scenarios/`
 - Implement new systems and register them in `cli/src/main.rs`
+ Loads scenario from `scenarios/simulation_config.json`
+ Runs all systems for the specified number of years and Monte Carlo runs per region
+ Prints mean and standard deviation for all output metrics per region
+ Prints colorized, per-field diffs for all entities (single-run mode)
 
 ---
 
