@@ -2,16 +2,16 @@
 # TODO: Align Rust program with extracted governance simulation specification
 
 ## 1. Output Metrics
-- [ ] Implement and track the following metrics:
-   - [ ] Law Quality
-   - [ ] Corruption Level
-   - [ ] Public Trust
-   - [ ] Crisis Response
-   - [ ] Adaptability
-   - [ ] Representation Accuracy
-   - [ ] Legislative Speed
-   - [ ] Economic Outcome
-   - [ ] Composite Score
+- [x] Implement and track the following metrics:
+   - [x] Law Quality
+   - [x] Corruption Level
+   - [x] Public Trust
+   - [x] Crisis Response
+   - [x] Adaptability
+   - [x] Representation Accuracy
+   - [x] Legislative Speed
+   - [x] Economic Outcome
+   - [x] Composite Score
 
 ## 2. Metric Formulas & Update Rules
 - [x] Implement formulas for each metric, including:
@@ -25,7 +25,7 @@
    - [x] Economic Outcome
    - [x] Composite Score (weighted average, invert corruption)
 - [x] Ensure all formulas use Clamp01 normalization where specified.
-- [ ] Implement randomization where required (e.g., cohortQualityShock, deliberationNoise, economicShock).
+- [x] Implement randomization where required (e.g., cohortQualityShock, deliberationNoise, economicShock).
 - [x] Support both CurrentUsSystem and FederalSensorumSystem variants where formulas differ.
 
 ## 3. State Variables & Simulation Entities
@@ -64,7 +64,7 @@
    - [x] SimulationConfig and CommonDynamicsConfig parameters
 
 ## 7. Testing and Validation
-- [ ] Add/expand tests to verify that all metrics, update rules, and cross-domain dependencies behave as specified.
+- [ ] Add/expand tests to verify that all metrics, update rules, and cross-domain dependencies behave as specified. (IN PROGRESS)
 
 ## 8. Documentation
 - [ ] Document all metric formulas, update rules, and cross-domain dependencies in code comments and/or module docs.

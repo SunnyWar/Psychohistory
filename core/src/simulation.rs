@@ -256,3 +256,126 @@ fn rotate_membership(system: &mut GovernanceSystem, year: usize) {
     // TODO: Implement membership rotation logic if required by the simulation
     // For now, this is a stub.
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::entities::{GovernanceSystem, YearOutcome};
+    use crate::config::SimulationConfig;
+
+    #[test]
+    fn test_simulate_year_metrics_deterministic() {
+        let mut state = SimulationState::default();
+        let config = SimulationConfig::default();
+        let system = GovernanceSystem::default();
+        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        let outcome = simulate_year(&system, &mut state, &config, 42, &plugins);
+        // All metrics should be in [0, 1]
+        assert!((0.0..=1.0).contains(&outcome.law_quality));
+        assert!((0.0..=1.0).contains(&outcome.corruption_level));
+        assert!((0.0..=1.0).contains(&outcome.public_trust));
+        assert!((0.0..=1.0).contains(&outcome.crisis_response));
+        assert!((0.0..=1.0).contains(&outcome.adaptability));
+        assert!((0.0..=1.0).contains(&outcome.representation_accuracy));
+        assert!((0.0..=1.0).contains(&outcome.legislative_speed));
+        assert!((0.0..=1.0).contains(&outcome.economic_outcome));
+        assert!((0.0..=1.0).contains(&outcome.composite_score));
+    }
+
+    #[test]
+    fn test_extreme_inputs() {
+        let mut state = SimulationState::default();
+        let mut config = SimulationConfig::default();
+        let system = GovernanceSystem::default();
+        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        // Set extreme values for state and config
+        state.avg_integrity = 0.0;
+        state.lobbying_pressure = 5.0;
+        state.donor_pressure = 5.0;
+        state.media_impact = 5.0;
+        state.reelection_pressure = 5.0;
+        state.normalized_wealth_influence = 5.0;
+        state.faction_formation = 5.0;
+        state.bad_law_drag = 5.0;
+        state.is_gridlocked = true;
+        state.external_shock = 5.0;
+        state.challenge_happened = true;
+        state.legislative_efficiency = 0.0;
+        state.deliberation_noise = 5.0;
+        state.deliberation_bonus = 5.0;
+        state.evidence_board_effect = 5.0;
+        state.cohort_quality_shock = 5.0;
+        state.stability_multiplier = 0.0;
+        state.legislative_competence = 0.0;
+        state.judicial_competence = 0.0;
+        state.expert_support_effectiveness = 0.0;
+        state.avg_competence = 0.0;
+        state.avg_leadership = 0.0;
+        state.avg_representation = 0.0;
+        state.policy_stock = 0.0;
+        config.bias_level = 1.0;
+        config.public_trust_decay_rate = 0.1;
+        config.lobbying_strength = 5.0;
+        config.wealth_influence_multiplier = 5.0;
+        config.crisis_year_probability = 1.0;
+        config.new_challenge_pressure = 1.0;
+        config.economic_volatility = 1.0;
+        config.baseline_public_trust = 0.0;
+        config.media_influence_strength = 5.0;
+        config.weights = [1.0; 8];
+        config.us_corruption_base = 1.0;
+        config.us_reelection_bonus = 5.0;
+        config.partisan_polarization = 1.0;
+        config.raw_law_quality = 0.0;
+        config.representative_efficiency = 0.0;
+        config.raw_speed = 0.0;
+        let outcome = simulate_year(&system, &mut state, &config, 1, &plugins);
+        // All metrics should still be clamped to [0, 1]
+        assert!((0.0..=1.0).contains(&outcome.law_quality));
+        assert!((0.0..=1.0).contains(&outcome.corruption_level));
+        assert!((0.0..=1.0).contains(&outcome.public_trust));
+        assert!((0.0..=1.0).contains(&outcome.crisis_response));
+        assert!((0.0..=1.0).contains(&outcome.adaptability));
+        assert!((0.0..=1.0).contains(&outcome.representation_accuracy));
+        assert!((0.0..=1.0).contains(&outcome.legislative_speed));
+        assert!((0.0..=1.0).contains(&outcome.economic_outcome));
+        assert!((0.0..=1.0).contains(&outcome.composite_score));
+    }
+
+    #[test]
+    fn test_cross_domain_dependency() {
+        let mut state = SimulationState::default();
+        let mut config = SimulationConfig::default();
+        let system = GovernanceSystem::default();
+        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        // Set corruption high, expect public trust and economic outcome to be lower
+        state.avg_integrity = 0.0;
+        state.lobbying_pressure = 5.0;
+        state.donor_pressure = 5.0;
+        state.reelection_pressure = 5.0;
+        state.normalized_wealth_influence = 5.0;
+        state.faction_formation = 5.0;
+        state.bad_law_drag = 5.0;
+        config.us_corruption_base = 1.0;
+        let outcome = simulate_year(&system, &mut state, &config, 2, &plugins);
+        // Corruption should be high, public trust and economic outcome should be low
+        assert!(outcome.corruption_level > 0.8);
+        assert!(outcome.public_trust < 0.5);
+        assert!(outcome.economic_outcome < 0.5);
+    }
+
+    #[test]
+    fn test_policy_stock_and_adaptability() {
+        let mut state = SimulationState::default();
+        let config = SimulationConfig::default();
+        let system = GovernanceSystem::default();
+        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        state.policy_stock = 1.0;
+        state.avg_competence = 1.0;
+        state.avg_leadership = 1.0;
+        state.challenge_happened = true;
+        let outcome = simulate_year(&system, &mut state, &config, 3, &plugins);
+        // Adaptability should be relatively high
+        assert!(outcome.adaptability > 0.5);
+    }
+}
