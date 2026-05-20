@@ -43,7 +43,7 @@ impl Scheduler {
             let systems_ref = &self.systems;
             state.par_execute_systems(|snapshot, key, data_bucket| {
                 // Route deeply nested namespaced keys (e.g., "us:ca:los_angeles:econ" -> "econ")
-                let archetype_key = key.split(':').last().unwrap_or(key);
+                let archetype_key = key.split(':').next_back().unwrap_or(key);
                 if let Some(system) = systems_ref.get(archetype_key) {
                     system.run_system(snapshot, data_bucket, time, key);
                 }

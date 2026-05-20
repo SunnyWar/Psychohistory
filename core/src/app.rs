@@ -21,7 +21,7 @@ const YELLOW: &str = "\x1b[33m";
 const RESET: &str = "\x1b[0m";
 
 fn colorize_change_f64(before: f64, after: f64) -> Option<String> {
-    if (before - after).abs() < std::f64::EPSILON {
+    if (before - after).abs() < f64::EPSILON {
         None
     } else if after > before {
         Some(format!("{GREEN}{:.2}{RESET}", after))
@@ -228,5 +228,11 @@ impl App {
                 println!("\n[{}]", key);
             }
         }
+    }
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
     }
 }

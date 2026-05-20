@@ -15,10 +15,14 @@ type ClonerFn = Box<
 
 type ClonerMap = HashMap<&'static str, ClonerFn>;
 
+use models::{EconSystemType, GovType};
+
 pub struct SimulationState {
     pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     cloners: ClonerMap,
+    pub gov_type: GovType,
+    pub econ_system: EconSystemType,
 }
 
 impl SimulationState {
@@ -69,6 +73,8 @@ impl SimulationState {
             current: HashMap::new(),
             next: HashMap::new(),
             cloners: HashMap::new(),
+            gov_type: GovType::Democracy,
+            econ_system: EconSystemType::Market,
         }
     }
 
