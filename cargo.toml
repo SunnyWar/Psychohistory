@@ -15,3 +15,4 @@ members = [
 models = { path = "models" }
 sdk = { path = "sdk" }
 core = { path = "core" }
+rand = { version = "0.10.1", features = ["std"] }

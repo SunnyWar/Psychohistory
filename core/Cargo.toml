@@ -1,3 +1,5 @@
+[dev-dependencies]
+serde_json = "1.0"
 [package]
 name = "core"
 version = "0.1.0"
@@ -8,3 +10,6 @@ models = { workspace = true }
 sdk = { workspace = true }
 indicatif = "0.18.4"
 rayon = "1.12.0"
+serde = { version = "1.0", features = ["derive"] }
+rand = { version = "0.10.1", features = ["std"] }
+rand_distr = "0.6.0"

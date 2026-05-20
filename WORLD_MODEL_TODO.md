@@ -46,22 +46,22 @@
    - [x] Plugins may modify the outcome (plugin hook implemented).
    - [x] Membership may be rotated (stub present).
    - [x] YearOutcome is recorded.
-- [ ] At end of run:
-   - [ ] RunResult is constructed with averages and composite score.
+- [x] At end of run:
+   - [x] RunResult is constructed with averages and composite score.
 
 ## 5. Cross-Domain Couplings
-- [ ] Ensure all metric dependencies are respected:
-   - [ ] Law Quality, Crisis Response, Adaptability, Legislative Speed, Economic Outcome, and Public Trust are interdependent.
-   - [ ] Corruption Level affects Public Trust and Economic Outcome.
-   - [ ] Media Impact affects Law Quality and Public Trust.
-   - [ ] Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
-   - [ ] Composite Score aggregates all metrics, inverting Corruption.
+- [x] Ensure all metric dependencies are respected:
+   - [x] Law Quality, Crisis Response, Adaptability, Legislative Speed, Economic Outcome, and Public Trust are interdependent.
+   - [x] Corruption Level affects Public Trust and Economic Outcome.
+   - [x] Media Impact affects Law Quality and Public Trust.
+   - [x] Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
+   - [x] Composite Score aggregates all metrics, inverting Corruption.
 
 ## 6. Constants, Thresholds, Magic Numbers
-- [ ] Use the same coefficients and normalization as specified:
-   - [ ] Clamp01 for all metrics
-   - [ ] All weights and coefficients (see extracted list)
-   - [ ] SimulationConfig and CommonDynamicsConfig parameters
+- [x] Use the same coefficients and normalization as specified:
+   - [x] Clamp01 for all metrics
+   - [x] All weights and coefficients (see extracted list)
+   - [x] SimulationConfig and CommonDynamicsConfig parameters
 
 ## 7. Testing and Validation
 - [ ] Add/expand tests to verify that all metrics, update rules, and cross-domain dependencies behave as specified.

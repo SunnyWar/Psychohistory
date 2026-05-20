@@ -1,4 +1,18 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ChamberType {
+    House,
+    Senate,
+    LegislativeAssembly,
+    JudicialTribunal,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SystemKind {
+    CurrentUsSystem,
+    FederalSensorumSystem,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Legislator {
@@ -14,37 +28,11 @@ pub struct Legislator {
     pub faction_affinity: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ChamberType {
-    House,
-    Senate,
-    LegislativeAssembly,
-    JudicialTribunal,
-}
-
-impl Default for ChamberType {
-    fn default() -> Self {
-        ChamberType::House
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct GovernanceSystem {
     pub members: Vec<Legislator>,
     pub system_kind: SystemKind,
     pub display_name: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum SystemKind {
-    CurrentUsSystem,
-    FederalSensorumSystem,
-}
-
-impl Default for SystemKind {
-    fn default() -> Self {
-        SystemKind::CurrentUsSystem
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -58,4 +46,16 @@ pub struct YearOutcome {
     pub legislative_speed: f64,
     pub economic_outcome: f64,
     pub composite_score: f64,
+}
+
+impl Default for ChamberType {
+    fn default() -> Self {
+        ChamberType::House
+    }
+}
+
+impl Default for SystemKind {
+    fn default() -> Self {
+        SystemKind::CurrentUsSystem
+    }
 }

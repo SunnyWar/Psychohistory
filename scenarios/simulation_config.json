@@ -24,46 +24,37 @@
   "regions": {
     "us": {
       "archetype": "sovereign_developed",
+      "simulation_parameters": {
+        "bias_level": 0.0,
+        "public_trust_decay_rate": 0.015,
+        "us_reelection_bonus": 1.0,
+        "partisan_polarization": 0.0,
+        "raw_law_quality": 1.0,
+        "representative_efficiency": 1.0,
+        "raw_speed": 1.0
+      },
       "components": {
-        "econ": { "gdp": 27360000000000.0, "inflation": 0.024 },
+                      "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "California" },
+                      "simulation_parameters": {
+                        "bias_level": 0.0,
+                        "public_trust_decay_rate": 0.015,
+                        "lobbying_strength": 1.0,
+                        "wealth_influence_multiplier": 1.0,
+                        "crisis_year_probability": 0.18,
+                        "new_challenge_pressure": 0.35,
+                        "economic_volatility": 0.20,
+                        "baseline_public_trust": 0.48,
+                        "media_influence_strength": 0.38,
+                        "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+                        "us_corruption_base": 0.0,
+                        "us_reelection_bonus": 1.0,
+                        "partisan_polarization": 0.0,
+                        "raw_law_quality": 1.0,
+                        "representative_efficiency": 1.0,
+                        "raw_speed": 1.0
+                      },
         "gov": { "tax_rate": 0.21, "budget": 0.0, "stability": 0.85 },
         "demog": { "population": 336000000, "birth_rate": 0.012 }
-      },
-      "sub_regions": {
-        "california": {
-          "archetype": "regional_subdivision",
-          "components": {
-            "econ": { "gdp": 3860000000000.0, "inflation": 0.026 },
-            "gov": { "tax_rate": 0.088, "budget": 0.0, "stability": 0.88 },
-            "demog": { "population": 39000000, "birth_rate": 0.011 }
-          },
-          "sub_regions": {
-            "los_angeles": {
-              "archetype": "urban_metropolitan",
-              "components": {
-                "econ": { "gdp": 1120000000000.0, "inflation": 0.027 },
-                "gov": { "tax_rate": 0.012, "budget": 0.0, "stability": 0.82 },
-                "demog": { "population": 3820000, "birth_rate": 0.010 }
-              }
-            },
-            "san_francisco": {
-              "archetype": "urban_metropolitan",
-              "components": {
-                "econ": { "gdp": 620000000000.0, "inflation": 0.029 },
-                "gov": { "tax_rate": 0.015, "budget": 0.0, "stability": 0.80 },
-                "demog": { "population": 810000, "birth_rate": 0.009 }
-              }
-            }
-          }
-        },
-        "texas": {
-          "archetype": "regional_subdivision",
-          "components": {
-            "econ": { "gdp": 2560000000000.0, "inflation": 0.023 },
-            "gov": { "tax_rate": 0.062, "budget": 0.0, "stability": 0.91 },
-            "demog": { "population": 30500000, "birth_rate": 0.013 }
-          }
-        }
       }
     },
     "cn": {

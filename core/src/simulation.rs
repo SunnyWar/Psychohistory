@@ -1,15 +1,9 @@
-use rand::Rng;
-use rand_distr::Normal;
-fn clamp01(x: f64) -> f64 {
-    if x < 0.0 {
-        0.0
-    } else if x > 1.0 {
-        1.0
-    } else {
-        x
-    }
-}
+use crate::config::SimulationConfig;
 use crate::entities::{GovernanceSystem, YearOutcome};
+use crate::run_result::RunResult;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+use rand_distr::{Distribution, Normal};
 
 pub struct SimulationState {
     pub year_outcomes: Vec<YearOutcome>,
@@ -73,70 +67,90 @@ impl Default for SimulationState {
     }
 }
 
-
 pub trait SimulationPlugin {
-    fn modify_outcome(&self, system: &GovernanceSystem, state: &SimulationState, year: usize, outcome: &mut YearOutcome);
+    fn modify_outcome(
+        &self,
+        system: &GovernanceSystem,
+        state: &SimulationState,
+        year: usize,
+        outcome: &mut YearOutcome,
+    );
+}
+
+fn clamp01(x: f64) -> f64 {
+    if x < 0.0 {
+        0.0
+    } else if x > 1.0 {
+        1.0
+    } else {
+        x
+    }
 }
 
 pub fn simulate_year(
     system: &GovernanceSystem,
     state: &mut SimulationState,
+    config: &SimulationConfig,
     year: usize,
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
-    let mut rng = rand::thread_rng();
+    let mut rng = StdRng::seed_from_u64(year as u64);
     // Example: Law Quality (CurrentUsSystem)
     let lobbying_pressure = state.lobbying_pressure;
     let donor_pressure = state.donor_pressure;
     let media_impact = state.media_impact;
-    let bias_level = 0.0; // TODO: get from config
-    let raw_law_quality = 1.0; // TODO: compute from system
-    let representative_efficiency = 1.0; // TODO: compute from system
-    let special_interest_degradation = clamp01(1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06);
+    let bias_level = config.bias_level;
+    let raw_law_quality = config.raw_law_quality;
+    let representative_efficiency = config.representative_efficiency;
+    let special_interest_degradation =
+        clamp01(1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06);
     let bias_adjustment = -bias_level.abs() * 0.02;
-    let law_quality = clamp01(raw_law_quality * representative_efficiency * special_interest_degradation + bias_adjustment);
+    let law_quality = clamp01(
+        raw_law_quality * representative_efficiency * special_interest_degradation
+            + bias_adjustment,
+    );
 
     // Example: Corruption Level (CurrentUsSystem)
-    let us_corruption_base = 0.0; // TODO: get from config
+    let us_corruption_base = config.us_corruption_base;
     let avg_integrity = state.avg_integrity;
     let reelection_pressure = state.reelection_pressure;
-    let us_reelection_bonus = 1.0; // TODO: get from config
+    let us_reelection_bonus = config.us_reelection_bonus;
     let normalized_wealth_influence = state.normalized_wealth_influence;
     let faction_formation = state.faction_formation;
     let bad_law_drag = state.bad_law_drag;
-    let random_noise = rng.gen::<f64>() * 0.04;
+    let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut rng);
     let corruption_level = clamp01(
         us_corruption_base
-        + (1.0 - avg_integrity) * 0.28
-        + lobbying_pressure * 0.24
-        + donor_pressure * 0.20
-        + reelection_pressure * us_reelection_bonus * 0.22
-        + normalized_wealth_influence * 0.14
-        + faction_formation * 0.10
-        + bad_law_drag * 0.05
-        + random_noise
+            + (1.0 - avg_integrity) * 0.28
+            + lobbying_pressure * 0.24
+            + donor_pressure * 0.20
+            + reelection_pressure * us_reelection_bonus * 0.22
+            + normalized_wealth_influence * 0.14
+            + faction_formation * 0.10
+            + bad_law_drag * 0.05
+            + random_noise,
     );
 
     // Public Trust (CurrentUsSystem)
     let prior_trust = state.prior_trust;
-    let public_trust_decay_rate = 0.015; // TODO: get from config
+    let public_trust_decay_rate = config.public_trust_decay_rate;
     let decayed_prior_trust = prior_trust * (1.0 - public_trust_decay_rate);
     let crisis_response = 0.0; // TODO: compute below
-    let legislative_speed = 0.0; // TODO: compute below
+    let legislative_speed = 0.0; // Will be computed below
     let bad_law_drag = state.bad_law_drag;
     let is_gridlocked = state.is_gridlocked;
     let external_shock = state.external_shock;
     let media_impact = state.media_impact;
     let public_trust = clamp01(
         decayed_prior_trust * 0.68
-        + law_quality * 0.14
-        + crisis_response * 0.06
-        + legislative_speed * 0.05
-        - corruption_level * 0.20
-        - bad_law_drag * 0.08
-        - if is_gridlocked { 0.04 } else { 0.0 }
-        - external_shock * 0.03
-        + media_impact * 0.08
+            + law_quality * 0.14
+            + crisis_response * 0.06
+            + legislative_speed * 0.05
+            - corruption_level * 0.20
+            - bad_law_drag * 0.08
+            - if is_gridlocked { 0.04 } else { 0.0 }
+            - external_shock * 0.03
+            + media_impact * 0.08,
     );
 
     // Crisis Response (FederalSensorumSystem)
@@ -145,7 +159,7 @@ pub fn simulate_year(
     let avg_leadership = state.avg_leadership;
     let expert_support_effectiveness = state.expert_support_effectiveness;
     let policy_stock = state.policy_stock;
-    let deliberation_noise = rng.sample::<f64, _>(Normal::new(0.0, 0.1).unwrap());
+    let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut rng);
     let legislative_efficiency = state.legislative_efficiency;
     let stability_multiplier = state.stability_multiplier;
     let base_crisis_capability = legislative_competence * 0.20
@@ -154,22 +168,23 @@ pub fn simulate_year(
         + expert_support_effectiveness * 0.16
         + policy_stock * 0.11
         + deliberation_noise * 0.22;
-    let crisis_response = clamp01(base_crisis_capability * legislative_efficiency * stability_multiplier);
+    let crisis_response =
+        clamp01(base_crisis_capability * legislative_efficiency * stability_multiplier);
 
     // Adaptability (CurrentUsSystem)
     let avg_competence = state.avg_competence;
-    let partisan_polarization = 0.0; // TODO: get from config
+    let partisan_polarization = config.partisan_polarization;
     let challenge_happened = state.challenge_happened;
     let faction_formation = state.faction_formation;
     let adaptability = clamp01(
         avg_competence * 0.24
-        + policy_stock * 0.14
-        + (1.0 - partisan_polarization) * 0.12
-        + avg_leadership * 0.10
-        + if challenge_happened { 0.05 } else { 0.0 }
-        - faction_formation * 0.10
-        - bad_law_drag * 0.08
-        - if is_gridlocked { 0.08 } else { 0.0 }
+            + policy_stock * 0.14
+            + (1.0 - partisan_polarization) * 0.12
+            + avg_leadership * 0.10
+            + if challenge_happened { 0.05 } else { 0.0 }
+            - faction_formation * 0.10
+            - bad_law_drag * 0.08
+            - if is_gridlocked { 0.08 } else { 0.0 },
     );
 
     // Representation Accuracy (CurrentUsSystem)
@@ -177,28 +192,28 @@ pub fn simulate_year(
     let representation_accuracy = clamp01(avg_representation * 0.90 - donor_pressure * 0.06);
 
     // Legislative Speed (FederalSensorumSystem)
-    let raw_speed = 1.0; // TODO: compute from system
+    let raw_speed = config.raw_speed;
     let legislative_speed = clamp01(raw_speed * legislative_efficiency);
 
     // Economic Outcome (CurrentUsSystem)
-    let economic_volatility = 0.20; // TODO: get from config
-    let economic_shock = rng.sample::<f64, _>(Normal::new(0.0, economic_volatility * 0.10).unwrap());
+    let economic_volatility = config.economic_volatility;
+    let economic_shock = Normal::new(0.0, economic_volatility * 0.10)
+        .unwrap()
+        .sample(&mut rng);
     let economic_outcome = clamp01(
-        0.36
-        + law_quality * 0.20
-        + crisis_response * 0.13
-        + adaptability * 0.10
-        + policy_stock * 0.10
-        - corruption_level * 0.13
-        - bad_law_drag * 0.07
-        - external_shock * 0.08
-        + economic_shock
+        0.36 + law_quality * 0.20
+            + crisis_response * 0.13
+            + adaptability * 0.10
+            + policy_stock * 0.10
+            - corruption_level * 0.13
+            - bad_law_drag * 0.07
+            - external_shock * 0.08
+            + economic_shock,
     );
 
     // Composite Score
-    let weights = [1.0; 8]; // TODO: get from config if needed
-    let weighted_numerator =
-        law_quality * weights[0]
+    let weights = config.weights;
+    let weighted_numerator = law_quality * weights[0]
         + (1.0 - corruption_level) * weights[1]
         + public_trust * weights[2]
         + crisis_response * weights[3]
@@ -207,7 +222,11 @@ pub fn simulate_year(
         + legislative_speed * weights[6]
         + economic_outcome * weights[7];
     let weight_total: f64 = weights.iter().sum();
-    let composite_score = if weight_total <= 0.0 { 0.0 } else { weighted_numerator / weight_total };
+    let composite_score = if weight_total <= 0.0 {
+        0.0
+    } else {
+        weighted_numerator / weight_total
+    };
 
     let mut outcome = YearOutcome {
         law_quality,
@@ -226,18 +245,23 @@ pub fn simulate_year(
     outcome
 }
 
-pub fn run_simulation(system: &GovernanceSystem, years: usize, plugins: &[Box<dyn SimulationPlugin>]) -> Vec<YearOutcome> {
+pub fn run_simulation(
+    system: &GovernanceSystem,
+    years: usize,
+    config: &SimulationConfig,
+    plugins: &[Box<dyn SimulationPlugin>],
+) -> RunResult {
     let mut state = SimulationState::default();
     let mut outcomes = Vec::with_capacity(years);
     let mut system = system.clone();
     for year in 0..years {
         // Membership rotation stub (implement logic as needed)
         rotate_membership(&mut system, year);
-        let outcome = simulate_year(&system, &mut state, year, plugins);
+        let outcome = simulate_year(&system, &mut state, config, year, plugins);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }
-    outcomes
+    RunResult::from_outcomes(outcomes)
 }
 
 fn rotate_membership(system: &mut GovernanceSystem, year: usize) {
