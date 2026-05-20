@@ -62,7 +62,26 @@
       "components": {
         "econ": { "gdp": 18560000000000.0, "inflation": 0.015 },
         "gov": { "tax_rate": 0.28, "budget": 0.0, "stability": 0.89 },
-        "demog": { "population": 1412000000, "birth_rate": 0.009 }
+        "demog": { "population": 1412000000, "birth_rate": 0.009 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "China" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       },
       "sub_regions": {
         "guangdong": {
@@ -70,7 +89,26 @@
           "components": {
             "econ": { "gdp": 1920000000000.0, "inflation": 0.014 },
             "gov": { "tax_rate": 0.24, "budget": 0.0, "stability": 0.92 },
-            "demog": { "population": 127000000, "birth_rate": 0.010 }
+            "demog": { "population": 127000000, "birth_rate": 0.010 },
+            "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "Guangdong" },
+            "simulation_parameters": {
+              "bias_level": 0.0,
+              "public_trust_decay_rate": 0.015,
+              "lobbying_strength": 1.0,
+              "wealth_influence_multiplier": 1.0,
+              "crisis_year_probability": 0.18,
+              "new_challenge_pressure": 0.35,
+              "economic_volatility": 0.20,
+              "baseline_public_trust": 0.48,
+              "media_influence_strength": 0.38,
+              "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+              "us_corruption_base": 0.0,
+              "us_reelection_bonus": 1.0,
+              "partisan_polarization": 0.0,
+              "raw_law_quality": 1.0,
+              "representative_efficiency": 1.0,
+              "raw_speed": 1.0
+            }
           }
         }
       }
@@ -80,7 +118,26 @@
       "components": {
         "econ": { "gdp": 4430000000000.0, "inflation": 0.021 },
         "gov": { "tax_rate": 0.31, "budget": 0.0, "stability": 0.92 },
-        "demog": { "population": 84300000, "birth_rate": 0.009 }
+        "demog": { "population": 84300000, "birth_rate": 0.009 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "Germany" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       }
     },
     "fr": {
@@ -88,7 +145,26 @@
       "components": {
         "econ": { "gdp": 3050000000000.0, "inflation": 0.022 },
         "gov": { "tax_rate": 0.34, "budget": 0.0, "stability": 0.84 },
-        "demog": { "population": 68000000, "birth_rate": 0.011 }
+        "demog": { "population": 68000000, "birth_rate": 0.011 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "France" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       }
     },
     "jp": {
@@ -96,7 +172,26 @@
       "components": {
         "econ": { "gdp": 4210000000000.0, "inflation": 0.018 },
         "gov": { "tax_rate": 0.26, "budget": 0.0, "stability": 0.94 },
-        "demog": { "population": 124000000, "birth_rate": 0.007 }
+        "demog": { "population": 124000000, "birth_rate": 0.007 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "Japan" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       }
     },
     "in": {
@@ -104,7 +199,26 @@
       "components": {
         "econ": { "gdp": 3940000000000.0, "inflation": 0.048 },
         "gov": { "tax_rate": 0.18, "budget": 0.0, "stability": 0.79 },
-        "demog": { "population": 1440000000, "birth_rate": 0.016 }
+        "demog": { "population": 1440000000, "birth_rate": 0.016 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "India" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       }
     },
     "gb": {
@@ -112,7 +226,26 @@
       "components": {
         "econ": { "gdp": 3340000000000.0, "inflation": 0.025 },
         "gov": { "tax_rate": 0.29, "budget": 0.0, "stability": 0.81 },
-        "demog": { "population": 68200000, "birth_rate": 0.010 }
+        "demog": { "population": 68200000, "birth_rate": 0.010 },
+        "governance_system": { "members": [], "system_kind": "CurrentUsSystem", "display_name": "United Kingdom" },
+        "simulation_parameters": {
+          "bias_level": 0.0,
+          "public_trust_decay_rate": 0.015,
+          "lobbying_strength": 1.0,
+          "wealth_influence_multiplier": 1.0,
+          "crisis_year_probability": 0.18,
+          "new_challenge_pressure": 0.35,
+          "economic_volatility": 0.20,
+          "baseline_public_trust": 0.48,
+          "media_influence_strength": 0.38,
+          "weights": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          "us_corruption_base": 0.0,
+          "us_reelection_bonus": 1.0,
+          "partisan_polarization": 0.0,
+          "raw_law_quality": 1.0,
+          "representative_efficiency": 1.0,
+          "raw_speed": 1.0
+        }
       }
     }
   }

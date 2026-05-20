@@ -34,12 +34,18 @@ fn main() {
     fn simulate_region_tree(region_name: &str, node: &Value, years: usize) {
         println!("[INFO] Simulating region: {}", region_name);
         // Try to load GovernanceSystem and SimulationConfig for this region
-        let system = node
-            .get("governance_system")
-            .and_then(|gs| serde_json::from_value(gs.clone()).ok());
-        let config = node
-            .get("simulation_parameters")
-            .and_then(|sp| serde_json::from_value(sp.clone()).ok());
+        // Support both top-level and 'components'-nested fields
+        let (system, config) = {
+            let system = node
+                .get("governance_system")
+                .or_else(|| node.get("components").and_then(|c| c.get("governance_system")))
+                .and_then(|gs| serde_json::from_value(gs.clone()).ok());
+            let config = node
+                .get("simulation_parameters")
+                .or_else(|| node.get("components").and_then(|c| c.get("simulation_parameters")))
+                .and_then(|sp| serde_json::from_value(sp.clone()).ok());
+            (system, config)
+        };
 
         if let (Some(system), Some(config)) = (system, config) {
             let plugins: Vec<Box<dyn core::simulation::SimulationPlugin>> = vec![]; // No plugins for now
