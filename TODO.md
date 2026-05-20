@@ -5,12 +5,12 @@ This TODO is tailored for the current codebase state. **For each item, first ins
 ---
 
 ## Phase 1: Configuration Audit & The 'us' Region Bug
-- [ ] **Audit the Config Parser:**  
+- [x] **Audit the Config Parser:**  
   - Inspect: [core/src/config.rs], [core/src/app.rs], [cli/src/main.rs]  
-  - Action: Review how scenario/config files are loaded and validated. Find out why `[WARN] Skipping region 'us' due to missing or invalid system/config` appears, while other regions load fine. Check for schema mismatches, missing fields, or validation logic that could cause this.
-- [ ] **Verify Dual-System Data:**  
+  - **Complete:** Config parsing now robust—missing fields are filled with defaults, incomplete configs are accepted, and tests validate this. The `[WARN] Skipping region 'us'` bug was due to missing fields in the top-level config, now handled by serde defaults.
+ - [x] **Verify Dual-System Data:**  
   - Inspect: [core/src/config.rs], [scenarios/simulation_config.json], [core/src/state.rs]  
-  - Action: Confirm that configuration structs support loading parameters for *both* a region’s "Status Quo" and "Sortition" alternatives. If fields exist, ensure they are populated from JSON and passed through to simulation state.
+  - **Complete:** Current config/schema only supports a single system per region (no dual-system or alternative block). If dual-system support is needed, schema and code must be extended to allow two sets of parameters per region.
 
 ---
 
