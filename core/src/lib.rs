@@ -1,4 +1,5 @@
 pub use app::App;
+pub use experiment::{ExperimentResult, run_experiment};
 pub use plugin::Plugin;
 pub use state::SimulationState;
 pub use system::System;

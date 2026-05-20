@@ -3,25 +3,25 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Deserialize)]
 pub struct SimulationConfig {
     #[serde(default)]
-    pub bias_level: f64,                  // [-1, 1]
+    pub bias_level: f64, // [-1, 1]
     #[serde(default)]
-    pub public_trust_decay_rate: f64,     // [0, 0.1]
+    pub public_trust_decay_rate: f64, // [0, 0.1]
     #[serde(default)]
-    pub lobbying_strength: f64,           // [0, 5]
+    pub lobbying_strength: f64, // [0, 5]
     #[serde(default)]
     pub wealth_influence_multiplier: f64, // [0, 5]
     #[serde(default)]
-    pub crisis_year_probability: f64,     // 0.18
+    pub crisis_year_probability: f64, // 0.18
     #[serde(default)]
-    pub new_challenge_pressure: f64,      // 0.35
+    pub new_challenge_pressure: f64, // 0.35
     #[serde(default)]
-    pub economic_volatility: f64,         // 0.20
+    pub economic_volatility: f64, // 0.20
     #[serde(default)]
-    pub baseline_public_trust: f64,       // 0.48
+    pub baseline_public_trust: f64, // 0.48
     #[serde(default)]
-    pub media_influence_strength: f64,    // 0.38
+    pub media_influence_strength: f64, // 0.38
     #[serde(default)]
-    pub weights: [f64; 8],                // for composite score
+    pub weights: [f64; 8], // for composite score
     #[serde(default)]
     pub us_corruption_base: f64,
     #[serde(default)]

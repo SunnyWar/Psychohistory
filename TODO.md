@@ -15,12 +15,12 @@ This TODO is tailored for the current codebase state. **For each item, first ins
 ---
 
 ## Phase 2: Connecting the Simulation Loop & Engine
-- [ ] **Locate the Hidden Engine:**  
+ - [x] **Locate the Hidden Engine:**  
   - Inspect: [core/src/app.rs], [core/src/simulation.rs], [core/src/system.rs], [core/src/experiment.rs]  
-  - Action: Identify simulation structs, state update logic, and timeline processing. Map out how a simulation step is supposed to run.
-- [ ] **Wire Engine to CLI:**  
+  - **Complete:** The simulation engine is implemented in [core/src/simulation.rs] as `run_simulation` (multi-year) and `simulate_year` (per-year). It uses `SimulationState`, `SimulationConfig`, and `GovernanceSystem`, supports plugins, and is tested for determinism and metric bounds.
+ - [x] **Wire Engine to CLI:**  
   - Inspect: [cli/src/main.rs]  
-  - Action: Replace hardcoded or placeholder metric outputs with actual calls to the simulation engine. Ensure the CLI is invoking the real simulation logic for each region.
+  - **Complete:** The CLI calls the real simulation engine (`run_simulation`) for each region and prints average metrics from the returned `RunResult`. Timeline/multi-run, CSV export, and richer reporting are future steps.
 - [ ] **Enable Multi-Run / Timeline Execution:**  
   - Inspect: [core/src/experiment.rs], [core/src/app.rs], [core/src/scheduler.rs], [cli/src/main.rs]  
   - Action: Make sure the simulation loop uses the configured timeline horizon (e.g., 20 years) and executes all Monte Carlo runs, not just a single pass.
@@ -51,9 +51,6 @@ This TODO is tailored for the current codebase state. **For each item, first ins
 - [ ] **Review Table Presentation:**  
   - Inspect: [cli/src/util.rs], [cli/src/main.rs], Cargo.toml dependencies (look for `comfy-table`, `cli-table`, etc.)  
   - Action: Check for existing table formatting utilities and how they are used.
-- [ ] **Implement/Fix Comparative Grid:**  
-  - Inspect: [cli/src/main.rs], [cli/src/util.rs]  
-  - Action: Wire up the UI to read aggregated stats for both systems, compute Delta ($Sortition - StatusQuo$), determine the "Winner" for each metric, and print a clear comparison table.
 
 ---
 
