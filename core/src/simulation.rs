@@ -77,16 +77,6 @@ pub trait SimulationPlugin {
     );
 }
 
-fn clamp01(x: f64) -> f64 {
-    if x < 0.0 {
-        0.0
-    } else if x > 1.0 {
-        1.0
-    } else {
-        x
-    }
-}
-
 pub fn simulate_year(
     system: &GovernanceSystem,
     state: &mut SimulationState,
@@ -103,12 +93,12 @@ pub fn simulate_year(
     let raw_law_quality = config.raw_law_quality;
     let representative_efficiency = config.representative_efficiency;
     let special_interest_degradation =
-        clamp01(1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06);
+        (1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06)
+            .clamp(0.0, 1.0);
     let bias_adjustment = -bias_level.abs() * 0.02;
-    let law_quality = clamp01(
-        raw_law_quality * representative_efficiency * special_interest_degradation
-            + bias_adjustment,
-    );
+    let law_quality = (raw_law_quality * representative_efficiency * special_interest_degradation
+        + bias_adjustment)
+        .clamp(0.0, 1.0);
 
     // Example: Corruption Level (CurrentUsSystem)
     let us_corruption_base = config.us_corruption_base;
@@ -119,17 +109,16 @@ pub fn simulate_year(
     let faction_formation = state.faction_formation;
     let bad_law_drag = state.bad_law_drag;
     let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut rng);
-    let corruption_level = clamp01(
-        us_corruption_base
-            + (1.0 - avg_integrity) * 0.28
-            + lobbying_pressure * 0.24
-            + donor_pressure * 0.20
-            + reelection_pressure * us_reelection_bonus * 0.22
-            + normalized_wealth_influence * 0.14
-            + faction_formation * 0.10
-            + bad_law_drag * 0.05
-            + random_noise,
-    );
+    let corruption_level = (us_corruption_base
+        + (1.0 - avg_integrity) * 0.28
+        + lobbying_pressure * 0.24
+        + donor_pressure * 0.20
+        + reelection_pressure * us_reelection_bonus * 0.22
+        + normalized_wealth_influence * 0.14
+        + faction_formation * 0.10
+        + bad_law_drag * 0.05
+        + random_noise)
+        .clamp(0.0, 1.0);
 
     // Public Trust (CurrentUsSystem)
     let prior_trust = state.prior_trust;
@@ -141,17 +130,16 @@ pub fn simulate_year(
     let is_gridlocked = state.is_gridlocked;
     let external_shock = state.external_shock;
     let media_impact = state.media_impact;
-    let public_trust = clamp01(
-        decayed_prior_trust * 0.68
-            + law_quality * 0.14
-            + crisis_response * 0.06
-            + legislative_speed * 0.05
-            - corruption_level * 0.20
-            - bad_law_drag * 0.08
-            - if is_gridlocked { 0.04 } else { 0.0 }
-            - external_shock * 0.03
-            + media_impact * 0.08,
-    );
+    let public_trust = (decayed_prior_trust * 0.68
+        + law_quality * 0.14
+        + crisis_response * 0.06
+        + legislative_speed * 0.05
+        - corruption_level * 0.20
+        - bad_law_drag * 0.08
+        - if is_gridlocked { 0.04 } else { 0.0 }
+        - external_shock * 0.03
+        + media_impact * 0.08)
+        .clamp(0.0, 1.0);
 
     // Crisis Response (FederalSensorumSystem)
     let legislative_competence = state.legislative_competence;
@@ -169,47 +157,47 @@ pub fn simulate_year(
         + policy_stock * 0.11
         + deliberation_noise * 0.22;
     let crisis_response =
-        clamp01(base_crisis_capability * legislative_efficiency * stability_multiplier);
+        (base_crisis_capability * legislative_efficiency * stability_multiplier).clamp(0.0, 1.0);
 
     // Adaptability (CurrentUsSystem)
     let avg_competence = state.avg_competence;
     let partisan_polarization = config.partisan_polarization;
     let challenge_happened = state.challenge_happened;
     let faction_formation = state.faction_formation;
-    let adaptability = clamp01(
-        avg_competence * 0.24
-            + policy_stock * 0.14
-            + (1.0 - partisan_polarization) * 0.12
-            + avg_leadership * 0.10
-            + if challenge_happened { 0.05 } else { 0.0 }
-            - faction_formation * 0.10
-            - bad_law_drag * 0.08
-            - if is_gridlocked { 0.08 } else { 0.0 },
-    );
+    let adaptability = (avg_competence * 0.24
+        + policy_stock * 0.14
+        + (1.0 - partisan_polarization) * 0.12
+        + avg_leadership * 0.10
+        + if challenge_happened { 0.05 } else { 0.0 }
+        - faction_formation * 0.10
+        - bad_law_drag * 0.08
+        - if is_gridlocked { 0.08 } else { 0.0 })
+    .clamp(0.0, 1.0);
 
     // Representation Accuracy (CurrentUsSystem)
     let avg_representation = state.avg_representation;
-    let representation_accuracy = clamp01(avg_representation * 0.90 - donor_pressure * 0.06);
+    let representation_accuracy =
+        (avg_representation * 0.90 - donor_pressure * 0.06).clamp(0.0, 1.0);
 
     // Legislative Speed (FederalSensorumSystem)
     let raw_speed = config.raw_speed;
-    let legislative_speed = clamp01(raw_speed * legislative_efficiency);
+    let legislative_speed = (raw_speed * legislative_efficiency).clamp(0.0, 1.0);
 
     // Economic Outcome (CurrentUsSystem)
     let economic_volatility = config.economic_volatility;
     let economic_shock = Normal::new(0.0, economic_volatility * 0.10)
         .unwrap()
         .sample(&mut rng);
-    let economic_outcome = clamp01(
-        0.36 + law_quality * 0.20
-            + crisis_response * 0.13
-            + adaptability * 0.10
-            + policy_stock * 0.10
-            - corruption_level * 0.13
-            - bad_law_drag * 0.07
-            - external_shock * 0.08
-            + economic_shock,
-    );
+    let economic_outcome = (0.36
+        + law_quality * 0.20
+        + crisis_response * 0.13
+        + adaptability * 0.10
+        + policy_stock * 0.10
+        - corruption_level * 0.13
+        - bad_law_drag * 0.07
+        - external_shock * 0.08
+        + economic_shock)
+        .clamp(0.0, 1.0);
 
     // Composite Score
     let weights = config.weights;

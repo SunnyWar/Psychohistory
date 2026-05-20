@@ -119,23 +119,23 @@ impl App {
             let mut any_change = false;
             let mut cross_domain = false;
             let mut changes = vec![];
-            if let (Some(DomainState::Demog(b)), Some(DomainState::Demog(a))) = (before, after) {
-                if b != a {
-                    any_change = b.print_diff(a);
-                    changes.push("demog");
-                }
+            if let (Some(DomainState::Demog(b)), Some(DomainState::Demog(a))) = (before, after)
+                && b != a
+            {
+                any_change = b.print_diff(a);
+                changes.push("demog");
             }
-            if let (Some(DomainState::Econ(b)), Some(DomainState::Econ(a))) = (before, after) {
-                if b != a {
-                    any_change = b.print_diff(a) || any_change;
-                    changes.push("econ");
-                }
+            if let (Some(DomainState::Econ(b)), Some(DomainState::Econ(a))) = (before, after)
+                && b != a
+            {
+                any_change = b.print_diff(a) || any_change;
+                changes.push("econ");
             }
-            if let (Some(DomainState::Gov(b)), Some(DomainState::Gov(a))) = (before, after) {
-                if b != a {
-                    any_change = b.print_diff(a) || any_change;
-                    changes.push("gov");
-                }
+            if let (Some(DomainState::Gov(b)), Some(DomainState::Gov(a))) = (before, after)
+                && b != a
+            {
+                any_change = b.print_diff(a) || any_change;
+                changes.push("gov");
             }
             // System transitions (global, not per-entity)
             // If you want per-entity, you must store gov_type/econ_system per entity
