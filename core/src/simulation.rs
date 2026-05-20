@@ -1,3 +1,5 @@
+use rand::Rng;
+use rand_distr::Normal;
 fn clamp01(x: f64) -> f64 {
     if x < 0.0 {
         0.0
@@ -82,6 +84,7 @@ pub fn simulate_year(
     year: usize,
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
+    let mut rng = rand::thread_rng();
     // Example: Law Quality (CurrentUsSystem)
     let lobbying_pressure = state.lobbying_pressure;
     let donor_pressure = state.donor_pressure;
@@ -101,7 +104,7 @@ pub fn simulate_year(
     let normalized_wealth_influence = state.normalized_wealth_influence;
     let faction_formation = state.faction_formation;
     let bad_law_drag = state.bad_law_drag;
-    let random_noise = 0.0; // TODO: random value in [0,1) * 0.04
+    let random_noise = rng.gen::<f64>() * 0.04;
     let corruption_level = clamp01(
         us_corruption_base
         + (1.0 - avg_integrity) * 0.28
@@ -142,7 +145,7 @@ pub fn simulate_year(
     let avg_leadership = state.avg_leadership;
     let expert_support_effectiveness = state.expert_support_effectiveness;
     let policy_stock = state.policy_stock;
-    let deliberation_noise = state.deliberation_noise; // TODO: random if stochastic
+    let deliberation_noise = rng.sample::<f64, _>(Normal::new(0.0, 0.1).unwrap());
     let legislative_efficiency = state.legislative_efficiency;
     let stability_multiplier = state.stability_multiplier;
     let base_crisis_capability = legislative_competence * 0.20
@@ -179,7 +182,7 @@ pub fn simulate_year(
 
     // Economic Outcome (CurrentUsSystem)
     let economic_volatility = 0.20; // TODO: get from config
-    let economic_shock = 0.0; // TODO: random gaussian(0, economic_volatility * 0.10)
+    let economic_shock = rng.sample::<f64, _>(Normal::new(0.0, economic_volatility * 0.10).unwrap());
     let economic_outcome = clamp01(
         0.36
         + law_quality * 0.20
