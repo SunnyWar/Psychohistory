@@ -1,3 +1,33 @@
+
+//! # Governance Simulation Core
+//!
+//! This module implements the main simulation logic for governance systems, including:
+//! - Output metrics (Law Quality, Corruption Level, Public Trust, Crisis Response, Adaptability, Representation Accuracy, Legislative Speed, Economic Outcome, Composite Score)
+//! - Metric formulas and update rules (see `simulate_year`)
+//! - Cross-domain dependencies between metrics
+//! - State variables and simulation entities
+//! - Plugin hooks for extensibility
+//!
+//! ## Metric Formulas & Update Rules
+//! Each metric is computed using a weighted sum of relevant state variables, configuration parameters, and random noise (where specified). All metrics are normalized to [0, 1] using `.clamp(0.0, 1.0)`.
+//!
+//! - **Law Quality**: Affected by lobbying, donor pressure, media impact, bias, and representative efficiency.
+//! - **Corruption Level**: Driven by integrity, lobbying, donor/donor pressure, reelection, wealth influence, faction formation, bad law drag, and random noise.
+//! - **Public Trust**: Decays from prior trust, increased by law quality, crisis response, legislative speed, media impact; decreased by corruption, bad law drag, gridlock, and external shocks.
+//! - **Crisis Response**: Combines legislative/judicial competence, leadership, expert support, policy stock, deliberation noise, legislative efficiency, and stability.
+//! - **Adaptability**: Based on competence, policy stock, polarization, leadership, challenge events, faction formation, bad law drag, and gridlock.
+//! - **Representation Accuracy**: Based on average representation and donor pressure.
+//! - **Legislative Speed**: Product of raw speed and legislative efficiency.
+//! - **Economic Outcome**: Weighted sum of law quality, crisis response, adaptability, policy stock, corruption, bad law drag, external shock, and economic shock.
+//! - **Composite Score**: Weighted average of all metrics, with corruption inverted.
+//!
+//! ## Cross-Domain Dependencies
+//! - Law Quality, Crisis Response, Adaptability, Legislative Speed, Economic Outcome, and Public Trust are interdependent.
+//! - Corruption Level affects Public Trust and Economic Outcome.
+//! - Media Impact affects Law Quality and Public Trust.
+//! - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
+//! - Composite Score aggregates all metrics, inverting Corruption.
+
 use crate::config::SimulationConfig;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::run_result::RunResult;
@@ -77,6 +107,36 @@ pub trait SimulationPlugin {
     );
 }
 
+/// Simulate a single year of governance, updating all output metrics.
+///
+/// # Metric Formulas
+/// - See module-level docs for details on each metric.
+/// - All metrics are normalized to [0, 1].
+/// - Randomization is applied to corruption, deliberation, and economic shocks.
+///
+/// # Cross-Domain Dependencies
+/// - Metrics are interdependent as described in the module docs.
+///
+/// # Arguments
+/// Simulate a single year of governance, updating all output metrics.
+///
+/// # Metric Formulas
+/// - See module-level docs for details on each metric.
+/// - All metrics are normalized to [0, 1].
+/// - Randomization is applied to corruption, deliberation, and economic shocks.
+///
+/// # Cross-Domain Dependencies
+/// - Metrics are interdependent as described in the module docs.
+///
+/// # Arguments
+/// * `system` - The governance system being simulated
+/// * `state` - The mutable simulation state for the current year
+/// * `config` - Simulation configuration parameters
+/// * `year` - The simulation year (used for RNG seed)
+/// * `plugins` - Optional plugin hooks for modifying outcomes
+///
+/// # Returns
+/// * `YearOutcome` - The computed metrics for the year
 pub fn simulate_year(
     system: &GovernanceSystem,
     state: &mut SimulationState,

@@ -64,7 +64,7 @@
    - [x] SimulationConfig and CommonDynamicsConfig parameters
 
 ## 7. Testing and Validation
-- [ ] Add/expand tests to verify that all metrics, update rules, and cross-domain dependencies behave as specified. (IN PROGRESS)
+- [x] Add/expand tests to verify that all metrics, update rules, and cross-domain dependencies behave as specified.
 
 ## 8. Documentation
-- [ ] Document all metric formulas, update rules, and cross-domain dependencies in code comments and/or module docs.
+- [x] Document all metric formulas, update rules, and cross-domain dependencies in code comments and/or module docs.
