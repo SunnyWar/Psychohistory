@@ -1,28 +1,35 @@
+
 ## Phase 7: CLI Refactor, Command-Line, and Logging Improvements
 
 - [ ] **Refactor CLI Entrypoint:**
-  - Move main logic from [cli/src/main.rs] into helper modules/files for readability and maintainability.
+  - Main logic is still monolithic in [cli/src/main.rs].
+  - TODO:
+    - [ ] Move scenario file loading and validation into a helper module (e.g., `scenario.rs`).
+    - [ ] Move region simulation tree traversal into its own module (e.g., `region_runner.rs`).
+    - [ ] Move result printing and formatting into a utility module (e.g., `output.rs`).
+    - [ ] Ensure `main.rs` only wires together argument parsing, logging, and high-level orchestration.
+    - [ ] Add unit tests for new helper modules.
 
-- [ ] **Command-Line Parsing with Crate:**
-  - Integrate a command-line parsing crate (e.g., `clap`, `structopt`, or `argh`).
-  - Define options for years, runs, scenario path, log file, verbosity, and help.
+- [x] **Command-Line Parsing with Crate:**
+  - Integrated `clap` for command-line parsing.
+  - Options for years, runs, scenario path, log file, verbosity, and help are defined.
 
-- [ ] **Command-Line Help Output:**
-  - Print a help message describing all options and their usage if no parameters are provided or if `--help` is passed.
+- [x] **Command-Line Help Output:**
+  - Help message prints all options and usage if no parameters are provided or if `--help` is passed.
 
-- [ ] **Scenario File Location Handling:**
-  - Locate `.json` scenario files relative to the executable by default.
-  - Update build to copy scenario files to the binary output directory.
-  - Add a command-line option to specify a custom scenario directory.
+- [x] **Scenario File Location Handling:**
+  - `.json` scenario files are located relative to the executable by default.
+  - Command-line option allows specifying a custom scenario directory.
+  - (Build copy to output dir: pending)
 
-- [ ] **Logging Support:**
-  - Add a command-line option for log file name and location.
-  - Log file name should be timestamped for each run.
-  - Log each major simulation task (region start/end, file loads, errors, etc.).
-  - Add a verbosity option to control log detail.
+- [x] **Logging Support:**
+  - Command-line option for log file name and location is present.
+  - Log file name is timestamped for each run.
+  - Major simulation tasks (region start/end, file loads, errors, etc.) are logged.
+  - Verbosity option controls log detail.
 
-- [ ] **No-Params Behavior:**
-  - If no parameters are provided, print help and exit without running a simulation.
+- [x] **No-Params Behavior:**
+  - If no parameters are provided, help is printed and simulation does not run.
 # Psychohistory Governance Simulator — Targeted TODO
 
 This TODO is tailored for the current codebase state. **For each item, first inspect the referenced files/modules to leverage existing logic before writing new code.**
