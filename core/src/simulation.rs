@@ -84,10 +84,18 @@ pub fn simulate_year(
 pub fn run_simulation(system: &GovernanceSystem, years: usize, plugins: &[Box<dyn SimulationPlugin>]) -> Vec<YearOutcome> {
     let mut state = SimulationState::default();
     let mut outcomes = Vec::with_capacity(years);
+    let mut system = system.clone();
     for year in 0..years {
-        let outcome = simulate_year(system, &mut state, year, plugins);
+        // Membership rotation stub (implement logic as needed)
+        rotate_membership(&mut system, year);
+        let outcome = simulate_year(&system, &mut state, year, plugins);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }
     outcomes
+}
+
+fn rotate_membership(system: &mut GovernanceSystem, year: usize) {
+    // TODO: Implement membership rotation logic if required by the simulation
+    // For now, this is a stub.
 }
