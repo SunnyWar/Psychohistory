@@ -55,14 +55,39 @@ Psychohistory/
 └── timebase/          # (Reserved for future time series features)
 ```
 
----
+
+## What to Expect as a User
+
+Psychohistory is designed for users who want to simulate and analyze the evolution of complex societies across economic, political, and demographic domains. When using this application, you can expect:
+
+- **Rich Output Metrics**: The simulation tracks and reports a variety of metrics for each region and year, including:
+  - Law Quality
+  - Corruption Level
+  - Public Trust
+  - Crisis Response
+  - Adaptability
+  - Representation Accuracy
+  - Legislative Speed
+  - Economic Outcome
+  - Composite Score (aggregated)
+- **Scenario-Driven Simulation**: You define the world and its regions using hierarchical JSON files. Each region can have its own economic, governance, and demographic parameters, and can be nested (e.g., countries, states, cities).
+- **Deterministic, Reproducible Results**: Simulations are deterministic by default, ensuring that the same scenario and configuration always produce the same results.
+- **Colorized State Diffs**: After each run, the CLI prints human-readable, colorized diffs showing how every entity changed over time.
+- **Extensible Plugin System**: You can add new domains (e.g., health, education), swap out models, or extend existing ones by writing new plugins.
+- **Cross-Domain Coupling**: Metrics and outcomes in one domain (e.g., governance) can affect others (e.g., economy, demography), allowing for realistic feedback loops.
+- **Transition Support**: The system supports mid-simulation transitions (e.g., government or economic system changes) and tracks their effects.
+- **Testing and Validation**: The codebase includes tests to ensure metrics, update rules, and cross-domain dependencies behave as specified.
+
+**Typical Workflow:**
+1. Edit or create scenario files in `scenarios/` to define your world.
+2. Run the simulation using the CLI (`cargo run --bin cli`).
+3. Review the output metrics and state diffs to analyze system behavior and outcomes.
+4. Extend or modify plugins, models, or scenarios as needed.
+
+For more details on metrics, update rules, and extensibility, see the code comments and module documentation.
 
 ## How It Works
 
-- **Scenario loading**: The CLI loads a hierarchical JSON scenario (see `scenarios/simulation_config.json`), recursively inflating all regions and their domain states.
-- **Plugin registration**: Each domain (econ, gov, demog) registers its plugin and system with the core engine.
-- **Simulation loop**: The scheduler runs all registered systems in parallel for a fixed number of steps.
-- **State diffing**: At the end, the engine prints a colorized, per-field diff for every entity, showing exactly what changed.
 
 ---
 
