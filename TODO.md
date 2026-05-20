@@ -10,26 +10,6 @@
     - [ ] Ensure `main.rs` only wires together argument parsing, logging, and high-level orchestration.
     - [ ] Add unit tests for new helper modules.
 
-- [x] **Command-Line Parsing with Crate:**
-  - Integrated `clap` for command-line parsing.
-  - Options for years, runs, scenario path, log file, verbosity, and help are defined.
-
-- [x] **Command-Line Help Output:**
-  - Help message prints all options and usage if no parameters are provided or if `--help` is passed.
-
-- [x] **Scenario File Location Handling:**
-  - `.json` scenario files are located relative to the executable by default.
-  - Command-line option allows specifying a custom scenario directory.
-  - (Build copy to output dir: pending)
-
-- [x] **Logging Support:**
-  - Command-line option for log file name and location is present.
-  - Log file name is timestamped for each run.
-  - Major simulation tasks (region start/end, file loads, errors, etc.) are logged.
-  - Verbosity option controls log detail.
-
-- [x] **No-Params Behavior:**
-  - If no parameters are provided, help is printed and simulation does not run.
 # Psychohistory Governance Simulator — Targeted TODO
 
 This TODO is tailored for the current codebase state. **For each item, first inspect the referenced files/modules to leverage existing logic before writing new code.**
