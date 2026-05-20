@@ -62,20 +62,30 @@ impl Default for SimulationState {
     }
 }
 
+
+pub trait SimulationPlugin {
+    fn modify_outcome(&self, system: &GovernanceSystem, state: &SimulationState, year: usize, outcome: &mut YearOutcome);
+}
+
 pub fn simulate_year(
     system: &GovernanceSystem,
     state: &mut SimulationState,
     year: usize,
+    plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
     // TODO: Implement metric formulas and update rules
-    YearOutcome::default()
+    let mut outcome = YearOutcome::default();
+    for plugin in plugins {
+        plugin.modify_outcome(system, state, year, &mut outcome);
+    }
+    outcome
 }
 
-pub fn run_simulation(system: &GovernanceSystem, years: usize) -> Vec<YearOutcome> {
+pub fn run_simulation(system: &GovernanceSystem, years: usize, plugins: &[Box<dyn SimulationPlugin>]) -> Vec<YearOutcome> {
     let mut state = SimulationState::default();
     let mut outcomes = Vec::with_capacity(years);
     for year in 0..years {
-        let outcome = simulate_year(system, &mut state, year);
+        let outcome = simulate_year(system, &mut state, year, plugins);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }
