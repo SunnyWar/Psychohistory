@@ -312,9 +312,13 @@ pub fn run_simulation(
     RunResult::from_outcomes(outcomes)
 }
 
-fn rotate_membership(system: &mut GovernanceSystem, year: usize) {
-    // TODO: Implement membership rotation logic if required by the simulation
-    // For now, this is a stub.
+/// Rotate membership for the governance system each year.
+/// Simple implementation: moves the first member to the end (cyclic rotation) if any.
+fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
+    if !system.members.is_empty() {
+        let first = system.members.remove(0);
+        system.members.push(first);
+    }
 }
 
 #[cfg(test)]
