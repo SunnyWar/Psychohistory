@@ -1,3 +1,29 @@
+// core/src/state.rs
+use models::{EconSystemType, GovType};
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
+use sdk::ReadSnapshot;
+use std::any::Any;
+use std::collections::HashMap;
+
+type ClonerFn = Box<
+    dyn Fn(
+            &Box<dyn Any + Send + Sync>,
+            Option<&mut Box<dyn Any + Send + Sync>>,
+        ) -> Option<Box<dyn Any + Send + Sync>>
+        + Send
+        + Sync,
+>;
+
+type ClonerMap = HashMap<&'static str, ClonerFn>;
+
+pub struct SimulationState {
+    pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
+    cloners: ClonerMap,
+    pub gov_type: GovType,
+    pub econ_system: EconSystemType,
+}
+
 impl SimulationState {
     /// Cross-domain coupling: get immutable reference to EconState (current plane)
     pub fn get_econ_state(&self) -> Option<&models::EconState> {
@@ -36,31 +62,6 @@ impl SimulationState {
             .get_mut("demog")?
             .downcast_mut::<models::DemogState>()
     }
-}
-// core/src/state.rs
-use models::{EconSystemType, GovType};
-use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
-use sdk::ReadSnapshot;
-use std::any::Any;
-use std::collections::HashMap;
-
-type ClonerFn = Box<
-    dyn Fn(
-            &Box<dyn Any + Send + Sync>,
-            Option<&mut Box<dyn Any + Send + Sync>>,
-        ) -> Option<Box<dyn Any + Send + Sync>>
-        + Send
-        + Sync,
->;
-
-type ClonerMap = HashMap<&'static str, ClonerFn>;
-
-pub struct SimulationState {
-    pub(crate) current: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    pub(crate) next: HashMap<&'static str, Box<dyn Any + Send + Sync>>,
-    cloners: ClonerMap,
-    pub gov_type: GovType,
-    pub econ_system: EconSystemType,
 }
 
 impl SimulationState {
