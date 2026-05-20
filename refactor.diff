@@ -1,0 +1,509 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 3320c1c..ce7f7b5 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -13,6 +13,65 @@ dependencies = [
+  "version_check",
+ ]
+ 
++[[package]]
++name = "android_system_properties"
++version = "0.1.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311"
++dependencies = [
++ "libc",
++]
++
++[[package]]
++name = "anstream"
++version = "1.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "824a212faf96e9acacdbd09febd34438f8f711fb84e09a8916013cd7815ca28d"
++dependencies = [
++ "anstyle",
++ "anstyle-parse",
++ "anstyle-query",
++ "anstyle-wincon",
++ "colorchoice",
++ "is_terminal_polyfill",
++ "utf8parse",
++]
++
++[[package]]
++name = "anstyle"
++version = "1.0.14"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
++
++[[package]]
++name = "anstyle-parse"
++version = "1.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "52ce7f38b242319f7cabaa6813055467063ecdc9d355bbb4ce0c68908cd8130e"
++dependencies = [
++ "utf8parse",
++]
++
++[[package]]
++name = "anstyle-query"
++version = "1.1.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
++dependencies = [
++ "windows-sys",
++]
++
++[[package]]
++name = "anstyle-wincon"
++version = "3.0.11"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
++dependencies = [
++ "anstyle",
++ "once_cell_polyfill",
++ "windows-sys",
++]
++
+ [[package]]
+ name = "anyhow"
+ version = "1.0.102"
+@@ -107,6 +166,16 @@ version = "1.11.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "1e748733b7cbc798e1434b6ac524f0c1ff2ab456fe201501e6497c8417a4fc33"
+ 
++[[package]]
++name = "cc"
++version = "1.2.62"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a1dce859f0832a7d088c4f1119888ab94ef4b5d6795d1ce05afb7fe159d79f98"
++dependencies = [
++ "find-msvc-tools",
++ "shlex",
++]
++
+ [[package]]
+ name = "cfg-if"
+ version = "1.0.4"
+@@ -130,10 +199,65 @@ dependencies = [
+  "rand_core 0.10.1",
+ ]
+ 
++[[package]]
++name = "chrono"
++version = "0.4.44"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c673075a2e0e5f4a1dde27ce9dee1ea4558c7ffe648f576438a20ca1d2acc4b0"
++dependencies = [
++ "iana-time-zone",
++ "js-sys",
++ "num-traits",
++ "wasm-bindgen",
++ "windows-link",
++]
++
++[[package]]
++name = "clap"
++version = "4.6.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1ddb117e43bbf7dacf0a4190fef4d345b9bad68dfc649cb349e7d17d28428e51"
++dependencies = [
++ "clap_builder",
++ "clap_derive",
++]
++
++[[package]]
++name = "clap_builder"
++version = "4.6.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "714a53001bf66416adb0e2ef5ac857140e7dc3a0c48fb28b2f10762fc4b5069f"
++dependencies = [
++ "anstream",
++ "anstyle",
++ "clap_lex",
++ "strsim",
++]
++
++[[package]]
++name = "clap_derive"
++version = "4.6.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f2ce8604710f6733aa641a2b3731eaa1e8b3d9973d5e3565da11800813f997a9"
++dependencies = [
++ "heck",
++ "proc-macro2",
++ "quote",
++ "syn 2.0.117",
++]
++
++[[package]]
++name = "clap_lex"
++version = "1.1.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
++
+ [[package]]
+ name = "cli"
+ version = "0.1.0"
+ dependencies = [
++ "chrono",
++ "clap",
+  "core",
+  "demog",
+  "econ",
+@@ -147,6 +271,12 @@ dependencies = [
+  "serde_json",
+ ]
+ 
++[[package]]
++name = "colorchoice"
++version = "1.0.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
++
+ [[package]]
+ name = "console"
+ version = "0.16.3"
+@@ -173,6 +303,12 @@ dependencies = [
+  "serde_json",
+ ]
+ 
++[[package]]
++name = "core-foundation-sys"
++version = "0.8.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
++
+ [[package]]
+ name = "cpufeatures"
+ version = "0.3.0"
+@@ -243,6 +379,12 @@ version = "1.0.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
+ 
++[[package]]
++name = "find-msvc-tools"
++version = "0.1.9"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
++
+ [[package]]
+ name = "foldhash"
+ version = "0.1.5"
+@@ -343,6 +485,30 @@ version = "0.5.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+ 
++[[package]]
++name = "iana-time-zone"
++version = "0.1.65"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e31bc9ad994ba00e440a8aa5c9ef0ec67d5cb5e5cb0cc7f8b744a35b389cc470"
++dependencies = [
++ "android_system_properties",
++ "core-foundation-sys",
++ "iana-time-zone-haiku",
++ "js-sys",
++ "log",
++ "wasm-bindgen",
++ "windows-core",
++]
++
++[[package]]
++name = "iana-time-zone-haiku"
++version = "0.1.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f31827a206f56af32e590ba56d5d2d085f558508192593743f16b2306495269f"
++dependencies = [
++ "cc",
++]
++
+ [[package]]
+ name = "id-arena"
+ version = "2.3.0"
+@@ -374,6 +540,12 @@ dependencies = [
+  "web-time",
+ ]
+ 
++[[package]]
++name = "is_terminal_polyfill"
++version = "1.70.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
++
+ [[package]]
+ name = "itoa"
+ version = "1.0.18"
+@@ -459,6 +631,12 @@ version = "1.21.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+ 
++[[package]]
++name = "once_cell_polyfill"
++version = "1.70.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
++
+ [[package]]
+ name = "pin-project-lite"
+ version = "0.2.17"
+@@ -759,6 +937,12 @@ dependencies = [
+  "zmij",
+ ]
+ 
++[[package]]
++name = "shlex"
++version = "1.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
++
+ [[package]]
+ name = "simdutf8"
+ version = "0.1.5"
+@@ -771,6 +955,12 @@ version = "0.4.12"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
+ 
++[[package]]
++name = "strsim"
++version = "0.11.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
++
+ [[package]]
+ name = "syn"
+ version = "1.0.109"
+@@ -868,6 +1058,12 @@ version = "0.5.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "81e544489bf3d8ef66c953931f56617f423cd4b5494be343d9b9d3dda037b9a3"
+ 
++[[package]]
++name = "utf8parse"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
++
+ [[package]]
+ name = "uuid"
+ version = "1.23.1"
+@@ -998,12 +1194,65 @@ dependencies = [
+  "wasm-bindgen",
+ ]
+ 
++[[package]]
++name = "windows-core"
++version = "0.62.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b8e83a14d34d0623b51dce9581199302a221863196a1dde71a7663a4c2be9deb"
++dependencies = [
++ "windows-implement",
++ "windows-interface",
++ "windows-link",
++ "windows-result",
++ "windows-strings",
++]
++
++[[package]]
++name = "windows-implement"
++version = "0.60.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "053e2e040ab57b9dc951b72c264860db7eb3b0200ba345b4e4c3b14f67855ddf"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 2.0.117",
++]
++
++[[package]]
++name = "windows-interface"
++version = "0.59.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3f316c4a2570ba26bbec722032c4099d8c8bc095efccdc15688708623367e358"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 2.0.117",
++]
++
+ [[package]]
+ name = "windows-link"
+ version = "0.2.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
+ 
++[[package]]
++name = "windows-result"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7781fa89eaf60850ac3d2da7af8e5242a5ea78d1a11c49bf2910bb5a73853eb5"
++dependencies = [
++ "windows-link",
++]
++
++[[package]]
++name = "windows-strings"
++version = "0.5.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
++dependencies = [
++ "windows-link",
++]
++
+ [[package]]
+ name = "windows-sys"
+ version = "0.61.2"
+diff --git a/cli/Cargo.toml b/cli/Cargo.toml
+index 8a13f0a..ee38c3d 100644
+--- a/cli/Cargo.toml
++++ b/cli/Cargo.toml
+@@ -15,4 +15,6 @@ demog = { path = "../plugins/demog" }
+ serde = { version = "1.0", features = ["derive"] }
+ serde_json = "1.0"
+ models = { path = "../models" }
++clap = { version = "4.5", features = ["derive"] }
++chrono = "0.4"
+ 
+diff --git a/cli/src/main.rs b/cli/src/main.rs
+index 0ef8c79..0688d93 100644
+--- a/cli/src/main.rs
++++ b/cli/src/main.rs
+@@ -1,25 +1,44 @@
++use clap::Parser;
+ use core::run_experiment;
+-use core::simulation::run_simulation;
+-// cli/src/main.rs
+ use serde_json::Value;
+ use std::fs::File;
+ use std::io::Read;
+-
++mod cli_args;
++mod logging;
+ mod util;
+ 
++use cli_args::CliArgs;
++use logging::Logger;
++
+ fn main() {
++    let args = CliArgs::parse();
++    if std::env::args().len() == 1 {
++        // No params: print help and exit
++        <CliArgs as clap::CommandFactory>::command()
++            .print_help()
++            .unwrap();
++        println!("");
++        return;
++    }
+     println!("[INFO] Starting simulation CLI...");
+-    // Open and ingest hierarchical simulation configuration asset
+-    let mut file = match File::open("scenarios/simulation_config.json") {
++    let mut logger = Logger::new(&args.log_dir, "psychohistory", args.verbose)
++        .expect("Failed to create log file");
++    logger.log("Simulation CLI started", 1);
++
++    // Locate scenario file
++    let scenario_path = format!("{}/simulation_config.json", args.scenario_dir);
++    let mut file = match File::open(&scenario_path) {
+         Ok(f) => f,
+         Err(e) => {
+-            eprintln!("[ERROR] Failed to locate simulation_config.json: {}", e);
++            eprintln!("[ERROR] Failed to locate {}: {}", scenario_path, e);
++            logger.log(&format!("Failed to locate scenario file: {}", e), 0);
+             return;
+         }
+     };
+     let mut json_str = String::new();
+     if let Err(e) = file.read_to_string(&mut json_str) {
+-        eprintln!("[ERROR] Failed to read simulation_config.json: {}", e);
++        eprintln!("[ERROR] Failed to read {}: {}", scenario_path, e);
++        logger.log(&format!("Failed to read scenario file: {}", e), 0);
+         return;
+     }
+ 
+@@ -27,12 +46,23 @@ fn main() {
+         Ok(val) => val,
+         Err(e) => {
+             eprintln!("[ERROR] Failed to parse config schema: {}", e);
++            logger.log(&format!("Failed to parse config schema: {}", e), 0);
+             return;
+         }
+     };
+ 
+     // Recursively traverse regions and run experiment for each
+-    fn simulate_region_tree(region_name: &str, node: &Value, years: usize, runs: usize) {
++    fn simulate_region_tree(
++        region_name: &str,
++        node: &Value,
++        years: usize,
++        runs: usize,
++        logger: &mut Logger,
++    ) {
++        logger.log(
++            &format!("Simulating region: {} ({} runs)", region_name, runs),
++            1,
++        );
+         println!("[INFO] Simulating region: {} ({} runs)", region_name, runs);
+         // Try to load GovernanceSystem and SimulationConfig for this region
+         // Support both top-level and 'components'-nested fields
+@@ -57,6 +87,7 @@ fn main() {
+         if let (Some(system), Some(config)) = (system, config) {
+             let plugins: Vec<Box<dyn core::simulation::SimulationPlugin>> = vec![]; // No plugins for now
+             let result = run_experiment(&system, years, &config, &plugins, runs);
++            logger.log(&format!("Completed region: {}", region_name), 1);
+             println!("=== Experiment Results for region: {} ===", region_name);
+             println!(
+                 "  [MEAN] Law Quality: {:.3}",
+@@ -131,6 +162,13 @@ fn main() {
+                 result.stddev.average_composite_score
+             );
+         } else {
++            logger.log(
++                &format!(
++                    "Skipping region '{}' due to missing or invalid system/config.",
++                    region_name
++                ),
++                0,
++            );
+             println!(
+                 "[WARN] Skipping region '{}' due to missing or invalid system/config.",
+                 region_name
+@@ -141,33 +179,28 @@ fn main() {
+         if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
+             for (sub_name, sub_node) in sub_regions {
+                 let next_name = format!("{}:{}", region_name, sub_name);
+-                simulate_region_tree(&next_name, sub_node, years, runs);
++                simulate_region_tree(&next_name, sub_node, years, runs, logger);
+             }
+         }
+     }
+ 
+-    // Parse command-line args for years and runs
+-    let args: Vec<String> = std::env::args().collect();
+-    let years = args
+-        .get(1)
+-        .and_then(|s| s.parse::<usize>().ok())
+-        .unwrap_or(10);
+-    let runs = args
+-        .get(2)
+-        .and_then(|s| s.parse::<usize>().ok())
+-        .unwrap_or(10);
+     match root_data.get("regions").and_then(|r| r.as_object()) {
+         Some(regions) if !regions.is_empty() => {
+             println!("[INFO] Found {} regions in config.", regions.len());
+             for (region_name, region_node) in regions {
+-                simulate_region_tree(region_name, region_node, years, runs);
++                simulate_region_tree(region_name, region_node, args.years, args.runs, &mut logger);
+             }
+         }
+         Some(_) => {
+             println!("[WARN] No regions found in simulation_config.json.");
++            logger.log("No regions found in simulation_config.json.", 0);
+         }
+         None => {
+             println!("[ERROR] 'regions' key missing or not an object in simulation_config.json.");
++            logger.log(
++                "'regions' key missing or not an object in simulation_config.json.",
++                0,
++            );
+         }
+     }
+ }

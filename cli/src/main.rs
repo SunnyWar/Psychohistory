@@ -1,25 +1,45 @@
-use core::run_experiment;
-use core::simulation::run_simulation;
-// cli/src/main.rs
+use clap::Parser;
 use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
-
+mod cli_args;
+mod logging;
 mod util;
 
+use psychohistory_core::run_experiment;
+
+use cli_args::CliArgs;
+use logging::Logger;
+
 fn main() {
+    let args = CliArgs::parse();
+    if std::env::args().len() == 1 {
+        // No params: print help and exit
+        <CliArgs as clap::CommandFactory>::command()
+            .print_help()
+            .unwrap();
+        println!("");
+        return;
+    }
     println!("[INFO] Starting simulation CLI...");
-    // Open and ingest hierarchical simulation configuration asset
-    let mut file = match File::open("scenarios/simulation_config.json") {
+    let mut logger = Logger::new(&args.log_dir, "psychohistory", args.verbose)
+        .expect("Failed to create log file");
+    logger.log("Simulation CLI started", 1);
+
+    // Locate scenario file
+    let scenario_path = format!("{}/simulation_config.json", args.scenario_dir);
+    let mut file = match File::open(&scenario_path) {
         Ok(f) => f,
         Err(e) => {
-            eprintln!("[ERROR] Failed to locate simulation_config.json: {}", e);
+            eprintln!("[ERROR] Failed to locate {}: {}", scenario_path, e);
+            logger.log(&format!("Failed to locate scenario file: {}", e), 0);
             return;
         }
     };
     let mut json_str = String::new();
     if let Err(e) = file.read_to_string(&mut json_str) {
-        eprintln!("[ERROR] Failed to read simulation_config.json: {}", e);
+        eprintln!("[ERROR] Failed to read {}: {}", scenario_path, e);
+        logger.log(&format!("Failed to read scenario file: {}", e), 0);
         return;
     }
 
@@ -27,12 +47,23 @@ fn main() {
         Ok(val) => val,
         Err(e) => {
             eprintln!("[ERROR] Failed to parse config schema: {}", e);
+            logger.log(&format!("Failed to parse config schema: {}", e), 0);
             return;
         }
     };
 
     // Recursively traverse regions and run experiment for each
-    fn simulate_region_tree(region_name: &str, node: &Value, years: usize, runs: usize) {
+    fn simulate_region_tree(
+        region_name: &str,
+        node: &Value,
+        years: usize,
+        runs: usize,
+        logger: &mut Logger,
+    ) {
+        logger.log(
+            &format!("Simulating region: {} ({} runs)", region_name, runs),
+            1,
+        );
         println!("[INFO] Simulating region: {} ({} runs)", region_name, runs);
         // Try to load GovernanceSystem and SimulationConfig for this region
         // Support both top-level and 'components'-nested fields
@@ -55,8 +86,9 @@ fn main() {
         };
 
         if let (Some(system), Some(config)) = (system, config) {
-            let plugins: Vec<Box<dyn core::simulation::SimulationPlugin>> = vec![]; // No plugins for now
+            let plugins: Vec<Box<dyn psychohistory_core::simulation::SimulationPlugin>> = vec![];
             let result = run_experiment(&system, years, &config, &plugins, runs);
+            logger.log(&format!("Completed region: {}", region_name), 1);
             println!("=== Experiment Results for region: {} ===", region_name);
             println!(
                 "  [MEAN] Law Quality: {:.3}",
@@ -131,6 +163,13 @@ fn main() {
                 result.stddev.average_composite_score
             );
         } else {
+            logger.log(
+                &format!(
+                    "Skipping region '{}' due to missing or invalid system/config.",
+                    region_name
+                ),
+                0,
+            );
             println!(
                 "[WARN] Skipping region '{}' due to missing or invalid system/config.",
                 region_name
@@ -141,33 +180,28 @@ fn main() {
         if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
             for (sub_name, sub_node) in sub_regions {
                 let next_name = format!("{}:{}", region_name, sub_name);
-                simulate_region_tree(&next_name, sub_node, years, runs);
+                simulate_region_tree(&next_name, sub_node, years, runs, logger);
             }
         }
     }
 
-    // Parse command-line args for years and runs
-    let args: Vec<String> = std::env::args().collect();
-    let years = args
-        .get(1)
-        .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(10);
-    let runs = args
-        .get(2)
-        .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(10);
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
             println!("[INFO] Found {} regions in config.", regions.len());
             for (region_name, region_node) in regions {
-                simulate_region_tree(region_name, region_node, years, runs);
+                simulate_region_tree(region_name, region_node, args.years, args.runs, &mut logger);
             }
         }
         Some(_) => {
             println!("[WARN] No regions found in simulation_config.json.");
+            logger.log("No regions found in simulation_config.json.", 0);
         }
         None => {
             println!("[ERROR] 'regions' key missing or not an object in simulation_config.json.");
+            logger.log(
+                "'regions' key missing or not an object in simulation_config.json.",
+                0,
+            );
         }
     }
 }
