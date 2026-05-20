@@ -7,7 +7,6 @@ use models::{DemogState, EconState, GovState};
 use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
-use util::fmt_currency;
 
 mod util;
 
