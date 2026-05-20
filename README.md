@@ -121,7 +121,7 @@ cargo run --bin cli
 - [x] Add `GovType` and `EconSystemType` enums to `models` and propagate through `SimulationState`.
 - [x] Implement a transition system in `core` to support mid‑simulation switching of government and economic types.
 - [x] Add cross-domain coupling hooks in `SimulationState` to enable direct econ ↔ gov ↔ demog interactions.
-- Refactor state diffing to track and report system transitions and cross-domain effects.
+- [x] Refactor state diffing to track and report system transitions and cross-domain effects.
 
 ---
 
