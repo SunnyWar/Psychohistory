@@ -29,23 +29,23 @@
 - [ ] Support both CurrentUsSystem and FederalSensorumSystem variants where formulas differ.
 
 ## 3. State Variables & Simulation Entities
-- [ ] Add/verify all required internal state variables:
-   - [ ] YearOutcomes (list of YearOutcome per run)
-   - [ ] priorTrust
-   - [ ] policyStock
-   - [ ] avgCompetence, avgIntegrity, avgLeadership, avgRepresentation
-   - [ ] lobbyingPressure, donorPressure, mediaImpact, reelectionPressure, normalizedWealthInfluence, factionFormation, badLawDrag, isGridlocked, externalShock, challengeHappened, legislativeEfficiency, deliberationNoise, deliberationBonus, evidenceBoardEffect, cohortQualityShock, stabilityMultiplier, legislativeCompetence, judicialCompetence, sortition.ExpertSupportEffectiveness
-- [ ] Define entities and attributes:
-   - [ ] Legislator (Id, Chamber, Competence, Integrity, Ideology, Wealth, IsExperienced, Representativeness, LeadershipQuality, FactionAffinity)
-   - [ ] GovernanceSystem (Members, SystemKind, DisplayName)
-   - [ ] YearOutcome (all output metrics)
+- [x] Add/verify all required internal state variables:
+   - [x] YearOutcomes (list of YearOutcome per run)
+   - [x] priorTrust
+   - [x] policyStock
+   - [x] avgCompetence, avgIntegrity, avgLeadership, avgRepresentation
+   - [x] lobbyingPressure, donorPressure, mediaImpact, reelectionPressure, normalizedWealthInfluence, factionFormation, badLawDrag, isGridlocked, externalShock, challengeHappened, legislativeEfficiency, deliberationNoise, deliberationBonus, evidenceBoardEffect, cohortQualityShock, stabilityMultiplier, legislativeCompetence, judicialCompetence, sortition.ExpertSupportEffectiveness
+- [x] Define entities and attributes:
+   - [x] Legislator (Id, Chamber, Competence, Integrity, Ideology, Wealth, IsExperienced, Representativeness, LeadershipQuality, FactionAffinity)
+   - [x] GovernanceSystem (Members, SystemKind, DisplayName)
+   - [x] YearOutcome (all output metrics)
 
 ## 4. Simulation Flow
-- [ ] For each year in a run:
-   - [ ] SimulateYear is called with current members, config, random, prior outcomes.
+- [x] For each year in a run:
+   - [x] SimulateYear is called with current members, config, random, prior outcomes.
    - [ ] Plugins may modify the outcome.
    - [ ] Membership may be rotated.
-   - [ ] YearOutcome is recorded.
+   - [x] YearOutcome is recorded.
 - [ ] At end of run:
    - [ ] RunResult is constructed with averages and composite score.
 
