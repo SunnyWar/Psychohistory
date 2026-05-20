@@ -1,3 +1,28 @@
+## Phase 7: CLI Refactor, Command-Line, and Logging Improvements
+
+- [ ] **Refactor CLI Entrypoint:**
+  - Move main logic from [cli/src/main.rs] into helper modules/files for readability and maintainability.
+
+- [ ] **Command-Line Parsing with Crate:**
+  - Integrate a command-line parsing crate (e.g., `clap`, `structopt`, or `argh`).
+  - Define options for years, runs, scenario path, log file, verbosity, and help.
+
+- [ ] **Command-Line Help Output:**
+  - Print a help message describing all options and their usage if no parameters are provided or if `--help` is passed.
+
+- [ ] **Scenario File Location Handling:**
+  - Locate `.json` scenario files relative to the executable by default.
+  - Update build to copy scenario files to the binary output directory.
+  - Add a command-line option to specify a custom scenario directory.
+
+- [ ] **Logging Support:**
+  - Add a command-line option for log file name and location.
+  - Log file name should be timestamped for each run.
+  - Log each major simulation task (region start/end, file loads, errors, etc.).
+  - Add a verbosity option to control log detail.
+
+- [ ] **No-Params Behavior:**
+  - If no parameters are provided, print help and exit without running a simulation.
 # Psychohistory Governance Simulator — Targeted TODO
 
 This TODO is tailored for the current codebase state. **For each item, first inspect the referenced files/modules to leverage existing logic before writing new code.**
