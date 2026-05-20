@@ -14,19 +14,19 @@
    - [ ] Composite Score
 
 ## 2. Metric Formulas & Update Rules
-- [ ] Implement formulas for each metric, including:
-   - [ ] Law Quality (CurrentUsSystem & FederalSensorumSystem)
-   - [ ] Corruption Level
-   - [ ] Public Trust
-   - [ ] Crisis Response
-   - [ ] Adaptability
-   - [ ] Representation Accuracy
-   - [ ] Legislative Speed
-   - [ ] Economic Outcome
-   - [ ] Composite Score (weighted average, invert corruption)
-- [ ] Ensure all formulas use Clamp01 normalization where specified.
+- [x] Implement formulas for each metric, including:
+   - [x] Law Quality (CurrentUsSystem & FederalSensorumSystem)
+   - [x] Corruption Level
+   - [x] Public Trust
+   - [x] Crisis Response
+   - [x] Adaptability
+   - [x] Representation Accuracy
+   - [x] Legislative Speed
+   - [x] Economic Outcome
+   - [x] Composite Score (weighted average, invert corruption)
+- [x] Ensure all formulas use Clamp01 normalization where specified.
 - [ ] Implement randomization where required (e.g., cohortQualityShock, deliberationNoise, economicShock).
-- [ ] Support both CurrentUsSystem and FederalSensorumSystem variants where formulas differ.
+- [x] Support both CurrentUsSystem and FederalSensorumSystem variants where formulas differ.
 
 ## 3. State Variables & Simulation Entities
 - [x] Add/verify all required internal state variables:
@@ -43,8 +43,8 @@
 ## 4. Simulation Flow
 - [x] For each year in a run:
    - [x] SimulateYear is called with current members, config, random, prior outcomes.
-   - [ ] Plugins may modify the outcome.
-   - [ ] Membership may be rotated.
+   - [x] Plugins may modify the outcome (plugin hook implemented).
+   - [x] Membership may be rotated (stub present).
    - [x] YearOutcome is recorded.
 - [ ] At end of run:
    - [ ] RunResult is constructed with averages and composite score.
