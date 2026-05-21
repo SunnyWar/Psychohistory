@@ -1,9 +1,7 @@
 use clap::Parser;
 use cli_args::CliArgs;
 use log::{error, info, warn};
-use psychohistory_core::experiment::ExperimentResult;
 use psychohistory_core::init_logger;
-use psychohistory_core::run_experiment;
 use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
