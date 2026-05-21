@@ -19,6 +19,9 @@ pub struct CliArgs {
     pub log_dir: String,
 
     /// Verbosity (repeat for more detail, e.g. -v, -vv)
-    #[arg(short, long, action = clap::ArgAction::Count)]
+    ///
+    /// Log level mapping:
+    ///   0 = Error, -v = Warn, -vv = Info, -vvv = Debug, -vvvv = Trace
+    #[arg(short, long, action = clap::ArgAction::Count, help = "Verbosity (repeat for more detail, e.g. -v, -vv). Log level mapping: 0=Error, -v=Warn, -vv=Info, -vvv=Debug, -vvvv=Trace")]
     pub verbose: u8,
 }

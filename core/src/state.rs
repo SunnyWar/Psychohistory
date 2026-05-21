@@ -1,3 +1,4 @@
+use log::debug;
 // core/src/state.rs
 use models::{EconSystemType, GovType};
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
@@ -67,11 +68,19 @@ impl SimulationState {
 impl SimulationState {
     /// Change the government type mid-simulation.
     pub fn set_gov_type(&mut self, new_type: GovType) {
+        debug!(
+            "Changing government type: {:?} -> {:?}",
+            self.gov_type, new_type
+        );
         self.gov_type = new_type;
     }
 
     /// Change the economic system type mid-simulation.
     pub fn set_econ_system(&mut self, new_type: EconSystemType) {
+        debug!(
+            "Changing economic system type: {:?} -> {:?}",
+            self.econ_system, new_type
+        );
         self.econ_system = new_type;
     }
 
@@ -82,6 +91,7 @@ impl SimulationState {
         key: &'static str,
         mutator: &mut impl FnMut(&mut T),
     ) {
+        debug!("Updating initial state for key: {key}");
         if let Some(boxed) = self.current.get_mut(key)
             && let Some(concrete) = boxed.downcast_mut::<T>()
         {

@@ -1,3 +1,4 @@
+use log::{debug, error};
 // core/src/system.rs
 use crate::state::SimulationState;
 use sdk::ReadSnapshot;
@@ -33,8 +34,14 @@ impl SimulationState {
         // `self.current` is borrowed immutably, while `self.next` is borrowed mutably.
         let snapshot = ReadSnapshot::new(&self.current);
 
-        if let Some(my_next_space) = self.next.get_mut(key) {
-            runner(&snapshot, my_next_space);
+        match self.next.get_mut(key) {
+            Some(my_next_space) => {
+                debug!("Running system for key: {key}");
+                runner(&snapshot, my_next_space);
+            }
+            None => {
+                error!("No mutable state bucket found for key: {key}");
+            }
         }
     }
 }

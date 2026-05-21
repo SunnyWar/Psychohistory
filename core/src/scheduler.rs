@@ -1,3 +1,4 @@
+use log::{debug, info};
 // core/src/scheduler.rs
 use crate::{state::SimulationState, system::System};
 use sdk::{SimulationTime, TimeGranularity};
@@ -19,15 +20,17 @@ impl Scheduler {
 
     // Accept key for O(1) dispatch
     pub fn add_system(&mut self, key: &'static str, system: Box<dyn System + Send + Sync>) {
-        println!(
-            "[core] Registering system for key '{}': {}",
-            key,
-            system.name()
-        );
+        let name = system.name();
+        info!("Registering system for key '{key}': {name}");
+        debug!("System registered: key={key}, name={name}");
         self.systems.insert(key, system);
     }
 
     pub fn run(&mut self, state: &mut SimulationState, steps: u64, granularity: TimeGranularity) {
+        info!(
+            "Scheduler run starting: steps={steps}, granularity={:?}",
+            granularity
+        );
         let pb = ProgressBar::new(steps);
         pb.set_style(
             ProgressStyle::with_template(
@@ -39,13 +42,16 @@ impl Scheduler {
 
         for step in 0..steps {
             let time = SimulationTime { step, granularity };
+            debug!("Tick {}/{}: time={:?}", step + 1, steps, time);
 
             let systems_ref = &self.systems;
             state.par_execute_systems(|snapshot, key, data_bucket| {
-                // Route deeply nested namespaced keys (e.g., "us:ca:los_angeles:econ" -> "econ")
                 let archetype_key = key.split(':').next_back().unwrap_or(key);
+                debug!("Dispatching system for key={}", archetype_key);
                 if let Some(system) = systems_ref.get(archetype_key) {
                     system.run_system(snapshot, data_bucket, time, key);
+                } else {
+                    debug!("No system registered for key={}", archetype_key);
                 }
             });
 
@@ -54,6 +60,7 @@ impl Scheduler {
         }
 
         pb.finish_with_message("Simulation complete");
+        info!("Scheduler run completed");
     }
 }
 

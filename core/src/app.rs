@@ -1,3 +1,4 @@
+use log::{debug, info};
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
@@ -27,10 +28,12 @@ pub struct App {
 impl App {
     /// Safely modifies an initialized component state across both data planes before a run execution.
     pub fn update_state<T: 'static>(&mut self, key: &'static str, mutator: impl FnMut(&mut T)) {
+        debug!("Updating state for key: {key}");
         let mut mutator = mutator;
         self.state.update_initial_state::<T>(key, &mut mutator);
     }
     pub fn new() -> Self {
+        debug!("Creating new App instance");
         let state = SimulationState::new();
         let scheduler = Scheduler::new();
         let initial_state = HashMap::new();
@@ -42,8 +45,9 @@ impl App {
     }
 
     pub fn add_plugin<P: Plugin>(&mut self, plugin: &P) {
-        println!("[core] Loading plugin: {}", P::NAME);
+        info!("Loading plugin: {}", P::NAME);
         plugin.build(self);
+        debug!("Plugin {} built and registered", P::NAME);
     }
 
     /// Capture a snapshot of the current state as a HashMap<String, DomainState>
@@ -74,9 +78,15 @@ impl App {
     }
 
     pub fn run(&mut self, steps: u64, granularity: TimeGranularity) {
+        info!(
+            "Simulation run starting: steps={steps}, granularity={:?}",
+            granularity
+        );
         // Capture initial snapshot before any ticks
         self.initial_state = self.snapshot_state();
+        debug!("Initial state snapshot captured");
         self.scheduler.run(&mut self.state, steps, granularity);
+        info!("Simulation run completed");
     }
 
     pub fn summarize_state(&self) {
