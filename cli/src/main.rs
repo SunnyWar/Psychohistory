@@ -49,55 +49,20 @@ fn main() {
         }
     };
 
-    // Recursively traverse regions and run experiment for each
-    fn simulate_region_tree(region_name: &str, node: &Value, years: usize, runs: usize) {
-        info!("Simulating region: {} ({} runs)", region_name, runs);
-        // Try to load GovernanceSystem and SimulationConfig for this region
-        // Support both top-level and 'components'-nested fields
-        let (system, config) = {
-            let system = node
-                .get("governance_system")
-                .or_else(|| {
-                    node.get("components")
-                        .and_then(|c| c.get("governance_system"))
-                })
-                .and_then(|gs| serde_json::from_value(gs.clone()).ok());
-            let config = node
-                .get("simulation_parameters")
-                .or_else(|| {
-                    node.get("components")
-                        .and_then(|c| c.get("simulation_parameters"))
-                })
-                .and_then(|sp| serde_json::from_value(sp.clone()).ok());
-            (system, config)
-        };
-
-        if let (Some(system), Some(config)) = (system, config) {
-            let plugins: Vec<Box<dyn psychohistory_core::simulation::SimulationPlugin>> = vec![];
-            let result: ExperimentResult = run_experiment(&system, years, &config, &plugins, runs);
-            info!("Completed region: {}", region_name);
-            result_output::print_experiment_results(region_name, &result);
-        } else {
-            warn!(
-                "Skipping region '{}' due to missing or invalid system/config.",
-                region_name
-            );
-        }
-
-        // Recurse into sub_regions
-        if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
-            for (sub_name, sub_node) in sub_regions {
-                let next_name = format!("{}:{}", region_name, sub_name);
-                simulate_region_tree(&next_name, sub_node, years, runs);
-            }
-        }
-    }
+    // Use the core simulation utility for region traversal
+    use psychohistory_core::simulation::simulate_region_tree;
 
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
             info!("Found {} regions in config.", regions.len());
             for (region_name, region_node) in regions {
-                simulate_region_tree(region_name, region_node, args.years, args.runs);
+                simulate_region_tree(
+                    region_name,
+                    region_node,
+                    args.years,
+                    args.runs,
+                    &result_output::print_experiment_results,
+                );
             }
         }
         Some(_) => {
