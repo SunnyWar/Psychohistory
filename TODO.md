@@ -1,14 +1,12 @@
 
+
 ## Phase 7: CLI Refactor, Command-Line, and Logging Improvements
 
-- [ ] **Refactor CLI Entrypoint:**
-  - Main logic is still monolithic in [cli/src/main.rs].
-  - TODO:
-    - [ ] Move scenario file loading and validation into a helper module (e.g., `scenario.rs`).
-    - [ ] Move region simulation tree traversal into its own module (e.g., `region_runner.rs`).
-    - [ ] Move result printing and formatting into a utility module (e.g., `output.rs`).
-    - [ ] Ensure `main.rs` only wires together argument parsing, logging, and high-level orchestration.
-    - [ ] Add unit tests for new helper modules.
+**Recommended next step:**
+
+- [ ] Extract scenario file loading and validation from [cli/src/main.rs] into a new helper module (e.g., `scenario.rs`).
+
+This will make subsequent refactoring (region runner, output, orchestration) easier and enable unit testing for scenario parsing.
 
 # Psychohistory Governance Simulator — Targeted TODO
 

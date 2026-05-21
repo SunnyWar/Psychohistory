@@ -8,6 +8,7 @@ use std::io::Read;
 
 mod cli_args;
 mod result_output;
+mod scenario;
 // logging is now provided by core
 mod util;
 
@@ -27,25 +28,11 @@ fn main() {
     init_logger(&args.log_dir, "psychohistory", args.verbose);
     info!("Simulation CLI started");
 
-    // Locate scenario file
-    let scenario_path = format!("{}/simulation_config.json", args.scenario_dir);
-    let mut file = match File::open(&scenario_path) {
-        Ok(f) => f,
-        Err(e) => {
-            error!("Failed to locate {}: {}", scenario_path, e);
-            return;
-        }
-    };
-    let mut json_str = String::new();
-    if let Err(e) = file.read_to_string(&mut json_str) {
-        error!("Failed to read {}: {}", scenario_path, e);
-        return;
-    }
-
-    let root_data: Value = match serde_json::from_str(&json_str) {
+    // Load scenario file using helper
+    let root_data = match scenario::load_scenario(&args.scenario_dir) {
         Ok(val) => val,
-        Err(e) => {
-            error!("Failed to parse config schema: {}", e);
+        Err(msg) => {
+            error!("{}", msg);
             return;
         }
     };

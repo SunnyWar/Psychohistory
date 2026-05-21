@@ -1,7 +1,10 @@
 use serde_json::Value;
 // Module-level documentation (converted from inner to outer doc comments)
+use crate::config::SimulationConfig;
+use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::experiment::ExperimentResult;
 use crate::run_experiment;
+use crate::run_result::RunResult;
 /// # Governance Simulation Core
 ///
 /// This module implements the main simulation logic for governance systems, including:
@@ -31,9 +34,6 @@ use crate::run_experiment;
 /// - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
-use crate::config::SimulationConfig;
-use crate::entities::{GovernanceSystem, YearOutcome};
-use crate::run_result::RunResult;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use rand_distr::{Distribution, Normal};
@@ -386,7 +386,6 @@ fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
 }
 
 extern crate serde_json;
-
 
 #[cfg(test)]
 mod tests {
