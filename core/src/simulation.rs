@@ -1,4 +1,3 @@
-extern crate serde_json;
 use serde_json::Value;
 // Module-level documentation (converted from inner to outer doc comments)
 use crate::experiment::ExperimentResult;
@@ -32,68 +31,6 @@ use crate::run_experiment;
 /// - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
-
-/// Recursively traverse regions in a scenario tree and run experiments for each region.
-///
-/// This utility loads the governance system and simulation config for each region node,
-/// runs the experiment, prints results, and recurses into subregions.
-///
-/// - `region_name`: Name of the current region (for reporting)
-/// - `node`: JSON node for the region
-/// - `years`: Number of years to simulate
-/// - `runs`: Number of experiment runs
-/// - `print_results`: Callback to print results (region_name, result)
-pub fn simulate_region_tree<F>(
-    region_name: &str,
-    node: &Value,
-    years: usize,
-    runs: usize,
-    print_results: &F,
-) where
-    F: Fn(&str, &ExperimentResult),
-{
-    info!("Simulating region: {} ({} runs)", region_name, runs);
-    // Try to load GovernanceSystem and SimulationConfig for this region
-    // Support both top-level and 'components'-nested fields
-    let (system, config) = {
-        let system = node
-            .get("governance_system")
-            .or_else(|| {
-                node.get("components")
-                    .and_then(|c| c.get("governance_system"))
-            })
-            .and_then(|gs| serde_json::from_value(gs.clone()).ok());
-        let config = node
-            .get("simulation_parameters")
-            .or_else(|| {
-                node.get("components")
-                    .and_then(|c| c.get("simulation_parameters"))
-            })
-            .and_then(|sp| serde_json::from_value(sp.clone()).ok());
-        (system, config)
-    };
-
-    if let (Some(system), Some(config)) = (system, config) {
-        let plugins: Vec<Box<dyn crate::simulation::SimulationPlugin>> = vec![];
-        let result: ExperimentResult = run_experiment(&system, years, &config, &plugins, runs);
-        info!("Completed region: {}", region_name);
-        print_results(region_name, &result);
-    } else {
-        warn!(
-            "Skipping region '{}' due to missing or invalid system/config.",
-            region_name
-        );
-    }
-
-    // Recurse into sub_regions
-    if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
-        for (sub_name, sub_node) in sub_regions {
-            let next_name = format!("{}:{}", region_name, sub_name);
-            simulate_region_tree(&next_name, sub_node, years, runs, print_results);
-        }
-    }
-}
-
 use crate::config::SimulationConfig;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::run_result::RunResult;
@@ -171,6 +108,67 @@ pub trait SimulationPlugin {
         year: usize,
         outcome: &mut YearOutcome,
     );
+}
+
+/// Recursively traverse regions in a scenario tree and run experiments for each region.
+///
+/// This utility loads the governance system and simulation config for each region node,
+/// runs the experiment, prints results, and recurses into subregions.
+///
+/// - `region_name`: Name of the current region (for reporting)
+/// - `node`: JSON node for the region
+/// - `years`: Number of years to simulate
+/// - `runs`: Number of experiment runs
+/// - `print_results`: Callback to print results (region_name, result)
+pub fn simulate_region_tree<F>(
+    region_name: &str,
+    node: &Value,
+    years: usize,
+    runs: usize,
+    print_results: &F,
+) where
+    F: Fn(&str, &ExperimentResult),
+{
+    info!("Simulating region: {} ({} runs)", region_name, runs);
+    // Try to load GovernanceSystem and SimulationConfig for this region
+    // Support both top-level and 'components'-nested fields
+    let (system, config) = {
+        let system = node
+            .get("governance_system")
+            .or_else(|| {
+                node.get("components")
+                    .and_then(|c| c.get("governance_system"))
+            })
+            .and_then(|gs| serde_json::from_value(gs.clone()).ok());
+        let config = node
+            .get("simulation_parameters")
+            .or_else(|| {
+                node.get("components")
+                    .and_then(|c| c.get("simulation_parameters"))
+            })
+            .and_then(|sp| serde_json::from_value(sp.clone()).ok());
+        (system, config)
+    };
+
+    if let (Some(system), Some(config)) = (system, config) {
+        let plugins: Vec<Box<dyn crate::simulation::SimulationPlugin>> = vec![];
+        let result: ExperimentResult = run_experiment(&system, years, &config, &plugins, runs);
+        info!("Completed region: {}", region_name);
+        print_results(region_name, &result);
+    } else {
+        warn!(
+            "Skipping region '{}' due to missing or invalid system/config.",
+            region_name
+        );
+    }
+
+    // Recurse into sub_regions
+    if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
+        for (sub_name, sub_node) in sub_regions {
+            let next_name = format!("{}:{}", region_name, sub_name);
+            simulate_region_tree(&next_name, sub_node, years, runs, print_results);
+        }
+    }
 }
 
 /// Simulate a single year of governance, updating all output metrics.
@@ -386,6 +384,9 @@ fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
         system.members.push(first);
     }
 }
+
+extern crate serde_json;
+
 
 #[cfg(test)]
 mod tests {
