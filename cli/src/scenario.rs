@@ -1,3 +1,22 @@
+/// Scenario file loading and validation utilities
+use serde_json::Value;
+use std::fs::File;
+use std::io::Read;
+
+/// Loads and parses the scenario JSON file at the given directory path.
+/// Returns the root serde_json::Value on success.
+pub fn load_scenario(scenario_dir: &str) -> Result<Value, String> {
+    let scenario_path = format!("{}/simulation_config.json", scenario_dir);
+    let mut file = File::open(&scenario_path)
+        .map_err(|e| format!("Failed to locate {}: {}", scenario_path, e))?;
+    let mut json_str = String::new();
+    file.read_to_string(&mut json_str)
+        .map_err(|e| format!("Failed to read {}: {}", scenario_path, e))?;
+    let root_data: Value = serde_json::from_str(&json_str)
+        .map_err(|e| format!("Failed to parse config schema: {}", e))?;
+    Ok(root_data)
+}
+
 #[cfg(test)]
 mod tests {
     use super::load_scenario;
@@ -41,22 +60,4 @@ mod tests {
                 .contains("Failed to parse config schema")
         );
     }
-}
-/// Scenario file loading and validation utilities
-use serde_json::Value;
-use std::fs::File;
-use std::io::Read;
-
-/// Loads and parses the scenario JSON file at the given directory path.
-/// Returns the root serde_json::Value on success.
-pub fn load_scenario(scenario_dir: &str) -> Result<Value, String> {
-    let scenario_path = format!("{}/simulation_config.json", scenario_dir);
-    let mut file = File::open(&scenario_path)
-        .map_err(|e| format!("Failed to locate {}: {}", scenario_path, e))?;
-    let mut json_str = String::new();
-    file.read_to_string(&mut json_str)
-        .map_err(|e| format!("Failed to read {}: {}", scenario_path, e))?;
-    let root_data: Value = serde_json::from_str(&json_str)
-        .map_err(|e| format!("Failed to parse config schema: {}", e))?;
-    Ok(root_data)
 }

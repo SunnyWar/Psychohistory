@@ -2,18 +2,15 @@ use clap::Parser;
 use cli_args::CliArgs;
 use log::{error, info, warn};
 use psychohistory_core::init_logger;
-use serde_json::Value;
-use std::fs::File;
-use std::io::Read;
+
+// Use the core simulation utility for region traversal
+use psychohistory_core::simulation::simulate_region_tree;
 
 mod cli_args;
 mod result_output;
 mod scenario;
 // logging is now provided by core
 mod util;
-
-// Use the core simulation utility for region traversal
-use psychohistory_core::simulation::simulate_region_tree;
 
 fn main() {
     let args = CliArgs::parse();
