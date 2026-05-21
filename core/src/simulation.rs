@@ -324,7 +324,7 @@ fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
 mod tests {
     use super::*;
     use crate::config::SimulationConfig;
-    use crate::entities::{GovernanceSystem, YearOutcome};
+    use crate::entities::GovernanceSystem;
 
     #[test]
     fn test_simulate_year_metrics_deterministic() {

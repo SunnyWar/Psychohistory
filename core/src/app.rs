@@ -1,15 +1,12 @@
+// Color helpers (used in println macros below)
+const YELLOW: &str = "\x1b[33m";
+const RESET: &str = "\x1b[0m";
 use log::{debug, info};
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
 use sdk::TimeGranularity;
 use std::collections::HashMap;
-
-// Color helpers
-const GREEN: &str = "\x1b[32m";
-const RED: &str = "\x1b[31m";
-const YELLOW: &str = "\x1b[33m";
-const RESET: &str = "\x1b[0m";
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum DomainState {
@@ -179,15 +176,5 @@ impl App {
 impl Default for App {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-fn colorize_change_f64(before: f64, after: f64) -> Option<String> {
-    if (before - after).abs() < f64::EPSILON {
-        None
-    } else if after > before {
-        Some(format!("{GREEN}{:.2}{RESET}", after))
-    } else {
-        Some(format!("{RED}{:.2}{RESET}", after))
     }
 }

@@ -237,7 +237,6 @@ impl SimulationState {
 
     /// Exposes exclusive mutable access *only* to the write-plane map.
     /// This allows splitting the borrow so `current` can be read simultaneously.
-
     pub fn mut_workspace(&mut self) -> &mut HashMap<&'static str, Box<dyn Any + Send + Sync>> {
         &mut self.next
     }

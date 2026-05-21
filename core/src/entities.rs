@@ -1,15 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum ChamberType {
+    #[default]
     House,
     Senate,
     LegislativeAssembly,
     JudicialTribunal,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum SystemKind {
+    #[default]
     CurrentUsSystem,
     FederalSensorumSystem,
 }
@@ -46,16 +48,4 @@ pub struct YearOutcome {
     pub legislative_speed: f64,
     pub economic_outcome: f64,
     pub composite_score: f64,
-}
-
-impl Default for ChamberType {
-    fn default() -> Self {
-        ChamberType::House
-    }
-}
-
-impl Default for SystemKind {
-    fn default() -> Self {
-        SystemKind::CurrentUsSystem
-    }
 }

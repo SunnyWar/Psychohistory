@@ -1,4 +1,4 @@
-use clap::{CommandFactory, Parser, ValueHint};
+use clap::{Parser, ValueHint};
 
 #[derive(Parser, Debug)]
 pub struct CliArgs {

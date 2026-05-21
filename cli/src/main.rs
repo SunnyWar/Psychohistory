@@ -11,7 +11,7 @@ use psychohistory_core::experiment::ExperimentResult;
 use psychohistory_core::run_experiment;
 
 use cli_args::CliArgs;
-use log::{debug, error, info, warn};
+use log::{error, info, warn};
 use psychohistory_core::init_logger;
 
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
         <CliArgs as clap::CommandFactory>::command()
             .print_help()
             .unwrap();
-        println!("");
+        println!();
         return;
     }
     init_logger(&args.log_dir, "psychohistory", args.verbose);
