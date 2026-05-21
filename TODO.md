@@ -1,63 +1,36 @@
-# Psychohistory Governance Simulator — Targeted TODO
+# Psychohistory Governance Simulator — Focused TODO
 
-This TODO is tailored for the current codebase state. **For each item, first inspect the referenced files/modules to leverage existing logic before writing new code.**
-
----
-
-## Phase 1: Configuration Audit & The 'us' Region Bug
-- [x] **Audit the Config Parser:**  
-  - Inspect: [core/src/config.rs], [core/src/app.rs], [cli/src/main.rs]  
-  - **Complete:** Config parsing now robust—missing fields are filled with defaults, incomplete configs are accepted, and tests validate this. The `[WARN] Skipping region 'us'` bug was due to missing fields in the top-level config, now handled by serde defaults.
- - [x] **Verify Dual-System Data:**  
-  - Inspect: [core/src/config.rs], [scenarios/simulation_config.json], [core/src/state.rs]  
-  - **Complete:** Current config/schema only supports a single system per region (no dual-system or alternative block). If dual-system support is needed, schema and code must be extended to allow two sets of parameters per region.
+**Prioritized for codebase quality: items that find/fix bugs, improve readability, or enhance maintainability are listed first.**
 
 ---
 
-## Phase 2: Connecting the Simulation Loop & Engine
- - [x] **Locate the Hidden Engine:**  
-  - Inspect: [core/src/app.rs], [core/src/simulation.rs], [core/src/system.rs], [core/src/experiment.rs]  
-  - **Complete:** The simulation engine is implemented in [core/src/simulation.rs] as `run_simulation` (multi-year) and `simulate_year` (per-year). It uses `SimulationState`, `SimulationConfig`, and `GovernanceSystem`, supports plugins, and is tested for determinism and metric bounds.
- - [x] **Wire Engine to CLI:**  
-  - Inspect: [cli/src/main.rs]  
-  - **Complete:** The CLI calls the real simulation engine (`run_simulation`) for each region and prints average metrics from the returned `RunResult`. Timeline/multi-run, CSV export, and richer reporting are future steps.
-- [ ] **Enable Multi-Run / Timeline Execution:**  
-  - Inspect: [core/src/experiment.rs], [core/src/app.rs], [core/src/scheduler.rs], [cli/src/main.rs]  
-  - Action: Make sure the simulation loop uses the configured timeline horizon (e.g., 20 years) and executes all Monte Carlo runs, not just a single pass.
-
----
-
-## Phase 3: Activating the Statistical Module
-- [ ] **Find the Accumulators:**  
+## 1. Simulation Correctness & Statistical Output
+- [x] **Enable Multi-Run / Timeline Execution**  
+  - Complete: The CLI exposes `--years` and `--runs` for timeline and Monte Carlo configuration. These are passed through to the simulation engine and results are aggregated. See README for usage.
+- [ ] **Find and Connect Statistical Accumulators**  
   - Inspect: [core/src/run_result.rs], [core/src/experiment.rs], [core/src/app.rs]  
-  - Action: Locate where Mean, StdDev, and 95% Confidence Intervals are calculated or defined. Review accumulator structs and their update logic.
-- [ ] **Pipe Simulation Output to Stats:**  
-  - Inspect: [core/src/experiment.rs], [core/src/run_result.rs]  
-  - Action: Ensure per-run simulation results are fed into these accumulators so aggregates are computed and not left empty.
+  - Action: Locate where Mean, StdDev, and 95% Confidence Intervals are calculated or defined. Ensure per-run simulation results are fed into these accumulators so aggregates are computed and not left empty. 
+  - *Priority: High — ensures output is meaningful and not misleading.*
 
 ---
 
-## Phase 4: Hooking Up CSV Exporting
-- [ ] **Locate Data Writers:**  
-  - Inspect: [core/src/experiment.rs], [core/src/run_result.rs], [core/src/app.rs], references to `simulation-summary.csv` and `per-run-results.csv`  
-  - Action: Find CSV export logic and verify file paths.
-- [ ] **Trigger the Writes:**  
-  - Inspect: [cli/src/main.rs], [core/src/app.rs]  
-  - Action: Wire CSV export functions to run at the end of each region’s simulation, ensuring cumulative data is written to disk.
-
----
-
-## Phase 5: Polishing the Console Presentation & Comparison
-- [ ] **Review Table Presentation:**  
+## 2. Output & Usability Improvements
+- [ ] **Hook Up CSV Exporting**  
+  - Inspect: [core/src/experiment.rs], [core/src/run_result.rs], [core/src/app.rs], [cli/src/main.rs], references to `simulation-summary.csv` and `per-run-results.csv`  
+  - Action: Find CSV export logic, verify file paths, and wire export functions to run at the end of each region’s simulation. Ensure cumulative data is written to disk. 
+  - *Priority: Medium — improves reproducibility and analysis.*
+- [ ] **Polish Console Table Presentation**  
   - Inspect: [cli/src/util.rs], [cli/src/main.rs], Cargo.toml dependencies (look for `comfy-table`, `cli-table`, etc.)  
-  - Action: Check for existing table formatting utilities and how they are used.
+  - Action: Check for existing table formatting utilities and how they are used. 
+  - *Priority: Medium — improves readability for users.*
 
 ---
 
-## Phase 6: Performance Optimization
-- [ ] **Check Parallelism Support:**  
+## 3. Performance & Maintainability
+- [ ] **Check and Improve Parallelism Support**  
   - Inspect: [Cargo.toml for `rayon`], [core/src/experiment.rs], [core/src/app.rs], [cli/src/main.rs]  
-  - Action: Look for existing parallel iterators or async code. If present, ensure region or Monte Carlo loops use them for concurrent execution.
+  - Action: Look for existing parallel iterators or async code. If present, ensure region or Monte Carlo loops use them for concurrent execution. 
+  - *Priority: Medium — improves performance for large runs.*
 
 ---
 

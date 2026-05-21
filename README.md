@@ -56,6 +56,33 @@ Psychohistory/
 ```
 
 
+
+## Command-Line Usage
+
+The CLI runner supports flexible simulation configuration:
+
+```
+psychohistory-cli [OPTIONS]
+```
+
+**Key options:**
+
+- `--years <N>`: Number of years to simulate (default: 10)
+- `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
+- `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
+- `--log-dir <DIR>`: Log file output directory (default: logs)
+- `-v, --verbose`: Increase logging verbosity (repeat for more detail)
+
+Example:
+
+```
+psychohistory-cli --years 20 --runs 100 --scenario-dir scenarios
+```
+
+This will run each region for 20 years, performing 100 Monte Carlo runs per region, and print aggregate statistics.
+
+---
+
 ## What to Expect as a User
 
 Psychohistory is designed for users who want to simulate and analyze the evolution of complex societies across economic, political, and demographic domains. When using this application, you can expect:
