@@ -11,6 +11,9 @@ mod result_output;
 // logging is now provided by core
 mod util;
 
+// Use the core simulation utility for region traversal
+use psychohistory_core::simulation::simulate_region_tree;
+
 fn main() {
     let args = CliArgs::parse();
     if std::env::args().len() == 1 {
@@ -46,9 +49,6 @@ fn main() {
             return;
         }
     };
-
-    // Use the core simulation utility for region traversal
-    use psychohistory_core::simulation::simulate_region_tree;
 
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
