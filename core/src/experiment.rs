@@ -1,50 +1,3 @@
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::config::SimulationConfig;
-    use crate::entities::GovernanceSystem;
-
-    #[test]
-    fn test_run_experiment_basic() {
-        let system = GovernanceSystem::default();
-        let config = SimulationConfig::default();
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
-        let runs = 5;
-        let years = 10;
-        let result = run_experiment(&system, years, &config, &plugins, runs);
-        assert_eq!(result.runs.len(), runs);
-        assert_eq!(result.n, runs);
-        // Means and stddevs should be in [0, 1] or 0
-        let m = &result.mean;
-        let s = &result.stddev;
-        for v in [
-            m.average_law_quality,
-            m.average_corruption_level,
-            m.average_public_trust,
-            m.average_crisis_response,
-            m.average_adaptability,
-            m.average_representation_accuracy,
-            m.average_legislative_speed,
-            m.average_economic_outcome,
-            m.average_composite_score,
-        ] {
-            assert!((0.0..=1.0).contains(&v));
-        }
-        for v in [
-            s.average_law_quality,
-            s.average_corruption_level,
-            s.average_public_trust,
-            s.average_crisis_response,
-            s.average_adaptability,
-            s.average_representation_accuracy,
-            s.average_legislative_speed,
-            s.average_economic_outcome,
-            s.average_composite_score,
-        ] {
-            assert!(v >= 0.0);
-        }
-    }
-}
 use crate::config::SimulationConfig;
 use crate::entities::GovernanceSystem;
 use crate::run_result::RunResult;
@@ -58,16 +11,6 @@ pub struct ExperimentResult {
     pub n: usize,
 }
 
-fn mean_stddev(values: &[f64]) -> (f64, f64) {
-    let n = values.len() as f64;
-    if n == 0.0 {
-        return (0.0, 0.0);
-    }
-    let mean = values.iter().sum::<f64>() / n;
-    let var = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n;
-    (mean, var.sqrt())
-}
-
 impl ExperimentResult {
     pub fn confidence_interval(stddev: f64, n: usize, z: f64) -> f64 {
         if n == 0 {
@@ -76,6 +19,16 @@ impl ExperimentResult {
             z * stddev / (n as f64).sqrt()
         }
     }
+}
+
+fn mean_stddev(values: &[f64]) -> (f64, f64) {
+    let n = values.len() as f64;
+    if n == 0.0 {
+        return (0.0, 0.0);
+    }
+    let mean = values.iter().sum::<f64>() / n;
+    let var = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n;
+    (mean, var.sqrt())
 }
 
 /// Run multiple simulations and aggregate results (mean, stddev).
@@ -133,5 +86,53 @@ pub fn run_experiment(
         mean,
         stddev,
         n,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::SimulationConfig;
+    use crate::entities::GovernanceSystem;
+
+    #[test]
+    fn test_run_experiment_basic() {
+        let system = GovernanceSystem::default();
+        let config = SimulationConfig::default();
+        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        let runs = 5;
+        let years = 10;
+        let result = run_experiment(&system, years, &config, &plugins, runs);
+        assert_eq!(result.runs.len(), runs);
+        assert_eq!(result.n, runs);
+        // Means and stddevs should be in [0, 1] or 0
+        let m = &result.mean;
+        let s = &result.stddev;
+        for v in [
+            m.average_law_quality,
+            m.average_corruption_level,
+            m.average_public_trust,
+            m.average_crisis_response,
+            m.average_adaptability,
+            m.average_representation_accuracy,
+            m.average_legislative_speed,
+            m.average_economic_outcome,
+            m.average_composite_score,
+        ] {
+            assert!((0.0..=1.0).contains(&v));
+        }
+        for v in [
+            s.average_law_quality,
+            s.average_corruption_level,
+            s.average_public_trust,
+            s.average_crisis_response,
+            s.average_adaptability,
+            s.average_representation_accuracy,
+            s.average_legislative_speed,
+            s.average_economic_outcome,
+            s.average_composite_score,
+        ] {
+            assert!(v >= 0.0);
+        }
     }
 }

@@ -1,18 +1,17 @@
-mod result_output;
 use clap::Parser;
+use cli_args::CliArgs;
+use log::{error, info, warn};
+use psychohistory_core::experiment::ExperimentResult;
+use psychohistory_core::init_logger;
+use psychohistory_core::run_experiment;
 use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
+
 mod cli_args;
+mod result_output;
 // logging is now provided by core
 mod util;
-
-use psychohistory_core::experiment::ExperimentResult;
-use psychohistory_core::run_experiment;
-
-use cli_args::CliArgs;
-use log::{error, info, warn};
-use psychohistory_core::init_logger;
 
 fn main() {
     let args = CliArgs::parse();

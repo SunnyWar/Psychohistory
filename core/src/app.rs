@@ -1,12 +1,13 @@
-// Color helpers (used in println macros below)
-const YELLOW: &str = "\x1b[33m";
-const RESET: &str = "\x1b[0m";
 use log::{debug, info};
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
 use sdk::TimeGranularity;
 use std::collections::HashMap;
+
+// Color helpers (used in println macros below)
+const YELLOW: &str = "\x1b[33m";
+const RESET: &str = "\x1b[0m";
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum DomainState {
