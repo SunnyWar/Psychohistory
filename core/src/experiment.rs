@@ -1,4 +1,4 @@
-use crate::config::SimulationConfig;
+use crate::config::SimulationContext;
 use crate::entities::GovernanceSystem;
 use crate::run_result::RunResult;
 use crate::simulation::{SimulationPlugin, run_simulation};
@@ -35,14 +35,13 @@ fn mean_stddev(values: &[f64]) -> (f64, f64) {
 pub fn run_experiment(
     system: &GovernanceSystem,
     years: usize,
-    config: &SimulationConfig,
+    context: &mut SimulationContext,
     plugins: &[Box<dyn SimulationPlugin>],
     runs: usize,
 ) -> ExperimentResult {
     let mut results = Vec::with_capacity(runs);
     for _ in 0..runs {
-        // Each run could get a different seed if run_simulation accepted it
-        let result = run_simulation(system, years, config, plugins);
+        let result = run_simulation(system, years, context, plugins);
         results.push(result);
     }
     // Aggregate means and stddevs for each metric
@@ -92,17 +91,17 @@ pub fn run_experiment(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::SimulationConfig;
+    use crate::config::SimulationContext;
     use crate::entities::GovernanceSystem;
-
+    use crate::simulation::SimulationPlugin;
     #[test]
     fn test_run_experiment_basic() {
         let system = GovernanceSystem::default();
-        let config = SimulationConfig::default();
+        let mut context = SimulationContext::new(Default::default(), None);
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         let runs = 5;
         let years = 10;
-        let result = run_experiment(&system, years, &config, &plugins, runs);
+        let result = run_experiment(&system, years, &mut context, &plugins, runs);
         assert_eq!(result.runs.len(), runs);
         assert_eq!(result.n, runs);
         // Means and stddevs should be in [0, 1] or 0
@@ -118,10 +117,6 @@ mod tests {
             m.average_legislative_speed,
             m.average_economic_outcome,
             m.average_composite_score,
-        ] {
-            assert!((0.0..=1.0).contains(&v));
-        }
-        for v in [
             s.average_law_quality,
             s.average_corruption_level,
             s.average_public_trust,
@@ -132,7 +127,8 @@ mod tests {
             s.average_economic_outcome,
             s.average_composite_score,
         ] {
-            assert!(v >= 0.0);
+            assert!((0.0..=1.0).contains(&v) || v == 0.0);
         }
     }
+    // End of test
 }

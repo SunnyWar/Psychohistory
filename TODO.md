@@ -1,13 +1,3 @@
-
-
-## Phase 7: CLI Refactor, Command-Line, and Logging Improvements
-
-**Recommended next step:**
-
-- [ ] Extract scenario file loading and validation from [cli/src/main.rs] into a new helper module (e.g., `scenario.rs`).
-
-This will make subsequent refactoring (region runner, output, orchestration) easier and enable unit testing for scenario parsing.
-
 # Psychohistory Governance Simulator — Targeted TODO
 
 This TODO is tailored for the current codebase state. **For each item, first inspect the referenced files/modules to leverage existing logic before writing new code.**

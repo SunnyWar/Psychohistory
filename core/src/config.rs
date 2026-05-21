@@ -1,3 +1,5 @@
+use rand::SeedableRng;
+use rand::rngs::StdRng;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize)]
@@ -56,5 +58,21 @@ impl Default for SimulationConfig {
             representative_efficiency: 1.0,
             raw_speed: 1.0,
         }
+    }
+}
+
+// A dedicated runtime container
+pub struct SimulationContext {
+    pub config: SimulationConfig,
+    pub rand: StdRng,
+}
+
+impl SimulationContext {
+    pub fn new(config: SimulationConfig, seed: Option<u64>) -> Self {
+        let rand = match seed {
+            Some(s) => StdRng::seed_from_u64(s),
+            None => rand::make_rng(),
+        };
+        Self { config, rand }
     }
 }

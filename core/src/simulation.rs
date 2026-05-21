@@ -1,6 +1,6 @@
 use serde_json::Value;
 // Module-level documentation (converted from inner to outer doc comments)
-use crate::config::SimulationConfig;
+use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::experiment::ExperimentResult;
 use crate::run_experiment;
@@ -34,8 +34,6 @@ use crate::run_result::RunResult;
 /// - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
-use rand::SeedableRng;
-use rand::rngs::StdRng;
 use rand_distr::{Distribution, Normal};
 
 pub struct SimulationState {
@@ -152,7 +150,8 @@ pub fn simulate_region_tree<F>(
 
     if let (Some(system), Some(config)) = (system, config) {
         let plugins: Vec<Box<dyn crate::simulation::SimulationPlugin>> = vec![];
-        let result: ExperimentResult = run_experiment(&system, years, &config, &plugins, runs);
+        let mut context = SimulationContext::new(config, None);
+        let result: ExperimentResult = run_experiment(&system, years, &mut context, &plugins, runs);
         info!("Completed region: {}", region_name);
         print_results(region_name, &result);
     } else {
@@ -204,18 +203,17 @@ pub fn simulate_region_tree<F>(
 pub fn simulate_year(
     system: &GovernanceSystem,
     state: &mut SimulationState,
-    config: &SimulationConfig,
+    context: &mut SimulationContext,
     year: usize,
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
-    let mut rng = StdRng::seed_from_u64(year as u64);
     // Example: Law Quality (CurrentUsSystem)
     let lobbying_pressure = state.lobbying_pressure;
     let donor_pressure = state.donor_pressure;
     let media_impact = state.media_impact;
-    let bias_level = config.bias_level;
-    let raw_law_quality = config.raw_law_quality;
-    let representative_efficiency = config.representative_efficiency;
+    let bias_level = context.config.bias_level;
+    let raw_law_quality = context.config.raw_law_quality;
+    let representative_efficiency = context.config.representative_efficiency;
     let special_interest_degradation =
         (1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06)
             .clamp(0.0, 1.0);
@@ -225,14 +223,14 @@ pub fn simulate_year(
         .clamp(0.0, 1.0);
 
     // Example: Corruption Level (CurrentUsSystem)
-    let us_corruption_base = config.us_corruption_base;
+    let us_corruption_base = context.config.us_corruption_base;
     let avg_integrity = state.avg_integrity;
     let reelection_pressure = state.reelection_pressure;
-    let us_reelection_bonus = config.us_reelection_bonus;
+    let us_reelection_bonus = context.config.us_reelection_bonus;
     let normalized_wealth_influence = state.normalized_wealth_influence;
     let faction_formation = state.faction_formation;
     let bad_law_drag = state.bad_law_drag;
-    let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut rng);
+    let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut context.rand);
     let corruption_level = (us_corruption_base
         + (1.0 - avg_integrity) * 0.28
         + lobbying_pressure * 0.24
@@ -246,7 +244,7 @@ pub fn simulate_year(
 
     // Public Trust (CurrentUsSystem)
     let prior_trust = state.prior_trust;
-    let public_trust_decay_rate = config.public_trust_decay_rate;
+    let public_trust_decay_rate = context.config.public_trust_decay_rate;
     let decayed_prior_trust = prior_trust * (1.0 - public_trust_decay_rate);
     let crisis_response = 0.0; // TODO: compute below
     let legislative_speed = 0.0; // Will be computed below
@@ -271,7 +269,7 @@ pub fn simulate_year(
     let avg_leadership = state.avg_leadership;
     let expert_support_effectiveness = state.expert_support_effectiveness;
     let policy_stock = state.policy_stock;
-    let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut rng);
+    let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut context.rand);
     let legislative_efficiency = state.legislative_efficiency;
     let stability_multiplier = state.stability_multiplier;
     let base_crisis_capability = legislative_competence * 0.20
@@ -285,7 +283,7 @@ pub fn simulate_year(
 
     // Adaptability (CurrentUsSystem)
     let avg_competence = state.avg_competence;
-    let partisan_polarization = config.partisan_polarization;
+    let partisan_polarization = context.config.partisan_polarization;
     let challenge_happened = state.challenge_happened;
     let faction_formation = state.faction_formation;
     let adaptability = (avg_competence * 0.24
@@ -304,14 +302,14 @@ pub fn simulate_year(
         (avg_representation * 0.90 - donor_pressure * 0.06).clamp(0.0, 1.0);
 
     // Legislative Speed (FederalSensorumSystem)
-    let raw_speed = config.raw_speed;
+    let raw_speed = context.config.raw_speed;
     let legislative_speed = (raw_speed * legislative_efficiency).clamp(0.0, 1.0);
 
     // Economic Outcome (CurrentUsSystem)
-    let economic_volatility = config.economic_volatility;
+    let economic_volatility = context.config.economic_volatility;
     let economic_shock = Normal::new(0.0, economic_volatility * 0.10)
         .unwrap()
-        .sample(&mut rng);
+        .sample(&mut context.rand);
     let economic_outcome = (0.36
         + law_quality * 0.20
         + crisis_response * 0.13
@@ -324,7 +322,7 @@ pub fn simulate_year(
         .clamp(0.0, 1.0);
 
     // Composite Score
-    let weights = config.weights;
+    let weights = context.config.weights;
     let weighted_numerator = law_quality * weights[0]
         + (1.0 - corruption_level) * weights[1]
         + public_trust * weights[2]
@@ -360,7 +358,7 @@ pub fn simulate_year(
 pub fn run_simulation(
     system: &GovernanceSystem,
     years: usize,
-    config: &SimulationConfig,
+    context: &mut SimulationContext,
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> RunResult {
     let mut state = SimulationState::default();
@@ -369,7 +367,7 @@ pub fn run_simulation(
     for year in 0..years {
         // Membership rotation stub (implement logic as needed)
         rotate_membership(&mut system, year);
-        let outcome = simulate_year(&system, &mut state, config, year, plugins);
+        let outcome = simulate_year(&system, &mut state, context, year, plugins);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }
@@ -390,16 +388,16 @@ extern crate serde_json;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::SimulationConfig;
+    use crate::config::SimulationContext;
     use crate::entities::GovernanceSystem;
 
     #[test]
     fn test_simulate_year_metrics_deterministic() {
         let mut state = SimulationState::default();
-        let config = SimulationConfig::default();
+        let mut context = SimulationContext::new(Default::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
-        let outcome = simulate_year(&system, &mut state, &config, 42, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 42, &plugins);
         // All metrics should be in [0, 1]
         assert!((0.0..=1.0).contains(&outcome.law_quality));
         assert!((0.0..=1.0).contains(&outcome.corruption_level));
@@ -415,7 +413,7 @@ mod tests {
     #[test]
     fn test_extreme_inputs() {
         let mut state = SimulationState::default();
-        let mut config = SimulationConfig::default();
+        let mut context = SimulationContext::new(Default::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         // Set extreme values for state and config
@@ -443,23 +441,24 @@ mod tests {
         state.avg_leadership = 0.0;
         state.avg_representation = 0.0;
         state.policy_stock = 0.0;
-        config.bias_level = 1.0;
-        config.public_trust_decay_rate = 0.1;
-        config.lobbying_strength = 5.0;
-        config.wealth_influence_multiplier = 5.0;
-        config.crisis_year_probability = 1.0;
-        config.new_challenge_pressure = 1.0;
-        config.economic_volatility = 1.0;
-        config.baseline_public_trust = 0.0;
-        config.media_influence_strength = 5.0;
-        config.weights = [1.0; 8];
-        config.us_corruption_base = 1.0;
-        config.us_reelection_bonus = 5.0;
-        config.partisan_polarization = 1.0;
-        config.raw_law_quality = 0.0;
-        config.representative_efficiency = 0.0;
-        config.raw_speed = 0.0;
-        let outcome = simulate_year(&system, &mut state, &config, 1, &plugins);
+        let c = &mut context.config;
+        c.bias_level = 1.0;
+        c.public_trust_decay_rate = 0.1;
+        c.lobbying_strength = 5.0;
+        c.wealth_influence_multiplier = 5.0;
+        c.crisis_year_probability = 1.0;
+        c.new_challenge_pressure = 1.0;
+        c.economic_volatility = 1.0;
+        c.baseline_public_trust = 0.0;
+        c.media_influence_strength = 5.0;
+        c.weights = [1.0; 8];
+        c.us_corruption_base = 1.0;
+        c.us_reelection_bonus = 5.0;
+        c.partisan_polarization = 1.0;
+        c.raw_law_quality = 0.0;
+        c.representative_efficiency = 0.0;
+        c.raw_speed = 0.0;
+        let outcome = simulate_year(&system, &mut state, &mut context, 1, &plugins);
         // All metrics should still be clamped to [0, 1]
         assert!((0.0..=1.0).contains(&outcome.law_quality));
         assert!((0.0..=1.0).contains(&outcome.corruption_level));
@@ -475,7 +474,7 @@ mod tests {
     #[test]
     fn test_cross_domain_dependency() {
         let mut state = SimulationState::default();
-        let mut config = SimulationConfig::default();
+        let mut context = SimulationContext::new(Default::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         // Set corruption high, expect public trust and economic outcome to be lower
@@ -486,8 +485,8 @@ mod tests {
         state.normalized_wealth_influence = 5.0;
         state.faction_formation = 5.0;
         state.bad_law_drag = 5.0;
-        config.us_corruption_base = 1.0;
-        let outcome = simulate_year(&system, &mut state, &config, 2, &plugins);
+        context.config.us_corruption_base = 1.0;
+        let outcome = simulate_year(&system, &mut state, &mut context, 2, &plugins);
         // Corruption should be high, public trust and economic outcome should be low
         assert!(outcome.corruption_level > 0.8);
         assert!(outcome.public_trust < 0.5);
@@ -497,14 +496,14 @@ mod tests {
     #[test]
     fn test_policy_stock_and_adaptability() {
         let mut state = SimulationState::default();
-        let config = SimulationConfig::default();
+        let mut context = SimulationContext::new(Default::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         state.policy_stock = 1.0;
         state.avg_competence = 1.0;
         state.avg_leadership = 1.0;
         state.challenge_happened = true;
-        let outcome = simulate_year(&system, &mut state, &config, 3, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 3, &plugins);
         // Adaptability should be relatively high
         assert!(outcome.adaptability > 0.5);
     }
