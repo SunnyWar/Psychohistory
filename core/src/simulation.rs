@@ -124,6 +124,7 @@ pub fn simulate_region_tree<F>(
     years: usize,
     runs: usize,
     print_results: &F,
+    seeds: Option<&[u64]>,
 ) where
     F: Fn(&str, &ExperimentResult),
 {
@@ -151,7 +152,8 @@ pub fn simulate_region_tree<F>(
     if let (Some(system), Some(config)) = (system, config) {
         let plugins: Vec<Box<dyn crate::simulation::SimulationPlugin>> = vec![];
         let mut context = SimulationContext::new(config, None);
-        let result: ExperimentResult = run_experiment(&system, years, &mut context, &plugins, runs);
+        let result: ExperimentResult =
+            run_experiment(&system, years, &mut context, &plugins, runs, seeds);
         info!("Completed region: {}", region_name);
         print_results(region_name, &result);
     } else {
@@ -165,7 +167,7 @@ pub fn simulate_region_tree<F>(
     if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
         for (sub_name, sub_node) in sub_regions {
             let next_name = format!("{}:{}", region_name, sub_name);
-            simulate_region_tree(&next_name, sub_node, years, runs, print_results);
+            simulate_region_tree(&next_name, sub_node, years, runs, print_results, seeds);
         }
     }
 }

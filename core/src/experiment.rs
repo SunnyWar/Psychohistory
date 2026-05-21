@@ -38,10 +38,13 @@ pub fn run_experiment(
     context: &mut SimulationContext,
     plugins: &[Box<dyn SimulationPlugin>],
     runs: usize,
+    seeds: Option<&[u64]>,
 ) -> ExperimentResult {
     let mut results = Vec::with_capacity(runs);
-    for _ in 0..runs {
-        let result = run_simulation(system, years, context, plugins);
+    for i in 0..runs {
+        let seed = seeds.and_then(|s| s.get(i)).copied();
+        let mut run_context = SimulationContext::new(context.config.clone(), seed);
+        let result = run_simulation(system, years, &mut run_context, plugins);
         results.push(result);
     }
     // Aggregate means and stddevs for each metric
@@ -101,7 +104,7 @@ mod tests {
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         let runs = 5;
         let years = 10;
-        let result = run_experiment(&system, years, &mut context, &plugins, runs);
+        let result = run_experiment(&system, years, &mut context, &plugins, runs, None);
         assert_eq!(result.runs.len(), runs);
         assert_eq!(result.n, runs);
         // Means and stddevs should be in [0, 1] or 0
