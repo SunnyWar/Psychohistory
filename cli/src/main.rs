@@ -1,3 +1,4 @@
+mod result_output;
 use clap::Parser;
 use serde_json::Value;
 use std::fs::File;
@@ -6,6 +7,7 @@ mod cli_args;
 // logging is now provided by core
 mod util;
 
+use psychohistory_core::experiment::ExperimentResult;
 use psychohistory_core::run_experiment;
 
 use cli_args::CliArgs;
@@ -73,81 +75,9 @@ fn main() {
 
         if let (Some(system), Some(config)) = (system, config) {
             let plugins: Vec<Box<dyn psychohistory_core::simulation::SimulationPlugin>> = vec![];
-            let result = run_experiment(&system, years, &config, &plugins, runs);
+            let result: ExperimentResult = run_experiment(&system, years, &config, &plugins, runs);
             info!("Completed region: {}", region_name);
-            println!("=== Experiment Results for region: {} ===", region_name);
-            println!(
-                "  [MEAN] Law Quality: {:.3}",
-                result.mean.average_law_quality
-            );
-            println!(
-                "  [MEAN] Corruption Level: {:.3}",
-                result.mean.average_corruption_level
-            );
-            println!(
-                "  [MEAN] Public Trust: {:.3}",
-                result.mean.average_public_trust
-            );
-            println!(
-                "  [MEAN] Crisis Response: {:.3}",
-                result.mean.average_crisis_response
-            );
-            println!(
-                "  [MEAN] Adaptability: {:.3}",
-                result.mean.average_adaptability
-            );
-            println!(
-                "  [MEAN] Representation Accuracy: {:.3}",
-                result.mean.average_representation_accuracy
-            );
-            println!(
-                "  [MEAN] Legislative Speed: {:.3}",
-                result.mean.average_legislative_speed
-            );
-            println!(
-                "  [MEAN] Economic Outcome: {:.3}",
-                result.mean.average_economic_outcome
-            );
-            println!(
-                "  [MEAN] Composite Score: {:.3}",
-                result.mean.average_composite_score
-            );
-            println!(
-                "  [STDDEV] Law Quality: {:.3}",
-                result.stddev.average_law_quality
-            );
-            println!(
-                "  [STDDEV] Corruption Level: {:.3}",
-                result.stddev.average_corruption_level
-            );
-            println!(
-                "  [STDDEV] Public Trust: {:.3}",
-                result.stddev.average_public_trust
-            );
-            println!(
-                "  [STDDEV] Crisis Response: {:.3}",
-                result.stddev.average_crisis_response
-            );
-            println!(
-                "  [STDDEV] Adaptability: {:.3}",
-                result.stddev.average_adaptability
-            );
-            println!(
-                "  [STDDEV] Representation Accuracy: {:.3}",
-                result.stddev.average_representation_accuracy
-            );
-            println!(
-                "  [STDDEV] Legislative Speed: {:.3}",
-                result.stddev.average_legislative_speed
-            );
-            println!(
-                "  [STDDEV] Economic Outcome: {:.3}",
-                result.stddev.average_economic_outcome
-            );
-            println!(
-                "  [STDDEV] Composite Score: {:.3}",
-                result.stddev.average_composite_score
-            );
+            result_output::print_experiment_results(region_name, &result);
         } else {
             warn!(
                 "Skipping region '{}' due to missing or invalid system/config.",
