@@ -3,6 +3,8 @@ name = "cli"
 version = "0.1.0"
 edition = "2024"
 
+build = "build.rs"
+
 [dependencies]
 num-format = "0.4.4"
 rust_decimal = "1.42.0"
@@ -17,6 +19,6 @@ serde_json = "1.0"
 models = { path = "../models" }
 clap = { version = "4.5", features = ["derive"] }
 log = "0.4"
-flexi_logger = "0.29"
+flexi_logger = "0.31.8"
 tempfile = "3.27.0"
 

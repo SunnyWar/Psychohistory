@@ -233,6 +233,12 @@ pub fn simulate_year(
     let faction_formation = state.faction_formation;
     let bad_law_drag = state.bad_law_drag;
     let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut context.rand);
+    log::info!(
+        "[DEBUG] Run RNG: region={}, year={}, corruption_noise={}",
+        context.config.raw_law_quality,
+        year,
+        random_noise
+    );
     let corruption_level = (us_corruption_base
         + (1.0 - avg_integrity) * 0.28
         + lobbying_pressure * 0.24
@@ -272,6 +278,12 @@ pub fn simulate_year(
     let expert_support_effectiveness = state.expert_support_effectiveness;
     let policy_stock = state.policy_stock;
     let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut context.rand);
+    log::info!(
+        "[DEBUG] Run RNG: region={}, year={}, deliberation_noise={}",
+        context.config.raw_law_quality,
+        year,
+        deliberation_noise
+    );
     let legislative_efficiency = state.legislative_efficiency;
     let stability_multiplier = state.stability_multiplier;
     let base_crisis_capability = legislative_competence * 0.20
