@@ -1,9 +1,8 @@
 use log::{debug, info};
 // core/src/scheduler.rs
 use crate::{state::SimulationState, system::System};
-use sdk::{SimulationTime, TimeGranularity};
-
 use indicatif::{ProgressBar, ProgressStyle};
+use sdk::{SimulationTime, TimeGranularity};
 use std::collections::HashMap;
 
 pub struct Scheduler {

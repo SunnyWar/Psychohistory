@@ -1,7 +1,7 @@
-use log::{debug, info};
 // core/src/app.rs
 use crate::plugin::Plugin;
 use crate::{scheduler::Scheduler, state::SimulationState};
+use log::{debug, info};
 use sdk::TimeGranularity;
 use std::collections::HashMap;
 

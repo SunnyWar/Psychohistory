@@ -1,5 +1,3 @@
-use serde_json::Value;
-// Module-level documentation (converted from inner to outer doc comments)
 use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::experiment::ExperimentResult;
@@ -35,6 +33,7 @@ use crate::run_result::RunResult;
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
 use rand_distr::{Distribution, Normal};
+use serde_json::Value;
 
 pub struct SimulationState {
     pub year_outcomes: Vec<YearOutcome>,

@@ -1,4 +1,3 @@
-pub mod seed_util;
 pub use app::App;
 pub use experiment::{ExperimentResult, run_experiment};
 pub use logging::init_logger;
@@ -7,6 +6,8 @@ pub use state::SimulationState;
 pub use system::System;
 
 // core/src/lib.rs
+pub mod seed_util;
+
 pub mod app;
 pub mod config;
 pub mod entities;

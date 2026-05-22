@@ -1,5 +1,5 @@
-use log::debug;
 // core/src/state.rs
+use log::debug;
 use models::{EconSystemType, GovType};
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use sdk::ReadSnapshot;
@@ -84,8 +84,6 @@ impl SimulationState {
         self.econ_system = new_type;
     }
 
-    /// Mutates a component state across both the current and next data planes.
-    /// Essential for seeding initial baselines prior to running the simulation loop.
     pub fn update_initial_state<T: 'static>(
         &mut self,
         key: &'static str,

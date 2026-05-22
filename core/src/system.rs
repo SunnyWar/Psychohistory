@@ -1,6 +1,6 @@
-use log::{debug, error};
 // core/src/system.rs
 use crate::state::SimulationState;
+use log::{debug, error};
 use sdk::ReadSnapshot;
 use sdk::SimulationTime;
 use std::any::Any;
@@ -30,8 +30,6 @@ impl SimulationState {
     where
         F: FnOnce(&ReadSnapshot, &mut Box<dyn Any + Send + Sync>),
     {
-        // Accessing fields directly allows the borrow checker to split the borrow.
-        // `self.current` is borrowed immutably, while `self.next` is borrowed mutably.
         let snapshot = ReadSnapshot::new(&self.current);
 
         match self.next.get_mut(key) {

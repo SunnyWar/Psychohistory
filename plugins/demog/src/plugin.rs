@@ -1,6 +1,6 @@
+// plugins/demog/src/plugin.rs
 use core::app::App;
 use core::plugin::Plugin;
-// plugins/demog/src/plugin.rs
 use models::{DemogState, GovState};
 use sdk::ReadSnapshot;
 use sdk::SimulationPlugin;
