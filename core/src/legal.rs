@@ -3,17 +3,16 @@
 use crate::entities::{GovernanceSystem, Legislator, YearOutcome};
 use crate::simulation::SimulationState;
 
-pub trait LegalSystemModel {
-    /// Simulate a legislative session (proposal, debate, passage, etc.)
-    fn simulate_legislative_session(
-        &self,
-        system: &GovernanceSystem,
-        state: &mut SimulationState,
-        year: usize,
-    ) -> YearOutcome;
-}
-
 pub struct DemocracyModel;
+#[derive(Clone)]
+struct LawProposal {
+    quality: f64,     // [0,1] quality of the law
+    support: f64,     // [0,1] support in legislature
+    controversy: f64, // [0,1] how controversial
+}
+pub struct AutocracyModel;
+pub struct MonarchyModel;
+pub struct OtherModel;
 impl LegalSystemModel for DemocracyModel {
     fn simulate_legislative_session(
         &self,
@@ -39,7 +38,48 @@ impl LegalSystemModel for DemocracyModel {
         outcome
     }
 }
-
+impl LegalSystemModel for AutocracyModel {
+    fn simulate_legislative_session(
+        &self,
+        system: &GovernanceSystem,
+        state: &mut SimulationState,
+        year: usize,
+    ) -> YearOutcome {
+        // TODO: Implement autocratic process
+        YearOutcome::default()
+    }
+}
+impl LegalSystemModel for MonarchyModel {
+    fn simulate_legislative_session(
+        &self,
+        system: &GovernanceSystem,
+        state: &mut SimulationState,
+        year: usize,
+    ) -> YearOutcome {
+        // TODO: Implement monarchy process
+        YearOutcome::default()
+    }
+}
+impl LegalSystemModel for OtherModel {
+    fn simulate_legislative_session(
+        &self,
+        system: &GovernanceSystem,
+        state: &mut SimulationState,
+        year: usize,
+    ) -> YearOutcome {
+        // TODO: Implement custom/other process
+        YearOutcome::default()
+    }
+}
+pub trait LegalSystemModel {
+    /// Simulate a legislative session (proposal, debate, passage, etc.)
+    fn simulate_legislative_session(
+        &self,
+        system: &GovernanceSystem,
+        state: &mut SimulationState,
+        year: usize,
+    ) -> YearOutcome;
+}
 // --- Democratic Process Step Stubs ---
 fn propose_laws(system: &GovernanceSystem, _state: &mut SimulationState) -> Vec<LawProposal> {
     // Each legislator has a chance to propose a law based on competence and leadership
@@ -145,51 +185,5 @@ fn compute_year_outcome(
         law_quality: quality,
         legislative_speed: final_laws.len() as f64 / 10.0,
         ..YearOutcome::default()
-    }
-}
-
-#[derive(Clone)]
-struct LawProposal {
-    quality: f64,     // [0,1] quality of the law
-    support: f64,     // [0,1] support in legislature
-    controversy: f64, // [0,1] how controversial
-}
-
-pub struct AutocracyModel;
-impl LegalSystemModel for AutocracyModel {
-    fn simulate_legislative_session(
-        &self,
-        system: &GovernanceSystem,
-        state: &mut SimulationState,
-        year: usize,
-    ) -> YearOutcome {
-        // TODO: Implement autocratic process
-        YearOutcome::default()
-    }
-}
-
-pub struct MonarchyModel;
-impl LegalSystemModel for MonarchyModel {
-    fn simulate_legislative_session(
-        &self,
-        system: &GovernanceSystem,
-        state: &mut SimulationState,
-        year: usize,
-    ) -> YearOutcome {
-        // TODO: Implement monarchy process
-        YearOutcome::default()
-    }
-}
-
-pub struct OtherModel;
-impl LegalSystemModel for OtherModel {
-    fn simulate_legislative_session(
-        &self,
-        system: &GovernanceSystem,
-        state: &mut SimulationState,
-        year: usize,
-    ) -> YearOutcome {
-        // TODO: Implement custom/other process
-        YearOutcome::default()
     }
 }
