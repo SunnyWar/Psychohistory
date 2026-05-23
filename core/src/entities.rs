@@ -1,6 +1,7 @@
-use crate::legal::*;
 use models::GovType;
 use serde::{Deserialize, Serialize};
+
+use crate::legal::{AutocracyModel, DemocracyModel, LegalSystemModel, MonarchyModel, OtherModel};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum ChamberType {
