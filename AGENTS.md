@@ -1,75 +1,53 @@
 # AGENTS.md
 
-This document provides persistent instructions for AI coding agents working in this Rust project.
+This document provides persistent instructions and behavioral guardrails for AI coding agents and Copilot assistants working in the Psychohistory Rust workspace.
 
-## Project Overview
-This is a **Rust workspace** (Cargo). Follow Rust idioms, safety, and performance best practices at all times.
+---
+
+## Project Purpose & Identity
+
+Psychohistory is a public-utility, open-science system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of global systems. 
+* **Target Audience:** Academic researchers, macroeconomists, and domain scientists.
+* **Licensing Enforcement:** PolyForm Noncommercial License 1.0.0. Do not write or suggest code patterns dependent on proprietary enterprise crates or closed ecosystems. Everything must remain open-source and modular.
+
+---
+
+## Architectural Mandates & Math Style
+
+When generating or refactoring code, you must reject generic web/software engineering paradigms and adopt a scientific-computing mindset:
+
+1. **Reject Naive Linear Logic:** Never use simple incremental modifications (e.g., `metric += adjustment`) for domain traits. Implement non-linear representations, state-space models, and explicit threshold/bifurcation functions (e.g., sigmoids for tipping points).
+2. **Conserved Physical Quantities:** Focus models on tracking actual physical or systemic resource pools (capital, demographics, energy throughput) rather than uncalibrated, abstract metrics.
+3. **Decoupled Architecture Layers:** Keep a strict boundary between the execution kernel (`core/`) and the research interfaces (`sdk/`, `lab/`). Researchers must be able to write mathematical plugins via the SDK without being exposed to parallel execution, multi-threading, or low-level memory buffers.
+4. **Theory-Driven Documentation:** Every state transition formula or plugin update rule you write must include triple-slash (`///`) documentation containing explicit mathematical equations (using LaTeX) and a placeholder referencing the peer-reviewed economic or sociological theory it models.
+
+---
 
 ## Exploration Workflow (Critical)
-Prefer `ast-outline` for efficient navigation:
 
-1. **Unfamiliar directory** — `ast-outline digest .` (or `<dir>`)
-2. **Single file structure** — `ast-outline <file.rs>`
-3. **Specific item** — `ast-outline show <file.rs> SymbolName` (supports suffix matching)
-4. **Implementors** — `ast-outline implements <Trait> .`
+Prefer `ast-outline` for efficient navigation to minimize context bloating:
+* Unfamiliar directory — `ast-outline digest .` (or `<dir>`)
+* Single file structure — `ast-outline <file.rs>`
+* Specific item — `ast-outline show <file.rs> SymbolName`
+* Implementors — `ast-outline implements <Trait> .`
 
-Only read full file contents when you need implementation details beyond signatures.
+Only read full file contents when you need implementation details beyond signatures. Never dump entire large files into context unless requested.
 
-**Never** dump entire large files into context unless necessary.
+---
 
-## Development Commands
+## Development & Verification Commands
 
-**Always verify changes with this sequence:**
-
+Always verify changes locally with this precise sequence before considering a task complete:
 ```bash
 cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets --all-features
 cargo fmt --all -- --check
-Helpful variants:
 
-cargo test <test_name> -- --exact — run specific test
-cargo test --lib / --bins / --examples
-cargo nextest run (if using nextest)
-cargo build --release for performance validation
+---
 
-Code Style & Rules (MUST Follow)
+## Prompt Engineering & Context Layering
 
-Write idiomatic, safe Rust. Prefer safe code; use unsafe only with strong justification and clear safety comments.
-Use thiserror + anyhow (or equivalent) for error handling.
-Prefer async/await with tokio (if async code is present).
-Follow Rust API Guidelines (rust-lang.github.io/api-guidelines).
-Use rustfmt defaults unless project-specific .rustfmt.toml exists.
-Comprehensive documentation: Public items must have /// docs. Internal complex logic should be documented.
-Tests: Unit tests near the code (#[cfg(test)] mod tests), integration tests in tests/.
-Use #[derive(...)] aggressively (Debug, Clone, PartialEq, etc. where appropriate).
-Avoid unwrap()/expect() in production code unless context makes panic impossible. Use proper error propagation.
-
-Architecture & Patterns
-
-Respect existing module structure and crate boundaries.
-Prefer small, focused crates in the workspace when it improves compile times or reusability.
-Use pub(crate) liberally for internal APIs.
-Follow established patterns in the codebase for logging, configuration, error handling, and testing.
-
-Tooling
-
-Primary tools: cargo, rust-analyzer, clippy, rustfmt
-Recommended: cargo-nextest, cargo-expand, cargo-udeps, cargo-outdated
-Linting is done via Clippy with -D warnings
-
-When Making Changes
-
-Understand the affected area using ast-outline.
-Make minimal, focused changes.
-Update/add tests.
-Run the full verification sequence above.
-Ensure no new warnings are introduced.
-Keep changes backward-compatible unless explicitly breaking (document in PR).
-
-Agent Behavior Rules
-
-Be concise in responses but thorough in reasoning.
-Never suggest todo!(), unimplemented!(), or placeholder code.
-Always consider performance, memory usage, and compile times in Rust.
-If unsure about project conventions, explore the existing code first.
+When navigating or generating code for complex engineering tasks, always pull context from our localized architectural prompt files:
+* **Macro System Architecture:** Refer to `.github/prompts/arch-direction.prompt` for explicit mandates regarding non-linear system dynamics, state-space representations, and cross-domain coupling abstractions.
+* **Context Anchoring:** Use the `#file:.github/prompts/arch-direction.prompt` syntax in the chat interface when initiating major refactors of the engine kernel or domain plugins to ensure strict alignment with our mathematical standards.
