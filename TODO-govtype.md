@@ -5,9 +5,9 @@ This file tracks the work required to implement detailed, type-specific simulati
 ---
 
 ## 1. Core Architecture
-- [ ] Refactor `GovernanceSystem` and simulation logic to branch on `GovType` (Democracy, Autocracy, Monarchy, Other).
-- [ ] Define a trait (e.g., `LegalSystemModel`) with methods for legislative process, law proposal, passage, veto, amendment, enforcement, and judicial review.
-- [ ] Implement a plugin or strategy pattern to select the correct model for each `GovType`.
+- [x] Refactor `GovernanceSystem` and simulation logic to branch on `GovType` (Democracy, Autocracy, Monarchy, Other).
+- [x] Define a trait (e.g., `LegalSystemModel`) with methods for legislative process, law proposal, passage, veto, amendment, enforcement, and judicial review.
+- [x] Implement a plugin or strategy pattern to select the correct model for each `GovType`.
 
 ## 2. Democracy Simulation
 - [ ] Model bicameral/parliamentary structures (e.g., House/Senate, committees).
