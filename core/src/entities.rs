@@ -1,3 +1,5 @@
+use crate::legal::*;
+use models::GovType;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -48,4 +50,16 @@ pub struct YearOutcome {
     pub legislative_speed: f64,
     pub economic_outcome: f64,
     pub composite_score: f64,
+}
+
+impl GovernanceSystem {
+    /// Select the appropriate legal system model for this system's government type.
+    pub fn legal_model(&self, gov_type: &GovType) -> Box<dyn LegalSystemModel> {
+        match gov_type {
+            GovType::Democracy => Box::new(DemocracyModel),
+            GovType::Autocracy => Box::new(AutocracyModel),
+            GovType::Monarchy => Box::new(MonarchyModel),
+            GovType::Other(_) => Box::new(OtherModel),
+        }
+    }
 }

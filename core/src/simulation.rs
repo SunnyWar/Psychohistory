@@ -32,6 +32,7 @@ use crate::run_result::RunResult;
 /// - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
+use models::GovType;
 use rand_distr::{Distribution, Normal};
 use serde_json::Value;
 
@@ -376,7 +377,10 @@ pub fn run_simulation(
     for year in 0..years {
         // Membership rotation stub (implement logic as needed)
         rotate_membership(&mut system, year);
+        // Main simulation logic (restored)
         let outcome = simulate_year(&system, &mut state, context, year, plugins);
+        // Optionally: call legal system model here for hooks/side effects
+        // let _ = system.legal_model(&GovType::Democracy).simulate_legislative_session(&system, &mut state, year);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }

@@ -2,6 +2,7 @@ pub mod app;
 pub mod config;
 pub mod entities;
 pub mod experiment;
+pub mod legal;
 pub mod logging;
 pub mod plugin;
 pub mod run_result;
