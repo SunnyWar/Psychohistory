@@ -1,5 +1,5 @@
-use log::{debug, info};
 // core/src/scheduler.rs
+use log::{debug, info};
 use crate::{state::SimulationState, system::System};
 use indicatif::{ProgressBar, ProgressStyle};
 use sdk::{SimulationTime, TimeGranularity};

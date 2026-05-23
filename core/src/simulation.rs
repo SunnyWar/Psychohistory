@@ -63,7 +63,6 @@ pub struct SimulationState {
     pub judicial_competence: f64,
     pub expert_support_effectiveness: f64,
 }
-
 impl Default for SimulationState {
     fn default() -> Self {
         Self {
@@ -96,7 +95,6 @@ impl Default for SimulationState {
         }
     }
 }
-
 pub trait SimulationPlugin {
     fn modify_outcome(
         &self,
@@ -106,7 +104,6 @@ pub trait SimulationPlugin {
         outcome: &mut YearOutcome,
     );
 }
-
 /// Recursively traverse regions in a scenario tree and run experiments for each region.
 ///
 /// This utility loads the governance system and simulation config for each region node,
@@ -170,7 +167,6 @@ pub fn simulate_region_tree<F>(
         }
     }
 }
-
 /// Simulate a single year of governance, updating all output metrics.
 ///
 /// # Metric Formulas
@@ -386,7 +382,6 @@ pub fn run_simulation(
     }
     RunResult::from_outcomes(outcomes)
 }
-
 /// Rotate membership for the governance system each year.
 /// Simple implementation: moves the first member to the end (cyclic rotation) if any.
 fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
@@ -395,8 +390,8 @@ fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
         system.members.push(first);
     }
 }
-
 extern crate serde_json;
+
 
 #[cfg(test)]
 mod tests {

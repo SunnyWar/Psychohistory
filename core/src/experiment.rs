@@ -10,7 +10,6 @@ pub struct ExperimentResult {
     pub stddev: RunResult,
     pub n: usize,
 }
-
 impl ExperimentResult {
     pub fn confidence_interval(stddev: f64, n: usize, z: f64) -> f64 {
         if n == 0 {
@@ -30,7 +29,6 @@ fn mean_stddev(values: &[f64]) -> (f64, f64) {
     let var = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n;
     (mean, var.sqrt())
 }
-
 /// Run multiple simulations and aggregate results (mean, stddev).
 pub fn run_experiment(
     system: &GovernanceSystem,
@@ -90,6 +88,7 @@ pub fn run_experiment(
         n,
     }
 }
+
 
 #[cfg(test)]
 mod tests {

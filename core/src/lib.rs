@@ -1,13 +1,5 @@
-pub use app::App;
-pub use experiment::{ExperimentResult, run_experiment};
-pub use logging::init_logger;
-pub use plugin::Plugin;
-pub use state::SimulationState;
-pub use system::System;
 
-// core/src/lib.rs
 pub mod seed_util;
-
 pub mod app;
 pub mod config;
 pub mod entities;
@@ -19,3 +11,10 @@ pub mod scheduler;
 pub mod simulation;
 pub mod state;
 pub mod system;
+
+pub use app::App;
+pub use experiment::{ExperimentResult, run_experiment};
+pub use logging::init_logger;
+pub use plugin::Plugin;
+pub use state::SimulationState;
+pub use system::System;

@@ -17,6 +17,7 @@ pub fn load_scenario(scenario_dir: &str) -> Result<Value, String> {
     Ok(root_data)
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::load_scenario;

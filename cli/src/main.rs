@@ -1,13 +1,14 @@
-use clap::Parser;
-use cli_args::CliArgs;
-use log::{error, info, warn};
-use psychohistory_core::init_logger;
-use psychohistory_core::simulation::simulate_region_tree;
 
 mod cli_args;
 mod result_output;
 mod scenario;
 mod util;
+
+use clap::Parser;
+use cli_args::CliArgs;
+use log::{error, info, warn};
+use psychohistory_core::init_logger;
+use psychohistory_core::simulation::simulate_region_tree;
 
 fn main() {
     use psychohistory_core::seed_util::generate_seeds;
