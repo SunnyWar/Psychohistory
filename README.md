@@ -28,6 +28,20 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 
 ---
 
+### Why Psychohistory?
+
+Unlike PySD, Vensim, Stella, or Minsky, Psychohistory offers:
+
+- **Rust-native performance** with strict determinism
+- **Modular plugin architecture** for easy domain extension
+- **Native hierarchical regions** (country → state → city)
+- **Research-focused tools** (colorized diffs, policy shocks, Python bindings)
+- **Strong public-good license**
+
+Built specifically for modeling complex institutional and civilizational dynamics.
+
+---
+
 ## Workspace Structure
 
 ```bash
