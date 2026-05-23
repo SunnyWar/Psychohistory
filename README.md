@@ -1,26 +1,35 @@
 # Psychohistory
 
-A modular, open-source, Rust-based simulation framework for global economic, political, demographic, and institutional dynamics.
+A modular, open-source, Rust-based system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of regional and global systems.
+
+> **Research Objective:** Psychohistory aims to provide a computationally rigorous, non-linear alternative to traditional, static policy-forecasting models. By evaluating institutions as dynamic, multi-domain feedback networks rather than static parameters, the engine simulates complex counterfactual scenarios—ranging from micro-policy shocks to foundational transitions in governance systems.
+
+---
+
+## Core Principles & Ethical Mandate
+
+Psychohistory is a public utility for humanity. Its development is guided by the belief that the tools used to simulate and understand global systems must never be weaponized for private financial gain or corporate optimization. 
+
+* **Public Good Focus:** This engine is designed to model systemic change for ecological, societal, and institutional resilience—not to maximize profitability or de-risk commercial portfolios.
+* **Non-Commercial Exclusivity:** We explicitly reject the integration of corporate, profit-driven research incentives. If an institution cannot utilize this framework because of commercial funding restrictions, this engine is functioning as intended.
 
 ---
 
 ## Features & Capabilities
 
-- **Multi-domain simulation**: Economy, governance, and demography as independent plugins
-- **Hierarchical, multi-country scenarios**: Load and simulate nested regions (e.g., US, California, Los Angeles)
-- **Double-buffered state**: Deterministic, parallel-safe updates
-- **Plugin architecture**: Add new domains or swap evaluators without touching the core
-- **Automated scenario loading**: Ingests JSON scenario trees from `scenarios/`
-- **Per-field, colorized state diffing**: Human-readable, colorized before/after diffs for every entity
-- **Deterministic output**: Stable, reproducible results
-- **CLI runner**: Run, diff, and report simulations from the command line
-- **Ready for extension**: Add new plugins, models, or scenario files easily
+- **Multi-domain simulation**: Economy, governance, and demography as independent plugins.
+- **Hierarchical, multi-country scenarios**: Load and simulate nested regions (e.g., US, California, Los Angeles).
+- **Double-buffered state**: Deterministic, parallel-safe updates to maintain chronological consistency across domains.
+- **Plugin architecture**: Add new domains or swap evaluators without touching the simulation core.
+- **Automated scenario loading**: Ingests JSON scenario trees from `scenarios/`.
+- **Per-field, colorized state diffing**: Human-readable, colorized before/after diffs for every state entity.
+- **Deterministic output**: Stable, reproducible results across identical configurations.
+- **CLI runner**: Run, diff, and report multi-run simulations from the command line.
 
 ---
 
 ## Workspace Structure
 
-```
 Psychohistory/
 ├── Cargo.toml         # Workspace manifest
 ├── AGENTS.md          # Agent instructions
@@ -53,74 +62,59 @@ Psychohistory/
 │   └── src/lib.rs
 ├── target/            # Build output
 └── timebase/          # (Reserved for future time series features)
-```
 
 
+---
 
-## Command-Line Usage
+## Developer & Researcher Interfaces
+
+To ensure accessibility for both systems engineers and domain scientists, the workspace enforces a strict separation of concerns across three layers:
+
+1. **The Kernel (`core/`):** A data-oriented, double-buffered execution loop optimized for thread-safe, parallel region updates and deterministic state-space evaluation.
+2. **The Research SDK (`sdk/`):** A high-level, declarative Rust interface. Researchers can implement custom domain plugins by writing pure mathematical state-transition functions without managing memory allocation, concurrency, or serialization.
+3. **The Simulation Lab (`lab/`):** Native Python bindings powered by `pyo3`. This allows data scientists and macroeconomists to configure scenarios, schedule policy shocks programmatically, run massive Monte Carlo parameter sweeps, and ingest output directly into Jupyter Notebooks as NumPy arrays or Pandas DataFrames.
+
+---
+
+## Methodological State Tracking (V1 Placeholders vs. Target State)
+
+The baseline simulation engine tracks a cross-domain array of metrics for each region and time-step. 
+
+> ⚠️ **Note to Researchers:** The active V1 implementation utilizes linear, statistical placeholder parameters (e.g., *Law Quality*, *Corruption Level*, *Public Trust*, *Legislative Speed*) to verify the parallel scheduler and diffing engines. Per the roadmap below, these are actively being replaced by conserved, empirical state-space vector representations.
+
+* **Scenario-Driven Ingestion:** The architecture reads structural configurations from nested JSON inputs, defining initial parameters and systemic constraints for nations down to municipalities.
+* **Cross-Domain Coupling:** Outcomes in one plugin domain dynamically feed into the state vectors of adjacent domains, preventing delayed tracking error and allowing real feedback loops.
+* **Transition Logic:** The core loop supports real-time, scheduled or conditional institutional adjustments (e.g., sudden shifts in a region's regulatory or allocation systems) to track emergent trajectory changes.
+
+---
+
+## Command-Line Usage & Workflow
 
 The CLI runner supports flexible simulation configuration:
 
-```
+```bash
 psychohistory-cli [OPTIONS]
-```
+Key options:
 
-**Key options:**
+--years <N>: Number of years to simulate (default: 10)
 
-- `--years <N>`: Number of years to simulate (default: 10)
-- `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
-- `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
-- `--log-dir <DIR>`: Log file output directory (default: logs)
-- `-v, --verbose`: Increase logging verbosity (repeat for more detail)
+--runs <N>: Number of Monte Carlo runs per region (default: 10)
 
-Example:
+--scenario-dir <DIR>: Path to scenario JSON directory (default: scenarios)
 
-```
-psychohistory-cli --years 20 --runs 100 --scenario-dir scenarios
-```
+--log-dir <DIR>: Log file output directory (default: logs)
 
-This will run each region for 20 years, performing 100 Monte Carlo runs per region, and print aggregate statistics.
+-v, --verbose: Increase logging verbosity
 
----
+##  Typical Workflow:
+Define or modify initial parameters in scenarios/simulation_config.json.
 
-## What to Expect as a User
+Execute the runner command: cargo run --bin cli -- --years 20 --runs 100
 
-Psychohistory is designed for users who want to simulate and analyze the evolution of complex societies across economic, political, and demographic domains. When using this application, you can expect:
+Analyze aggregate mean and standard deviation outputs alongside colorized field diffs to examine the trajectory.
 
-- **Rich Output Metrics**: The simulation tracks and reports a variety of metrics for each region and year, including:
-  - Law Quality
-  - Corruption Level
-  - Public Trust
-  - Crisis Response
-  - Adaptability
-  - Representation Accuracy
-  - Legislative Speed
-  - Economic Outcome
-  - Composite Score (aggregated)
-- **Scenario-Driven Simulation**: You define the world and its regions using hierarchical JSON files. Each region can have its own economic, governance, and demographic parameters, and can be nested (e.g., countries, states, cities).
-- **Deterministic, Reproducible Results**: Simulations are deterministic by default, ensuring that the same scenario and configuration always produce the same results.
-- **Colorized State Diffs**: After each run, the CLI prints human-readable, colorized diffs showing how every entity changed over time.
-- **Extensible Plugin System**: You can add new domains (e.g., health, education), swap out models, or extend existing ones by writing new plugins.
-- **Cross-Domain Coupling**: Metrics and outcomes in one domain (e.g., governance) can affect others (e.g., economy, demography), allowing for realistic feedback loops.
-- **Transition Support**: The system supports mid-simulation transitions (e.g., government or economic system changes) and tracks their effects.
-- **Testing and Validation**: The codebase includes tests to ensure metrics, update rules, and cross-domain dependencies behave as specified.
-
-**Typical Workflow:**
-1. Edit or create scenario files in `scenarios/` to define your world.
-2. Run the simulation using the CLI (`cargo run --bin cli`).
-3. Review the output metrics and state diffs to analyze system behavior and outcomes.
-4. Extend or modify plugins, models, or scenarios as needed.
-
-For more details on metrics, update rules, and extensibility, see the code comments and module documentation.
-
-## How It Works
-
-
----
-
-## Example Scenario JSON
-
-```json
+Example Scenario JSON
+JSON
 {
   "regions": {
     "us": {
@@ -141,82 +135,32 @@ For more details on metrics, update rules, and extensibility, see the code comme
     }
   }
 }
-```
 
----
+## TODO (Priority‑Ordered Roadmap)
+🔥 Priority 1 — Mathematical & Engine Rigor
+[ ] Transition from Linear Metrics to State-Space Models: Refactor existing domain attributes to model conserved physical and institutional resource pools instead of subjective, linear values.
 
-## Running a Simulation
+[ ] Non-Linear Tipping Points: Implement sigmoid, step, and bifurcating transition functions to properly capture structural systemic collapses or sudden governmental transitions.
 
-```bash
-cargo run --bin cli
-```
+[ ] Strict Determinism Audit: Enforce strict floating-point determinism across target architectures (e.g., addressing cross-platform f64 rounding differences) to preserve absolute reproducibility in Monte Carlo runs.
 
-- Loads scenario from `scenarios/simulation_config.json`
----
+⚡ Priority 2 — Cross-Domain Coupling & SDK Architecture
+[ ] Zero-Copy State Ingestion: Optimize sdk/ traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
 
-## Extending Psychohistory
+[ ] Feedback Loop Validation: Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
 
-- Add new plugins in `plugins/`
-- Add new domain state structs in `models/`
-- Add new scenario files in `scenarios/`
-- Implement new systems and register them in `cli/src/main.rs`
- Loads scenario from `scenarios/simulation_config.json`
- Runs all systems for the specified number of years and Monte Carlo runs per region
- Prints mean and standard deviation for all output metrics per region
- Prints colorized, per-field diffs for all entities (single-run mode)
+📊 Priority 3 — The Research Lab (Python & Jupyter Integration)
+[ ] Complete pyo3 Exposure: Map the hierarchical SimulationState and EngineRunner structs directly to Python classes in the lab/ crate.
 
----
+[ ] High-Throughput Parameter Sweeps: Build a native multi-threaded runner interface optimized for execution inside Python to handle sensitivity analyses and automated parameter calibration.
 
-## TODO (Priority‑Ordered)
-
-### 🔥 Priority 1 — Core Architectural Primitives
-
-- [x] Add `GovType` and `EconSystemType` enums to `models` and propagate through `SimulationState`.
-- [x] Implement a transition system in `core` to support mid‑simulation switching of government and economic types.
-- [x] Add cross-domain coupling hooks in `SimulationState` to enable direct econ ↔ gov ↔ demog interactions.
-- [x] Refactor state diffing to track and report system transitions and cross-domain effects.
-
----
-
-### 🔥 Priority 2 — Domain Plugin Upgrades
-
-- Update `gov` plugin to support multiple government types using the new `GovType` enum.
-- Update `econ` plugin to support multiple economic systems using the new `EconSystemType` enum.
-- Implement plugin logic for handling mid-simulation transitions (e.g., democracy → autocracy, market → planned).
-- Add cross-domain effect handlers in each plugin to respond to changes in other domains.
-
----
-
-### 🔥 Priority 3 — Scenario Schema Expansion
-
-- Extend scenario JSON schema to accept `gov_type` and `econ_system_type` fields for each region/component.
-- Add support for specifying scheduled or conditional system transitions in scenario files.
-- Allow cross-domain coupling parameters (e.g., tax policy impact on demography) in scenario JSON.
-
----
-
-### Priority 4 — CLI / UX Integration
-
-- Update CLI to validate and display new scenario schema fields (`gov_type`, `econ_system_type`, transitions).
-- Add CLI options to trigger or schedule system transitions during simulation runs.
-- Enhance output to clearly show when and where system transitions and cross-domain effects occur.
-
----
-
-### Priority 5 — Testing & Determinism Guarantees
-
-- Add unit and integration tests for government and economic system transitions.
-- Add tests for scenario parsing with new fields and transition logic.
-- Add regression tests for cross-domain coupling to ensure deterministic and reproducible results.
-
----
-
-### Priority 6 — Labs / Python Bindings
-
-- Add support for Python bindings (pyo3) for new fields, transitions, and cross-domain coupling.
-
----
+📚 Priority 4 — Theoretical Grounding & Documentation
+[ ] Theory Attribution Standards: Document every update rule and mathematical formula in the plugins/ codebase using explicit LaTeX syntax, strictly citing the peer-reviewed economic, demographic, or sociological frameworks they derive from.
 
 ## License
+This project is licensed under the PolyForm Noncommercial License 1.0.0 — see LICENSE.md for details.
 
-PolyForm Noncommercial License 1.0.0 — see LICENSE.md for details.
+Notice to Contributors and Institutional Researchers:
+While receiving external or corporate research funding does not inherently disqualify you from using this framework, proprietary capture is strictly prohibited.
+
+If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community. We simulate open systems; we do not tolerate closed science.
