@@ -1,3 +1,4 @@
+```markdown
 # Psychohistory
 
 A modular, open-source, Rust-based system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of regional and global systems.
@@ -29,6 +30,9 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 ---
 
 ## Workspace Structure
+
+
+```
 
 Psychohistory/
 ├── Cargo.toml         # Workspace manifest
@@ -63,6 +67,7 @@ Psychohistory/
 ├── target/            # Build output
 └── timebase/          # (Reserved for future time series features)
 
+```
 
 ---
 
@@ -94,27 +99,28 @@ The CLI runner supports flexible simulation configuration:
 
 ```bash
 psychohistory-cli [OPTIONS]
-Key options:
 
---years <N>: Number of years to simulate (default: 10)
+```
 
---runs <N>: Number of Monte Carlo runs per region (default: 10)
+**Key options:**
 
---scenario-dir <DIR>: Path to scenario JSON directory (default: scenarios)
+* `--years <N>`: Number of years to simulate (default: 10)
+* `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
+* `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
+* `--log-dir <DIR>`: Log file output directory (default: logs)
+* `-v, --verbose`: Increase logging verbosity
 
---log-dir <DIR>: Log file output directory (default: logs)
+### Typical Workflow:
 
--v, --verbose: Increase logging verbosity
+1. Define or modify initial parameters in `scenarios/simulation_config.json`.
+2. Execute the runner command: `cargo run --bin cli -- --years 20 --runs 100`
+3. Analyze aggregate mean and standard deviation outputs alongside colorized field diffs to examine the trajectory.
 
-##  Typical Workflow:
-Define or modify initial parameters in scenarios/simulation_config.json.
+---
 
-Execute the runner command: cargo run --bin cli -- --years 20 --runs 100
+## Example Scenario JSON
 
-Analyze aggregate mean and standard deviation outputs alongside colorized field diffs to examine the trajectory.
-
-Example Scenario JSON
-JSON
+```json
 {
   "regions": {
     "us": {
@@ -136,31 +142,42 @@ JSON
   }
 }
 
+```
+
+---
+
 ## TODO (Priority‑Ordered Roadmap)
-🔥 Priority 1 — Mathematical & Engine Rigor
-[ ] Transition from Linear Metrics to State-Space Models: Refactor existing domain attributes to model conserved physical and institutional resource pools instead of subjective, linear values.
 
-[ ] Non-Linear Tipping Points: Implement sigmoid, step, and bifurcating transition functions to properly capture structural systemic collapses or sudden governmental transitions.
+### 🔥 Priority 1 — Mathematical & Engine Rigor
 
-[ ] Strict Determinism Audit: Enforce strict floating-point determinism across target architectures (e.g., addressing cross-platform f64 rounding differences) to preserve absolute reproducibility in Monte Carlo runs.
+* [ ] **Transition from Linear Metrics to State-Space Models:** Refactor existing domain attributes to model conserved physical and institutional resource pools instead of subjective, linear values.
+* [ ] **Non-Linear Tipping Points:** Implement sigmoid, step, and bifurcating transition functions to properly capture structural systemic collapses or sudden governmental transitions.
+* [ ] **Strict Determinism Audit:** Enforce strict floating-point determinism across target architectures (e.g., addressing cross-platform `f64` rounding differences) to preserve absolute reproducibility in Monte Carlo runs.
 
-⚡ Priority 2 — Cross-Domain Coupling & SDK Architecture
-[ ] Zero-Copy State Ingestion: Optimize sdk/ traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
+### ⚡ Priority 2 — Cross-Domain Coupling & SDK Architecture
 
-[ ] Feedback Loop Validation: Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
+* [ ] **Zero-Copy State Ingestion:** Optimize `sdk/` traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
+* [ ] **Feedback Loop Validation:** Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
 
-📊 Priority 3 — The Research Lab (Python & Jupyter Integration)
-[ ] Complete pyo3 Exposure: Map the hierarchical SimulationState and EngineRunner structs directly to Python classes in the lab/ crate.
+### 📊 Priority 3 — The Research Lab (Python & Jupyter Integration)
 
-[ ] High-Throughput Parameter Sweeps: Build a native multi-threaded runner interface optimized for execution inside Python to handle sensitivity analyses and automated parameter calibration.
+* [ ] **Complete `pyo3` Exposure:** Map the hierarchical `SimulationState` and `EngineRunner` structs directly to Python classes in the `lab/` crate.
+* [ ] **High-Throughput Parameter Sweeps:** Build a native multi-threaded runner interface optimized for execution inside Python to handle sensitivity analyses and automated parameter calibration.
 
-📚 Priority 4 — Theoretical Grounding & Documentation
-[ ] Theory Attribution Standards: Document every update rule and mathematical formula in the plugins/ codebase using explicit LaTeX syntax, strictly citing the peer-reviewed economic, demographic, or sociological frameworks they derive from.
+### 📚 Priority 4 — Theoretical Grounding & Documentation
+
+* [ ] **Theory Attribution Standards:** Document every update rule and mathematical formula in the `plugins/` codebase using explicit LaTeX syntax, strictly citing the peer-reviewed economic, demographic, or sociological frameworks they derive from.
+
+---
 
 ## License
-This project is licensed under the PolyForm Noncommercial License 1.0.0 — see LICENSE.md for details.
 
-Notice to Contributors and Institutional Researchers:
-While receiving external or corporate research funding does not inherently disqualify you from using this framework, proprietary capture is strictly prohibited.
+This project is licensed under the **PolyForm Noncommercial License 1.0.0** — see `LICENSE.md` for details.
 
-If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community. We simulate open systems; we do not tolerate closed science.
+> **Notice to Contributors and Institutional Researchers:**
+> While receiving external or corporate research funding does not inherently disqualify you from using this framework, **proprietary capture is strictly prohibited**.
+> If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community. We simulate open systems; we do not tolerate closed science.
+
+```
+
+```
