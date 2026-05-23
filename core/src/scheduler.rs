@@ -1,7 +1,7 @@
 // core/src/scheduler.rs
-use log::{debug, info};
 use crate::{state::SimulationState, system::System};
 use indicatif::{ProgressBar, ProgressStyle};
+use log::{debug, info};
 use sdk::{SimulationTime, TimeGranularity};
 use std::collections::HashMap;
 

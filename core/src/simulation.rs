@@ -392,7 +392,6 @@ fn rotate_membership(system: &mut GovernanceSystem, _year: usize) {
 }
 extern crate serde_json;
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

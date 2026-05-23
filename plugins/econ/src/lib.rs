@@ -1,4 +1,3 @@
-
 // plugins/econ/src/lib.rs
 pub mod plugin;
 pub mod state;

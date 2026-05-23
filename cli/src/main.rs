@@ -1,5 +1,5 @@
-
 mod cli_args;
+mod csv_export;
 mod result_output;
 mod scenario;
 mod util;
@@ -37,14 +37,21 @@ fn main() {
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
             info!("Found {} regions in config.", regions.len());
+            use csv_export::{write_per_run_csv, write_summary_csv};
             for (region_name, region_node) in regions {
                 let seeds = generate_seeds(top_seed, args.runs);
+                // Closure to print and export results
+                let output_results = |region_name: &str, result: &psychohistory_core::experiment::ExperimentResult| {
+                    result_output::print_experiment_results(region_name, result);
+                    let _ = write_summary_csv("simulation-summary.csv", region_name, result);
+                    let _ = write_per_run_csv("per-run-results.csv", region_name, &result.runs);
+                };
                 simulate_region_tree(
                     region_name,
                     region_node,
                     args.years,
                     args.runs,
-                    &result_output::print_experiment_results,
+                    &output_results,
                     Some(&seeds),
                 );
             }

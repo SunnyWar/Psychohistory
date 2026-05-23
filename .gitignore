@@ -21,3 +21,5 @@ target
 #.idea/
 logs/psychohistory_*.log
 logs/logs/*.log
+simulation-summary.csv
+per-run-results.csv

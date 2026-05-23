@@ -1,5 +1,3 @@
-
-pub mod seed_util;
 pub mod app;
 pub mod config;
 pub mod entities;
@@ -8,6 +6,7 @@ pub mod logging;
 pub mod plugin;
 pub mod run_result;
 pub mod scheduler;
+pub mod seed_util;
 pub mod simulation;
 pub mod state;
 pub mod system;
