@@ -1,4 +1,3 @@
-```markdown
 # Psychohistory
 
 A modular, open-source, Rust-based system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of regional and global systems.
@@ -9,10 +8,10 @@ A modular, open-source, Rust-based system dynamics framework designed to model m
 
 ## Core Principles & Ethical Mandate
 
-Psychohistory is a public utility for humanity. Its development is guided by the belief that the tools used to simulate and understand global systems must never be weaponized for private financial gain or corporate optimization. 
+Psychohistory is a public utility for humanity. Its development is guided by the belief that the tools used to simulate and understand global systems must never be weaponized for private financial gain or corporate optimization.
 
-* **Public Good Focus:** This engine is designed to model systemic change for ecological, societal, and institutional resilience—not to maximize profitability or de-risk commercial portfolios.
-* **Non-Commercial Exclusivity:** We explicitly reject the integration of corporate, profit-driven research incentives. If an institution cannot utilize this framework because of commercial funding restrictions, this engine is functioning as intended.
+- **Public Good Focus:** This engine is designed to model systemic change for ecological, societal, and institutional resilience—not to maximize profitability or de-risk commercial portfolios.
+- **Non-Commercial Exclusivity:** We explicitly reject the integration of corporate, profit-driven research incentives. If an institution cannot utilize this framework because of commercial funding restrictions, this engine is functioning as intended.
 
 ---
 
@@ -31,9 +30,7 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 
 ## Workspace Structure
 
-
-```
-
+```bash
 Psychohistory/
 ├── Cargo.toml         # Workspace manifest
 ├── AGENTS.md          # Agent instructions
@@ -66,7 +63,6 @@ Psychohistory/
 │   └── src/lib.rs
 ├── target/            # Build output
 └── timebase/          # (Reserved for future time series features)
-
 ```
 
 ---
@@ -83,13 +79,13 @@ To ensure accessibility for both systems engineers and domain scientists, the wo
 
 ## Methodological State Tracking (V1 Placeholders vs. Target State)
 
-The baseline simulation engine tracks a cross-domain array of metrics for each region and time-step. 
+The baseline simulation engine tracks a cross-domain array of metrics for each region and time-step.
 
 > ⚠️ **Note to Researchers:** The active V1 implementation utilizes linear, statistical placeholder parameters (e.g., *Law Quality*, *Corruption Level*, *Public Trust*, *Legislative Speed*) to verify the parallel scheduler and diffing engines. Per the roadmap below, these are actively being replaced by conserved, empirical state-space vector representations.
 
-* **Scenario-Driven Ingestion:** The architecture reads structural configurations from nested JSON inputs, defining initial parameters and systemic constraints for nations down to municipalities.
-* **Cross-Domain Coupling:** Outcomes in one plugin domain dynamically feed into the state vectors of adjacent domains, preventing delayed tracking error and allowing real feedback loops.
-* **Transition Logic:** The core loop supports real-time, scheduled or conditional institutional adjustments (e.g., sudden shifts in a region's regulatory or allocation systems) to track emergent trajectory changes.
+- **Scenario-Driven Ingestion:** The architecture reads structural configurations from nested JSON inputs, defining initial parameters and systemic constraints for nations down to municipalities.
+- **Cross-Domain Coupling:** Outcomes in one plugin domain dynamically feed into the state vectors of adjacent domains, preventing delayed tracking error and allowing real feedback loops.
+- **Transition Logic:** The core loop supports real-time, scheduled or conditional institutional adjustments (e.g., sudden shifts in a region's regulatory or allocation systems) to track emergent trajectory changes.
 
 ---
 
@@ -99,16 +95,15 @@ The CLI runner supports flexible simulation configuration:
 
 ```bash
 psychohistory-cli [OPTIONS]
-
 ```
 
 **Key options:**
 
-* `--years <N>`: Number of years to simulate (default: 10)
-* `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
-* `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
-* `--log-dir <DIR>`: Log file output directory (default: logs)
-* `-v, --verbose`: Increase logging verbosity
+- `--years <N>`: Number of years to simulate (default: 10)
+- `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
+- `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
+- `--log-dir <DIR>`: Log file output directory (default: logs)
+- `-v, --verbose`: Increase logging verbosity
 
 ### Typical Workflow:
 
@@ -141,32 +136,31 @@ psychohistory-cli [OPTIONS]
     }
   }
 }
-
 ```
 
 ---
 
-## TODO (Priority‑Ordered Roadmap)
+## TODO (Priority-Ordered Roadmap)
 
 ### 🔥 Priority 1 — Mathematical & Engine Rigor
 
-* [ ] **Transition from Linear Metrics to State-Space Models:** Refactor existing domain attributes to model conserved physical and institutional resource pools instead of subjective, linear values.
-* [ ] **Non-Linear Tipping Points:** Implement sigmoid, step, and bifurcating transition functions to properly capture structural systemic collapses or sudden governmental transitions.
-* [ ] **Strict Determinism Audit:** Enforce strict floating-point determinism across target architectures (e.g., addressing cross-platform `f64` rounding differences) to preserve absolute reproducibility in Monte Carlo runs.
+- [ ] **Transition from Linear Metrics to State-Space Models:** Refactor existing domain attributes to model conserved physical and institutional resource pools instead of subjective, linear values.
+- [ ] **Non-Linear Tipping Points:** Implement sigmoid, step, and bifurcating transition functions to properly capture structural systemic collapses or sudden governmental transitions.
+- [ ] **Strict Determinism Audit:** Enforce strict floating-point determinism across target architectures (e.g., addressing cross-platform `f64` rounding differences) to preserve absolute reproducibility in Monte Carlo runs.
 
 ### ⚡ Priority 2 — Cross-Domain Coupling & SDK Architecture
 
-* [ ] **Zero-Copy State Ingestion:** Optimize `sdk/` traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
-* [ ] **Feedback Loop Validation:** Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
+- [ ] **Zero-Copy State Ingestion:** Optimize `sdk/` traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
+- [ ] **Feedback Loop Validation:** Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
 
 ### 📊 Priority 3 — The Research Lab (Python & Jupyter Integration)
 
-* [ ] **Complete `pyo3` Exposure:** Map the hierarchical `SimulationState` and `EngineRunner` structs directly to Python classes in the `lab/` crate.
-* [ ] **High-Throughput Parameter Sweeps:** Build a native multi-threaded runner interface optimized for execution inside Python to handle sensitivity analyses and automated parameter calibration.
+- [ ] **Complete `pyo3` Exposure:** Map the hierarchical `SimulationState` and `EngineRunner` structs directly to Python classes in the `lab/` crate.
+- [ ] **High-Throughput Parameter Sweeps:** Build a native multi-threaded runner interface optimized for execution inside Python to handle sensitivity analyses and automated parameter calibration.
 
 ### 📚 Priority 4 — Theoretical Grounding & Documentation
 
-* [ ] **Theory Attribution Standards:** Document every update rule and mathematical formula in the `plugins/` codebase using explicit LaTeX syntax, strictly citing the peer-reviewed economic, demographic, or sociological frameworks they derive from.
+- [ ] **Theory Attribution Standards:** Document every update rule and mathematical formula in the `plugins/` codebase using explicit LaTeX syntax, strictly citing the peer-reviewed economic, demographic, or sociological frameworks they derive from.
 
 ---
 
@@ -174,10 +168,6 @@ psychohistory-cli [OPTIONS]
 
 This project is licensed under the **PolyForm Noncommercial License 1.0.0** — see `LICENSE.md` for details.
 
-> **Notice to Contributors and Institutional Researchers:**
-> While receiving external or corporate research funding does not inherently disqualify you from using this framework, **proprietary capture is strictly prohibited**.
+> **Notice to Contributors and Institutional Researchers:**  
+> While receiving external or corporate research funding does not inherently disqualify you from using this framework, **proprietary capture is strictly prohibited**.  
 > If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community. We simulate open systems; we do not tolerate closed science.
-
-```
-
-```
