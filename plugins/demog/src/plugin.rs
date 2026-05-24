@@ -37,8 +37,6 @@ impl SimulationPlugin for DemogPlugin {
             .downcast_mut::<DemogState>()
             .expect("Failed to downcast to DemogState");
 
-        let dt = time.delta_years();
-
         // stability_modifier = gov.tax_rate.min(0.5) or 0.0 if no gov state
         let stability_modifier = world
             .get::<GovState>("gov")
@@ -48,6 +46,7 @@ impl SimulationPlugin for DemogPlugin {
         demog.birth_rate = 0.01f64.mul_add(-stability_modifier, 0.015);
 
         // population = population * (1.0 + birth_rate * dt)
+        let dt = time.delta_years();
         let growth_factor = 1.0f64.mul_add(demog.birth_rate * dt, 1.0);
         demog.population = (demog.population as f64 * growth_factor) as u64;
     }

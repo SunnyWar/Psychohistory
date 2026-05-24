@@ -238,7 +238,7 @@ pub fn simulate_year(
 
     let economic_outcome = economic_outcome(
         context,
-        EconomicInputs {
+        &EconomicInputs {
             law_quality,
             corruption_level,
             bad_law_drag,
@@ -288,7 +288,7 @@ pub fn simulate_year(
 }
 
 // Economic Outcome (CurrentUsSystem)
-fn economic_outcome(context: &mut SimulationContext, econ: EconomicInputs) -> f64 {
+fn economic_outcome(context: &mut SimulationContext, econ: &EconomicInputs) -> f64 {
     let economic_volatility = context.config.economic_volatility;
     let economic_shock = Normal::new(0.0, economic_volatility * 0.10)
         .unwrap()
