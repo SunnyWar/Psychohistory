@@ -13,6 +13,22 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 - **Public Good Focus:** This engine is designed to model systemic change for ecological, societal, and institutional resilience—not to maximize profitability or de-risk commercial portfolios.
 - **Non-Commercial Exclusivity:** We explicitly reject the integration of corporate, profit-driven research incentives. If an institution cannot utilize this framework because of commercial funding restrictions, this engine is functioning as intended.
 
+## 🛑 Current Status: Pre-Alpha / Not Ready for Prime Time
+
+**Psychohistory is currently in an active, pre-alpha prototyping phase. It is NOT ready for production simulations, academic citations, or institutional policy forecasting.** 
+
+The underlying architecture is undergoing core structural refactoring. While the repository is public to encourage open-source review, it will not be considered "ready for prime time" or open for public announcement until the following milestones are comprehensively cleared:
+
+### 🟩 Crucial Pre-Announcement Milestones
+
+- [ ] **Mathematical Rigor (State-Space Transition):** Complete the replacement of all legacy, linear metric placeholders (e.g., subjective 0-100 scores) with strict, non-linear system dynamics equations and conserved resource-pool vectors.
+- [ ] **Robust Python Interface (`lab/`):** Fully expose the core execution loop and state data structures to Python via `pyo3`, enabling a researcher to run a complete simulation and extract Pandas DataFrames from a Jupyter Notebook without reading Rust code.
+- [ ] **Cross-Platform Determinism Verification:** Implement automated CI testing to verify that floating-point calculations match identically down to the final decimal place across both `x86_64` (Intel/AMD) and `aarch64` (Apple Silicon/ARM) hardware architectures.
+- [ ] **Zero-Warning Compilation & Audit:** Achieve a state of absolute compliance across the entire workspace workspace, passing `cargo clippy -- -D warnings` and strict deterministic regression testing under heavy multi-threaded workloads.
+- [ ] **Empirical Validation Blueprint:** Build one verified, end-to-end "Toy Scenario" that replicates a historical macroeconomic or demographic tipping point with documented, mathematically sound calibration data.
+
+*If you are an academic researcher or systems engineer interested in building these foundational pillars, please review our `AGENTS.md` and the roadmap below before opening a Pull Request.*
+
 ---
 
 ## Features & Capabilities
