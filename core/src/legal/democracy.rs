@@ -3,6 +3,7 @@ use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
 use crate::simulation::SimulationState;
 use rand::Rng;
+use rand::RngExt;
 
 pub struct DemocracyModel;
 
@@ -49,8 +50,7 @@ fn propose_laws(
             .mul_add(leg.competence, 0.2f64.mul_add(leg.leadership_quality, 0.2))
             .min(0.9);
 
-        let raw_u64 = context.rand.next_u64();
-        let random_f64 = (raw_u64 as f64) / (u64::MAX as f64);
+        let random_f64: f64 = context.rand.random();
 
         if random_f64 < prop_chance {
             // quality = 0.5 + 0.5 * competence
@@ -130,10 +130,7 @@ fn vote_in_chambers(
                 .mul_add(leg.faction_affinity, base_support)
                 .clamp(0.0, 1.0);
 
-            let raw_u64 = context.rand.next_u64();
-
-            // Normalize u64 into a f64 in the range [0.0, 1.0)
-            let random_f64 = (raw_u64 as f64) / (u64::MAX as f64);
+            let random_f64: f64 = context.rand.random();
 
             if random_f64 < p {
                 yes_votes += 1.0;
