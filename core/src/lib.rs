@@ -1,3 +1,4 @@
+//#![warn(clippy::pedantic)]
 pub mod app;
 pub mod config;
 pub mod entities;

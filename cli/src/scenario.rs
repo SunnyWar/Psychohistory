@@ -4,16 +4,16 @@ use std::fs::File;
 use std::io::Read;
 
 /// Loads and parses the scenario JSON file at the given directory path.
-/// Returns the root serde_json::Value on success.
+/// Returns the root `serde_json::Value` on success.
 pub fn load_scenario(scenario_dir: &str) -> Result<Value, String> {
-    let scenario_path = format!("{}/simulation_config.json", scenario_dir);
-    let mut file = File::open(&scenario_path)
-        .map_err(|e| format!("Failed to locate {}: {}", scenario_path, e))?;
+    let scenario_path = format!("{scenario_dir}/simulation_config.json");
+    let mut file =
+        File::open(&scenario_path).map_err(|e| format!("Failed to locate {scenario_path}: {e}"))?;
     let mut json_str = String::new();
     file.read_to_string(&mut json_str)
-        .map_err(|e| format!("Failed to read {}: {}", scenario_path, e))?;
+        .map_err(|e| format!("Failed to read {scenario_path}: {e}"))?;
     let root_data: Value = serde_json::from_str(&json_str)
-        .map_err(|e| format!("Failed to parse config schema: {}", e))?;
+        .map_err(|e| format!("Failed to parse config schema: {e}"))?;
     Ok(root_data)
 }
 

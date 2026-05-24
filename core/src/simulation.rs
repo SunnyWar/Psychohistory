@@ -153,16 +153,13 @@ pub fn simulate_region_tree<F>(
         info!("Completed region: {region_name}");
         print_results(region_name, &result);
     } else {
-        warn!(
-            "Skipping region '{}' due to missing or invalid system/config.",
-            region_name
-        );
+        warn!("Skipping region '{region_name}' due to missing or invalid system/config.");
     }
 
     // Recurse into sub_regions
     if let Some(sub_regions) = node.get("sub_regions").and_then(|sr| sr.as_object()) {
         for (sub_name, sub_node) in sub_regions {
-            let next_name = format!("{}:{}", region_name, sub_name);
+            let next_name = format!("{region_name}:{sub_name}");
             simulate_region_tree(&next_name, sub_node, years, runs, print_results, seeds);
         }
     }
@@ -204,67 +201,11 @@ pub fn simulate_year(
     year: usize,
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
-    // Example: Law Quality (CurrentUsSystem)
-    let lobbying_pressure = state.lobbying_pressure;
-    let donor_pressure = state.donor_pressure;
-    let media_impact = state.media_impact;
-    let bias_level = context.config.bias_level;
-    let raw_law_quality = context.config.raw_law_quality;
-    let representative_efficiency = context.config.representative_efficiency;
-    let special_interest_degradation =
-        (1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06)
-            .clamp(0.0, 1.0);
-    let bias_adjustment = -bias_level.abs() * 0.02;
-    let law_quality = (raw_law_quality * representative_efficiency * special_interest_degradation
-        + bias_adjustment)
-        .clamp(0.0, 1.0);
-
-    // Example: Corruption Level (CurrentUsSystem)
-    let us_corruption_base = context.config.us_corruption_base;
-    let avg_integrity = state.avg_integrity;
-    let reelection_pressure = state.reelection_pressure;
-    let us_reelection_bonus = context.config.us_reelection_bonus;
-    let normalized_wealth_influence = state.normalized_wealth_influence;
-    let faction_formation = state.faction_formation;
-    let bad_law_drag = state.bad_law_drag;
-    let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut context.rand);
-    log::info!(
-        "[DEBUG] Run RNG: region={}, year={}, corruption_noise={}",
-        context.config.raw_law_quality,
-        year,
-        random_noise
-    );
-    let corruption_level = (us_corruption_base
-        + (1.0 - avg_integrity) * 0.28
-        + lobbying_pressure * 0.24
-        + donor_pressure * 0.20
-        + reelection_pressure * us_reelection_bonus * 0.22
-        + normalized_wealth_influence * 0.14
-        + faction_formation * 0.10
-        + bad_law_drag * 0.05
-        + random_noise)
-        .clamp(0.0, 1.0);
-
-    // Public Trust (CurrentUsSystem)
-    let prior_trust = state.prior_trust;
-    let public_trust_decay_rate = context.config.public_trust_decay_rate;
-    let decayed_prior_trust = prior_trust * (1.0 - public_trust_decay_rate);
-    let crisis_response = 0.0; // TODO: compute below
-    let legislative_speed = 0.0; // Will be computed below
-    let bad_law_drag = state.bad_law_drag;
-    let is_gridlocked = state.is_gridlocked;
-    let external_shock = state.external_shock;
-    let media_impact = state.media_impact;
-    let public_trust = (decayed_prior_trust * 0.68
-        + law_quality * 0.14
-        + crisis_response * 0.06
-        + legislative_speed * 0.05
-        - corruption_level * 0.20
-        - bad_law_drag * 0.08
-        - if is_gridlocked { 0.04 } else { 0.0 }
-        - external_shock * 0.03
-        + media_impact * 0.08)
-        .clamp(0.0, 1.0);
+    let (lobbying_pressure, donor_pressure, law_quality) = law_quality(state, context);
+    let corruption_level =
+        corruption_level(state, context, year, lobbying_pressure, donor_pressure);
+    let (bad_law_drag, is_gridlocked, external_shock, public_trust) =
+        public_trust(state, context, law_quality, corruption_level);
 
     // Crisis Response (FederalSensorumSystem)
     let legislative_competence = state.legislative_competence;
@@ -362,6 +303,90 @@ pub fn simulate_year(
         plugin.modify_outcome(system, state, year, &mut outcome);
     }
     outcome
+}
+
+// Public Trust (CurrentUsSystem)
+fn public_trust(
+    state: &mut SimulationState,
+    context: &mut SimulationContext,
+    law_quality: f64,
+    corruption_level: f64,
+) -> (f64, bool, f64, f64) {
+    let prior_trust = state.prior_trust;
+    let public_trust_decay_rate = context.config.public_trust_decay_rate;
+    let decayed_prior_trust = prior_trust * (1.0 - public_trust_decay_rate);
+    let crisis_response = 0.0;
+    // TODO: compute below
+    let legislative_speed = 0.0;
+    // Will be computed below
+    let bad_law_drag = state.bad_law_drag;
+    let is_gridlocked = state.is_gridlocked;
+    let external_shock = state.external_shock;
+    let media_impact = state.media_impact;
+    let public_trust = (decayed_prior_trust * 0.68
+        + law_quality * 0.14
+        + crisis_response * 0.06
+        + legislative_speed * 0.05
+        - corruption_level * 0.20
+        - bad_law_drag * 0.08
+        - if is_gridlocked { 0.04 } else { 0.0 }
+        - external_shock * 0.03
+        + media_impact * 0.08)
+        .clamp(0.0, 1.0);
+    (bad_law_drag, is_gridlocked, external_shock, public_trust)
+}
+
+// Example: Corruption Level (CurrentUsSystem)
+fn corruption_level(
+    state: &mut SimulationState,
+    context: &mut SimulationContext,
+    year: usize,
+    lobbying_pressure: f64,
+    donor_pressure: f64,
+) -> f64 {
+    let us_corruption_base = context.config.us_corruption_base;
+    let avg_integrity = state.avg_integrity;
+    let reelection_pressure = state.reelection_pressure;
+    let us_reelection_bonus = context.config.us_reelection_bonus;
+    let normalized_wealth_influence = state.normalized_wealth_influence;
+    let faction_formation = state.faction_formation;
+    let bad_law_drag = state.bad_law_drag;
+    let random_noise = Normal::new(0.0, 0.04).unwrap().sample(&mut context.rand);
+    log::info!(
+        "[DEBUG] Run RNG: region={}, year={}, corruption_noise={}",
+        context.config.raw_law_quality,
+        year,
+        random_noise
+    );
+
+    (us_corruption_base
+        + (1.0 - avg_integrity) * 0.28
+        + lobbying_pressure * 0.24
+        + donor_pressure * 0.20
+        + reelection_pressure * us_reelection_bonus * 0.22
+        + normalized_wealth_influence * 0.14
+        + faction_formation * 0.10
+        + bad_law_drag * 0.05
+        + random_noise)
+        .clamp(0.0, 1.0)
+}
+
+// Example: Law Quality (CurrentUsSystem)
+fn law_quality(state: &mut SimulationState, context: &mut SimulationContext) -> (f64, f64, f64) {
+    let lobbying_pressure = state.lobbying_pressure;
+    let donor_pressure = state.donor_pressure;
+    let media_impact = state.media_impact;
+    let bias_level = context.config.bias_level;
+    let raw_law_quality = context.config.raw_law_quality;
+    let representative_efficiency = context.config.representative_efficiency;
+    let special_interest_degradation =
+        (1.0 - lobbying_pressure * 0.14 - donor_pressure * 0.12 - media_impact * 0.06)
+            .clamp(0.0, 1.0);
+    let bias_adjustment = -bias_level.abs() * 0.02;
+    let law_quality = (raw_law_quality * representative_efficiency * special_interest_degradation
+        + bias_adjustment)
+        .clamp(0.0, 1.0);
+    (lobbying_pressure, donor_pressure, law_quality)
 }
 
 pub fn run_simulation(

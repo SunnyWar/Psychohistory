@@ -13,7 +13,7 @@ impl Plugin for GovPlugin {
     const NAME: &'static str = "gov";
 
     fn build(&self, app: &mut App) {
-        // Insert GovState if not present
+        // Insert `GovState` if not present
         if !app.state.mut_workspace().contains_key("gov") {
             app.state.insert("gov", GovState::default());
         }

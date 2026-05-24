@@ -43,7 +43,7 @@ pub struct GovState {
 }
 
 impl EconState {
-    /// Print field-level diff between self and another EconState. Returns true if any field changed.
+    /// Print field-level diff between self and another `EconState`. Returns true if any field changed.
     pub fn print_diff(&self, other: &Self) -> bool {
         let mut changed = false;
         if (self.gdp - other.gdp).abs() > f64::EPSILON {
@@ -62,7 +62,7 @@ impl EconState {
 }
 
 impl DemogState {
-    /// Print field-level diff between self and another DemogState. Returns true if any field changed.
+    /// Print field-level diff between self and another `DemogState`. Returns true if any field changed.
     pub fn print_diff(&self, other: &Self) -> bool {
         let mut changed = false;
         if self.population != other.population {
@@ -81,7 +81,7 @@ impl DemogState {
 }
 
 impl GovState {
-    /// Print field-level diff between self and another GovState. Returns true if any field changed.
+    /// Print field-level diff between self and another `GovState`. Returns true if any field changed.
     pub fn print_diff(&self, other: &Self) -> bool {
         let mut changed = false;
         if (self.tax_rate - other.tax_rate).abs() > f64::EPSILON {

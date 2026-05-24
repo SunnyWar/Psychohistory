@@ -13,7 +13,7 @@ impl Plugin for EconPlugin {
     const NAME: &'static str = "econ";
 
     fn build(&self, app: &mut App) {
-        // Insert EconState if not present
+        // Insert `EconState` if not present
         if !app.state.mut_workspace().contains_key("econ") {
             app.state.insert("econ", EconState::default());
         }
@@ -42,14 +42,8 @@ impl SimulationPlugin for EconPlugin {
 
         // If you need the key, pass it via the system runner or store in state.
         // For now, fallback to single-country logic or refactor as needed.
-        let population = world
-            .get::<DemogState>("demog")
-            .map(|d| d.population)
-            .unwrap_or(0);
-        let stability = world
-            .get::<GovState>("gov")
-            .map(|g| g.stability)
-            .unwrap_or(1.0);
+        let population = world.get::<DemogState>("demog").map_or(0, |d| d.population);
+        let stability = world.get::<GovState>("gov").map_or(1.0, |g| g.stability);
 
         if population > 10_000_000 {
             // GDP growth scales with population size and societal stability

@@ -11,7 +11,9 @@ use psychohistory_core::init_logger;
 use psychohistory_core::simulation::simulate_region_tree;
 
 fn main() {
+    use csv_export::{write_per_run_csv, write_summary_csv};
     use psychohistory_core::seed_util::generate_seeds;
+
     let args = CliArgs::parse();
     if std::env::args().len() == 1 {
         <CliArgs as clap::CommandFactory>::command()
@@ -29,7 +31,7 @@ fn main() {
     let root_data = match scenario::load_scenario(&args.scenario_dir) {
         Ok(val) => val,
         Err(msg) => {
-            error!("{}", msg);
+            error!("{msg}");
             return;
         }
     };
@@ -37,7 +39,6 @@ fn main() {
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
             info!("Found {} regions in config.", regions.len());
-            use csv_export::{write_per_run_csv, write_summary_csv};
             for (region_name, region_node) in regions {
                 let seeds = generate_seeds(top_seed, args.runs);
                 // Closure to print and export results

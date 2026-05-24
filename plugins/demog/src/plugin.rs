@@ -13,7 +13,7 @@ impl Plugin for DemogPlugin {
     const NAME: &'static str = "demog";
 
     fn build(&self, app: &mut App) {
-        // Insert DemogState if not present
+        // Insert `DemogState` if not present
         if !app.state.mut_workspace().contains_key("demog") {
             app.state.insert("demog", DemogState::default());
         }

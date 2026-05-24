@@ -26,38 +26,41 @@ pub struct SimulationState {
 }
 
 impl SimulationState {
-    /// Cross-domain coupling: get immutable reference to EconState (current plane)
+    /// Cross-domain coupling: get immutable reference to `EconState` (current plane)
+    #[must_use]
     pub fn get_econ_state(&self) -> Option<&models::EconState> {
         self.current
             .get("econ")?
             .downcast_ref::<models::EconState>()
     }
 
-    /// Cross-domain coupling: get immutable reference to GovState (current plane)
+    /// Cross-domain coupling: get immutable reference to `GovState` (current plane)
+    #[must_use]
     pub fn get_gov_state(&self) -> Option<&models::GovState> {
         self.current.get("gov")?.downcast_ref::<models::GovState>()
     }
 
-    /// Cross-domain coupling: get immutable reference to DemogState (current plane)
+    /// Cross-domain coupling: get immutable reference to `DemogState` (current plane)
+    #[must_use]
     pub fn get_demog_state(&self) -> Option<&models::DemogState> {
         self.current
             .get("demog")?
             .downcast_ref::<models::DemogState>()
     }
 
-    /// Cross-domain coupling: get mutable reference to EconState (write plane)
+    /// Cross-domain coupling: get mutable reference to `EconState` (write plane)
     pub fn get_econ_state_mut(&mut self) -> Option<&mut models::EconState> {
         self.next
             .get_mut("econ")?
             .downcast_mut::<models::EconState>()
     }
 
-    /// Cross-domain coupling: get mutable reference to GovState (write plane)
+    /// Cross-domain coupling: get mutable reference to `GovState` (write plane)
     pub fn get_gov_state_mut(&mut self) -> Option<&mut models::GovState> {
         self.next.get_mut("gov")?.downcast_mut::<models::GovState>()
     }
 
-    /// Cross-domain coupling: get mutable reference to 'DemogState' (write plane)
+    /// Cross-domain coupling: get mutable reference to `DemogState` (write plane)
     pub fn get_demog_state_mut(&mut self) -> Option<&mut models::DemogState> {
         self.next
             .get_mut("demog")?
@@ -120,6 +123,7 @@ impl SimulationState {
     }
 
     /// Public accessor for the cloners map (for snapshotting)
+    #[must_use]
     pub fn cloners(&self) -> &ClonerMap {
         &self.cloners
     }
