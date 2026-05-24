@@ -2,6 +2,7 @@ use crate::config::SimulationContext;
 use crate::entities::GovernanceSystem;
 use crate::run_result::RunResult;
 use crate::simulation::{SimulationPlugin, run_simulation};
+use ndarray::ArrayView1;
 
 #[derive(Debug, Clone)]
 pub struct ExperimentResult {
@@ -21,14 +22,17 @@ impl ExperimentResult {
 }
 
 fn mean_stddev(values: &[f64]) -> (f64, f64) {
-    let n = values.len() as f64;
-    if n == 0.0 {
+    if values.is_empty() {
         return (0.0, 0.0);
     }
-    let mean = values.iter().sum::<f64>() / n;
-    let var = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n;
-    (mean, var.sqrt())
+
+    let arr = ArrayView1::from(values);
+    let mean = arr.mean().unwrap_or(0.0);
+    let stddev = arr.std(0.0);
+
+    (mean, stddev)
 }
+
 /// Run multiple simulations and aggregate results (mean, stddev).
 pub fn run_experiment(
     system: &GovernanceSystem,

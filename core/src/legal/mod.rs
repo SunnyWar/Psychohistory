@@ -1,14 +1,13 @@
 //! Legal and legislative system trait and implementations for per-GovType simulation.
 
-use crate::entities::{GovernanceSystem, YearOutcome};
-use crate::simulation::SimulationState;
-
 pub mod autocracy;
 pub mod democracy;
 pub mod monarchy;
 pub mod other;
 
-// Re-export implementations for flat, public access API
+use crate::entities::{GovernanceSystem, YearOutcome};
+use crate::simulation::SimulationState;
+
 pub use autocracy::AutocracyModel;
 pub use democracy::DemocracyModel;
 pub use monarchy::MonarchyModel;

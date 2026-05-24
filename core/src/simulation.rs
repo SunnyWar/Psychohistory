@@ -32,7 +32,6 @@ use crate::run_result::RunResult;
 /// - Economic Outcome includes Law Quality, Crisis Response, Adaptability, Corruption Level, and external shocks.
 /// - Composite Score aggregates all metrics, inverting Corruption.
 use log::{info, warn};
-use models::GovType;
 use rand_distr::{Distribution, Normal};
 use serde_json::Value;
 
