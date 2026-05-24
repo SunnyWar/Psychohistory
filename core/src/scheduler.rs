@@ -11,6 +11,7 @@ pub struct Scheduler {
 }
 
 impl Scheduler {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             systems: HashMap::new(),
@@ -46,11 +47,11 @@ impl Scheduler {
             let systems_ref = &self.systems;
             state.par_execute_systems(|snapshot, key, data_bucket| {
                 let archetype_key = key.split(':').next_back().unwrap_or(key);
-                debug!("Dispatching system for key={}", archetype_key);
+                debug!("Dispatching system for key={archetype_key}");
                 if let Some(system) = systems_ref.get(archetype_key) {
                     system.run_system(snapshot, data_bucket, time, key);
                 } else {
-                    debug!("No system registered for key={}", archetype_key);
+                    debug!("No system registered for key={archetype_key}");
                 }
             });
 

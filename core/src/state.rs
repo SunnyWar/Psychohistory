@@ -57,7 +57,7 @@ impl SimulationState {
         self.next.get_mut("gov")?.downcast_mut::<models::GovState>()
     }
 
-    /// Cross-domain coupling: get mutable reference to DemogState (write plane)
+    /// Cross-domain coupling: get mutable reference to 'DemogState' (write plane)
     pub fn get_demog_state_mut(&mut self) -> Option<&mut models::DemogState> {
         self.next
             .get_mut("demog")?
@@ -102,7 +102,7 @@ impl SimulationState {
         }
     }
     /// Executes registered systems across the parallel data planes.
-    /// By building the ReadSnapshot internally from `self.current`, we cleanly split
+    /// By building the `ReadSnapshot` internally from `self.current`, we cleanly split
     /// the borrow from `self.next` so Rayon workers can access both simultaneously.
     pub fn par_execute_systems<F>(&mut self, f: F)
     where
@@ -123,6 +123,7 @@ impl SimulationState {
     pub fn cloners(&self) -> &ClonerMap {
         &self.cloners
     }
+    #[must_use]
     pub fn new() -> Self {
         Self {
             current: HashMap::new(),
@@ -166,6 +167,7 @@ impl SimulationState {
     }
 
     /// Read an immutable value from the frozen *current* tick frame.
+    #[must_use]
     pub fn get<T: 'static>(&self, key: &'static str) -> &T {
         self.current
             .get(key)
@@ -176,6 +178,7 @@ impl SimulationState {
 
     /// Grab a raw reference to the current underlying map.
     /// This is what we will wrap inside our `ReadSnapshot`.
+    #[must_use]
     pub fn as_raw_map(&self) -> &HashMap<&'static str, Box<dyn Any + Send + Sync>> {
         &self.current
     }

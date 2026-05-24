@@ -4,7 +4,7 @@ use psychohistory_core::experiment::ExperimentResult;
 
 /// Print experiment results to stdout
 pub fn print_experiment_results(region_name: &str, result: &ExperimentResult) {
-    println!("=== Experiment Results for region: {} ===", region_name);
+    println!("=== Experiment Results for region: {region_name} ===");
     let mut table = Table::new();
     table
         .load_preset(UTF8_FULL)
@@ -57,5 +57,5 @@ pub fn print_experiment_results(region_name: &str, result: &ExperimentResult) {
         format!("{:.3}", result.stddev.average_composite_score).as_str(),
     ]);
 
-    println!("{}", table);
+    println!("{table}");
 }

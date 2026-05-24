@@ -113,7 +113,7 @@ pub trait SimulationPlugin {
 /// - `node`: JSON node for the region
 /// - `years`: Number of years to simulate
 /// - `runs`: Number of experiment runs
-/// - `print_results`: Callback to print results (region_name, result)
+/// - `print_results`: Callback to print results (`region_name`, `result`)
 pub fn simulate_region_tree<F>(
     region_name: &str,
     node: &Value,
@@ -124,7 +124,7 @@ pub fn simulate_region_tree<F>(
 ) where
     F: Fn(&str, &ExperimentResult),
 {
-    info!("Simulating region: {} ({} runs)", region_name, runs);
+    info!("Simulating region: {region_name} ({runs})");
     // Try to load GovernanceSystem and SimulationConfig for this region
     // Support both top-level and 'components'-nested fields
     let (system, config) = {
@@ -150,7 +150,7 @@ pub fn simulate_region_tree<F>(
         let mut context = SimulationContext::new(config, None);
         let result: ExperimentResult =
             run_experiment(&system, years, &mut context, &plugins, runs, seeds);
-        info!("Completed region: {}", region_name);
+        info!("Completed region: {region_name}");
         print_results(region_name, &result);
     } else {
         warn!(

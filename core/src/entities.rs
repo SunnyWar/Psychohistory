@@ -55,6 +55,7 @@ pub struct YearOutcome {
 
 impl GovernanceSystem {
     /// Select the appropriate legal system model for this system's government type.
+    #[must_use]
     pub fn legal_model(&self, gov_type: &GovType) -> Box<dyn LegalSystemModel> {
         match gov_type {
             GovType::Democracy => Box::new(DemocracyModel),

@@ -15,7 +15,7 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 
 ## 🛑 Current Status: Pre-Alpha / Not Ready for Prime Time
 
-**Psychohistory is currently in an active, pre-alpha prototyping phase. It is NOT ready for production simulations, academic citations, or institutional policy forecasting.** 
+**Psychohistory is currently in an active, pre-alpha prototyping phase. It is NOT ready for production simulations, academic citations, or institutional policy forecasting.**
 
 The underlying architecture is undergoing core structural refactoring. While the repository is public to encourage open-source review, it will not be considered "ready for prime time" or open for public announcement until the following milestones are comprehensively cleared:
 
@@ -140,7 +140,7 @@ psychohistory-cli [OPTIONS]
 - `--log-dir <DIR>`: Log file output directory (default: logs)
 - `-v, --verbose`: Increase logging verbosity
 
-### Typical Workflow:
+### Typical Workflow
 
 1. Define or modify initial parameters in `scenarios/simulation_config.json`.
 2. Execute the runner command: `cargo run --bin cli -- --years 20 --runs 100`

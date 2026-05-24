@@ -30,6 +30,7 @@ impl App {
         let mut mutator = mutator;
         self.state.update_initial_state::<T>(key, &mut mutator);
     }
+    #[must_use]
     pub fn new() -> Self {
         debug!("Creating new App instance");
         let state = SimulationState::new();
@@ -48,7 +49,8 @@ impl App {
         debug!("Plugin {} built and registered", P::NAME);
     }
 
-    /// Capture a snapshot of the current state as a HashMap<String, DomainState>
+    /// Capture a snapshot of the current state as a `HashMap`<String, `DomainState`>
+    #[must_use]
     pub fn snapshot_state(&self) -> HashMap<String, DomainState> {
         let mut map = HashMap::new();
         for (&key, val) in self.state.as_raw_map() {
@@ -76,10 +78,7 @@ impl App {
     }
 
     pub fn run(&mut self, steps: u64, granularity: TimeGranularity) {
-        info!(
-            "Simulation run starting: steps={steps}, granularity={:?}",
-            granularity
-        );
+        info!("Simulation run starting: steps={steps}, granularity={granularity:?}");
         // Capture initial snapshot before any ticks
         self.initial_state = self.snapshot_state();
         debug!("Initial state snapshot captured");
@@ -89,10 +88,9 @@ impl App {
 
     pub fn summarize_state(&self) {
         println!("[core] Final state keys:");
-        let mut keys: Vec<_> = self.state.keys().map(|k| k.to_string()).collect();
-        keys.sort();
+        let keys: Vec<_> = self.state.keys().map(std::string::ToString::to_string).collect();
         for key in &keys {
-            println!("  - {}", key);
+            println!("  - {key}");
         }
         println!("[core] State changes:");
         let final_snapshot = self.snapshot_state();
@@ -110,14 +108,12 @@ impl App {
 
         if before_gov_type != after_gov_type {
             println!(
-                "{YELLOW}[system transition]{RESET} Government type changed: {:?} → {:?}",
-                before_gov_type, after_gov_type
+                "{YELLOW}[system transition]{RESET} Government type changed: {before_gov_type:?} → {after_gov_type:?}"
             );
         }
         if before_econ_system != after_econ_system {
             println!(
-                "{YELLOW}[system transition]{RESET} Economic system changed: {:?} → {:?}",
-                before_econ_system, after_econ_system
+                "{YELLOW}[system transition]{RESET} Economic system changed: {before_econ_system:?} → {after_econ_system:?}"
             );
         }
 
@@ -155,7 +151,7 @@ impl App {
                 cross_domain = true;
             }
             if any_change {
-                println!("\n[{}]", key);
+                println!("\n[{key}]");
                 if cross_domain {
                     println!(
                         "  {YELLOW}[cross-domain effect]{RESET} changes in: {:?}",

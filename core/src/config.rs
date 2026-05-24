@@ -45,6 +45,7 @@ pub struct SimulationContext {
 }
 
 impl SimulationContext {
+    #[must_use]
     pub fn new(config: SimulationConfig, seed: Option<u64>) -> Self {
         let rand = match seed {
             Some(s) => StdRng::seed_from_u64(s),

@@ -6,9 +6,11 @@ This document provides persistent instructions and behavioral guardrails for AI 
 
 ## Project Purpose & Identity
 
-Psychohistory is a public-utility, open-science system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of global systems. 
-* **Target Audience:** Academic researchers, macroeconomists, and domain scientists.
-* **Licensing Enforcement:** PolyForm Noncommercial License 1.0.0. Do not write or suggest code patterns dependent on proprietary enterprise crates or closed ecosystems. Everything must remain open-source and modular.
+Psychohistory is a public-utility, open-science system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of global systems.
+
+* Target Audience:** Academic researchers, macroeconomists, and domain scientists.
+
+* Licensing Enforcement:** PolyForm Noncommercial License 1.0.0. Do not write or suggest code patterns dependent on proprietary enterprise crates or closed ecosystems. Everything must remain open-source and modular.
 
 ---
 
@@ -26,9 +28,13 @@ When generating or refactoring code, you must reject generic web/software engine
 ## Exploration Workflow (Critical)
 
 Prefer `ast-outline` for efficient navigation to minimize context bloating:
+
 * Unfamiliar directory — `ast-outline digest .` (or `<dir>`)
+
 * Single file structure — `ast-outline <file.rs>`
+
 * Specific item — `ast-outline show <file.rs> SymbolName`
+
 * Implementors — `ast-outline implements <Trait> .`
 
 Only read full file contents when you need implementation details beyond signatures. Never dump entire large files into context unless requested.
@@ -38,12 +44,12 @@ Only read full file contents when you need implementation details beyond signatu
 ## Development & Verification Commands
 
 Always verify changes locally with this precise sequence before considering a task complete:
+
 ```bash
 cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets --all-features
 cargo fmt --all -- --check
-
 ---
 
 ## Prompt Engineering & Context Layering

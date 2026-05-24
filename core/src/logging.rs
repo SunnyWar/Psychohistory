@@ -1,8 +1,8 @@
 use flexi_logger::{Cleanup, Criterion, Duplicate, FileSpec, Logger, Naming};
 use log::{LevelFilter, debug, error, info};
 
-/// Initialize logging with flexi_logger, mapping verbose_level to LevelFilter.
-/// Logs go to a file in log_dir with the given prefix, and are also duplicated to stderr.
+/// Initialize logging with `flexi_logger`, mapping `verbose_level` to `LevelFilter`.
+/// Logs go to a file in `log_dir` with the given prefix, and are also duplicated to stderr.
 pub fn init_logger(log_dir: &str, prefix: &str, verbose_level: u8) {
     debug!(
         "Initializing logger: log_dir={log_dir}, prefix={prefix}, verbose_level={verbose_level}"

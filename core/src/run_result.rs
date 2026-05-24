@@ -15,6 +15,7 @@ pub struct RunResult {
 }
 
 impl RunResult {
+    #[must_use]
     pub fn from_outcomes(outcomes: Vec<YearOutcome>) -> Self {
         let n = outcomes.len() as f64;
         let sum = |f: fn(&YearOutcome) -> f64| outcomes.iter().map(f).sum::<f64>();
