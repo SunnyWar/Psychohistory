@@ -251,19 +251,23 @@ pub fn simulate_year(
 
     // Composite Score
     let weights = context.config.weights;
-    let weighted_numerator = law_quality * weights[0]
-        + (1.0 - corruption_level) * weights[1]
-        + public_trust * weights[2]
-        + crisis_response * weights[3]
-        + adaptability * weights[4]
-        + representation_accuracy * weights[5]
-        + legislative_speed * weights[6]
-        + economic_outcome * weights[7];
+
+    let mut acc = 0.0;
+
+    acc = law_quality.mul_add(weights[0], acc);
+    acc = (1.0 - corruption_level).mul_add(weights[1], acc);
+    acc = public_trust.mul_add(weights[2], acc);
+    acc = crisis_response.mul_add(weights[3], acc);
+    acc = adaptability.mul_add(weights[4], acc);
+    acc = representation_accuracy.mul_add(weights[5], acc);
+    acc = legislative_speed.mul_add(weights[6], acc);
+    acc = economic_outcome.mul_add(weights[7], acc);
+
     let weight_total: f64 = weights.iter().sum();
     let composite_score = if weight_total <= 0.0 {
         0.0
     } else {
-        weighted_numerator / weight_total
+        acc / weight_total
     };
 
     let mut outcome = YearOutcome {

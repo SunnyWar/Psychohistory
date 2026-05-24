@@ -18,17 +18,39 @@ impl RunResult {
     #[must_use]
     pub fn from_outcomes(outcomes: Vec<YearOutcome>) -> Self {
         let n = outcomes.len() as f64;
-        let sum = |f: fn(&YearOutcome) -> f64| outcomes.iter().map(f).sum::<f64>();
-        RunResult {
-            average_law_quality: sum(|o| o.law_quality) / n,
-            average_corruption_level: sum(|o| o.corruption_level) / n,
-            average_public_trust: sum(|o| o.public_trust) / n,
-            average_crisis_response: sum(|o| o.crisis_response) / n,
-            average_adaptability: sum(|o| o.adaptability) / n,
-            average_representation_accuracy: sum(|o| o.representation_accuracy) / n,
-            average_legislative_speed: sum(|o| o.legislative_speed) / n,
-            average_economic_outcome: sum(|o| o.economic_outcome) / n,
-            average_composite_score: sum(|o| o.composite_score) / n,
+
+        let mut sum_law_quality = 0.0;
+        let mut sum_corruption_level = 0.0;
+        let mut sum_public_trust = 0.0;
+        let mut sum_crisis_response = 0.0;
+        let mut sum_adaptability = 0.0;
+        let mut sum_representation_accuracy = 0.0;
+        let mut sum_legislative_speed = 0.0;
+        let mut sum_economic_outcome = 0.0;
+        let mut sum_composite_score = 0.0;
+
+        for o in &outcomes {
+            sum_law_quality += o.law_quality;
+            sum_corruption_level += o.corruption_level;
+            sum_public_trust += o.public_trust;
+            sum_crisis_response += o.crisis_response;
+            sum_adaptability += o.adaptability;
+            sum_representation_accuracy += o.representation_accuracy;
+            sum_legislative_speed += o.legislative_speed;
+            sum_economic_outcome += o.economic_outcome;
+            sum_composite_score += o.composite_score;
+        }
+
+        Self {
+            average_law_quality: sum_law_quality / n,
+            average_corruption_level: sum_corruption_level / n,
+            average_public_trust: sum_public_trust / n,
+            average_crisis_response: sum_crisis_response / n,
+            average_adaptability: sum_adaptability / n,
+            average_representation_accuracy: sum_representation_accuracy / n,
+            average_legislative_speed: sum_legislative_speed / n,
+            average_economic_outcome: sum_economic_outcome / n,
+            average_composite_score: sum_composite_score / n,
             outcomes,
         }
     }

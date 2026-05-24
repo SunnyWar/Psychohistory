@@ -32,18 +32,35 @@ impl LegalSystemModel for DemocracyModel {
 
 // --- Democratic Process Step Stubs ---
 
-fn propose_laws(system: &GovernanceSystem, _state: &mut SimulationState) -> Vec<LawProposal> {
-    let mut proposals = Vec::new();
+// BUG: these use the global random generator, which can cause non-determinism in multi-threaded contexts. Should use a thread-local RNG seeded from the main seed for full determinism.
+fn propose_laws(system: &GovernanceSystem, _state: &SimulationState) -> Vec<LawProposal> {
+    let mut proposals = Vec::with_capacity(system.members.len());
+
     for leg in &system.members {
-        let prop_chance = 0.2 + 0.3 * leg.competence + 0.2 * leg.leadership_quality;
-        if rand::random::<f64>() < prop_chance.min(0.9) {
+        // prop_chance = 0.2 + 0.3 * competence + 0.2 * leadership_quality
+        let prop_chance = 0.3f64
+            .mul_add(leg.competence, 0.2f64.mul_add(leg.leadership_quality, 0.2))
+            .min(0.9);
+
+        if rand::random::<f64>() < prop_chance {
+            // quality = 0.5 + 0.5 * competence
+            let quality = 0.5f64.mul_add(leg.competence, 0.5);
+
+            // support = 0.4 + 0.3 * representativeness
+            let support = 0.3f64.mul_add(leg.representativeness, 0.4);
+
+            // controversy = 0.5 - 0.3 * integrity + 0.2 * (rand - 0.5)
+            let noise = rand::random::<f64>() - 0.5;
+            let controversy = 0.3f64.mul_add(-leg.integrity, 0.2f64.mul_add(noise, 0.5));
+
             proposals.push(LawProposal {
-                quality: 0.5 + 0.5 * leg.competence,
-                support: 0.4 + 0.3 * leg.representativeness,
-                controversy: 0.5 - 0.3 * leg.integrity + 0.2 * (rand::random::<f64>() - 0.5),
+                quality,
+                support,
+                controversy,
             });
         }
     }
+
     if proposals.is_empty() {
         proposals.push(LawProposal {
             quality: 0.5,
@@ -51,6 +68,7 @@ fn propose_laws(system: &GovernanceSystem, _state: &mut SimulationState) -> Vec<
             controversy: 0.5,
         });
     }
+
     proposals
 }
 
@@ -76,29 +94,38 @@ fn debate_and_amend(
         .collect()
 }
 
+// BUG: the uses the global random generator, which can cause non-determinism in multi-threaded contexts. Should use a thread-local RNG seeded from the main seed for full determinism.
 fn vote_in_chambers(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
-    _state: &mut SimulationState,
+    _state: &SimulationState,
 ) -> Vec<LawProposal> {
-    let mut passed = Vec::new();
+    let member_count = system.members.len() as f64;
+
+    let mut passed = Vec::with_capacity(proposals.len());
+
     for prop in proposals {
         let mut yes_votes = 0.0;
-        let mut total = 0.0;
+
+        // base_support = prop.support - 0.1 * prop.controversy
+        let base_support = 0.1f64.mul_add(-prop.controversy, prop.support);
+
         for leg in &system.members {
-            let base = prop.support + 0.2 * leg.faction_affinity - 0.1 * prop.controversy;
-            let vote = if rand::random::<f64>() < base.clamp(0.0, 1.0) {
-                1.0
-            } else {
-                0.0
-            };
-            yes_votes += vote;
-            total += 1.0;
+            // p = base_support + 0.2 * leg.faction_affinity
+            let p = 0.2f64
+                .mul_add(leg.faction_affinity, base_support)
+                .clamp(0.0, 1.0);
+
+            if rand::random::<f64>() < p {
+                yes_votes += 1.0;
+            }
         }
-        if yes_votes / total > 0.5 {
+
+        if yes_votes > member_count * 0.5 {
             passed.push(prop.clone());
         }
     }
+
     passed
 }
 
