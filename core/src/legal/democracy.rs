@@ -22,7 +22,7 @@ impl LegalSystemModel for DemocracyModel {
         context: &mut SimulationContext,
     ) -> YearOutcome {
         // --- Democratic Legislative Session Simulation ---
-        let proposals = propose_laws(system, state);
+        let proposals = propose_laws(system, state, context);
         let reviewed = committee_review(&proposals, system, state);
         let debated = debate_and_amend(&reviewed, system, state);
         let passed = vote_in_chambers(&debated, system, state, context);
@@ -36,7 +36,11 @@ impl LegalSystemModel for DemocracyModel {
 // --- Democratic Process Step Stubs ---
 
 // BUG: these use the global random generator, which can cause non-determinism in multi-threaded contexts. Should use a thread-local RNG seeded from the main seed for full determinism.
-fn propose_laws(system: &GovernanceSystem, _state: &SimulationState) -> Vec<LawProposal> {
+fn propose_laws(
+    system: &GovernanceSystem,
+    _state: &SimulationState,
+    context: &mut SimulationContext,
+) -> Vec<LawProposal> {
     let mut proposals = Vec::with_capacity(system.members.len());
 
     for leg in &system.members {
@@ -45,7 +49,10 @@ fn propose_laws(system: &GovernanceSystem, _state: &SimulationState) -> Vec<LawP
             .mul_add(leg.competence, 0.2f64.mul_add(leg.leadership_quality, 0.2))
             .min(0.9);
 
-        if rand::random::<f64>() < prop_chance {
+        let raw_u64 = context.rand.next_u64();
+        let random_f64 = (raw_u64 as f64) / (u64::MAX as f64);
+
+        if random_f64 < prop_chance {
             // quality = 0.5 + 0.5 * competence
             let quality = 0.5f64.mul_add(leg.competence, 0.5);
 
@@ -53,7 +60,8 @@ fn propose_laws(system: &GovernanceSystem, _state: &SimulationState) -> Vec<LawP
             let support = 0.3f64.mul_add(leg.representativeness, 0.4);
 
             // controversy = 0.5 - 0.3 * integrity + 0.2 * (rand - 0.5)
-            let noise = rand::random::<f64>() - 0.5;
+            let raw_u64 = context.rand.next_u64();
+            let noise = (raw_u64 as f64) / (u64::MAX as f64) - 0.5;
             let controversy = 0.3f64.mul_add(-leg.integrity, 0.2f64.mul_add(noise, 0.5));
 
             proposals.push(LawProposal {
