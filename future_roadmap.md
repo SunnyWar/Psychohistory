@@ -19,4 +19,11 @@
 * **Empirical Data Importer (Data Ingestion Pipeline):** Design an ingestion tool to automatically scrape, parse, and clean open data repositories (such as the World Bank API or UN Demographic Datasets) and convert them directly into valid, nested `scenarios/*.json` schema files.
 * **Sensitivity & Critical Path Diagnostics:** Implement automated sensitivity analysis features to isolate which specific macro-parameters or resource bottlenecks trigger the highest system volatility or accelerate tipping-point collapses across global vectors.
 
+### 🌐 Phase 4 — Global Network Dynamics & Scale Mechanics (Missing Pillars)
+
+* **Trans-Boundary Network Flow Topology:** Implement a dedicated global network layer to handle inter-regional dependencies, explicitly modeling trade flows, migration vectors, capital flight, and contagion effects across regional boundaries rather than treating nested entities as closed systems.
+* **Multi-Frequency Temporal Scheduling:** Refactor the `core/` scheduler to support asynchronous, multi-scale time-stepping, allowing fast-moving domains (e.g., macroeconomic supply shocks) to execute at high frequencies while slow-moving domains (e.g., demographic cohorts) update on macro-intervals.
+* **Global Conservation & Balance Reconciliation:** Introduce a systemic verification loop to enforce global conservation laws (e.g., cross-border resource, trade, and financial balances must reconcile to zero globally) to eliminate statistical phantom drift during long-horizon simulations.
+* **Forward-Looking Expectation Horizons:** Expand the `sdk/` state visibility to allow models to read scheduled or highly probable future scenario events, simulating how entities dynamically adjust their present state vector in anticipation of a future institutional shock.
+
 ---
