@@ -202,49 +202,24 @@ pub fn simulate_year(
     plugins: &[Box<dyn SimulationPlugin>],
 ) -> YearOutcome {
     let (lobbying_pressure, donor_pressure, law_quality) = law_quality(state, context);
+
     let corruption_level =
         corruption_level(state, context, year, lobbying_pressure, donor_pressure);
+
     let (bad_law_drag, is_gridlocked, external_shock, public_trust) =
         public_trust(state, context, law_quality, corruption_level);
 
-    // Crisis Response (FederalSensorumSystem)
-    let legislative_competence = state.legislative_competence;
-    let judicial_competence = state.judicial_competence;
-    let avg_leadership = state.avg_leadership;
-    let expert_support_effectiveness = state.expert_support_effectiveness;
-    let policy_stock = state.policy_stock;
-    let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut context.rand);
-    log::info!(
-        "[DEBUG] Run RNG: region={}, year={}, deliberation_noise={}",
-        context.config.raw_law_quality,
-        year,
-        deliberation_noise
-    );
-    let legislative_efficiency = state.legislative_efficiency;
-    let stability_multiplier = state.stability_multiplier;
-    let base_crisis_capability = legislative_competence * 0.20
-        + judicial_competence * 0.24
-        + avg_leadership * 0.13
-        + expert_support_effectiveness * 0.16
-        + policy_stock * 0.11
-        + deliberation_noise * 0.22;
-    let crisis_response =
-        (base_crisis_capability * legislative_efficiency * stability_multiplier).clamp(0.0, 1.0);
+    let (avg_leadership, policy_stock, legislative_efficiency, crisis_response) =
+        crisis_response(state, context, year);
 
-    // Adaptability (CurrentUsSystem)
-    let avg_competence = state.avg_competence;
-    let partisan_polarization = context.config.partisan_polarization;
-    let challenge_happened = state.challenge_happened;
-    let faction_formation = state.faction_formation;
-    let adaptability = (avg_competence * 0.24
-        + policy_stock * 0.14
-        + (1.0 - partisan_polarization) * 0.12
-        + avg_leadership * 0.10
-        + if challenge_happened { 0.05 } else { 0.0 }
-        - faction_formation * 0.10
-        - bad_law_drag * 0.08
-        - if is_gridlocked { 0.08 } else { 0.0 })
-    .clamp(0.0, 1.0);
+    let adaptability = adaptability(
+        state,
+        context,
+        bad_law_drag,
+        is_gridlocked,
+        avg_leadership,
+        policy_stock,
+    );
 
     // Representation Accuracy (CurrentUsSystem)
     let avg_representation = state.avg_representation;
@@ -303,6 +278,67 @@ pub fn simulate_year(
         plugin.modify_outcome(system, state, year, &mut outcome);
     }
     outcome
+}
+
+// Adaptability (CurrentUsSystem)
+fn adaptability(
+    state: &SimulationState,
+    context: &SimulationContext,
+    bad_law_drag: f64,
+    is_gridlocked: bool,
+    avg_leadership: f64,
+    policy_stock: f64,
+) -> f64 {
+    let avg_competence = state.avg_competence;
+    let partisan_polarization = context.config.partisan_polarization;
+    let challenge_happened = state.challenge_happened;
+    let faction_formation = state.faction_formation;
+    let adaptability = (avg_competence * 0.24
+        + policy_stock * 0.14
+        + (1.0 - partisan_polarization) * 0.12
+        + avg_leadership * 0.10
+        + if challenge_happened { 0.05 } else { 0.0 }
+        - faction_formation * 0.10
+        - bad_law_drag * 0.08
+        - if is_gridlocked { 0.08 } else { 0.0 })
+    .clamp(0.0, 1.0);
+    adaptability
+}
+
+// Crisis Response (FederalSensorumSystem)
+fn crisis_response(
+    state: &SimulationState,
+    context: &mut SimulationContext,
+    year: usize,
+) -> (f64, f64, f64, f64) {
+    let legislative_competence = state.legislative_competence;
+    let judicial_competence = state.judicial_competence;
+    let avg_leadership = state.avg_leadership;
+    let expert_support_effectiveness = state.expert_support_effectiveness;
+    let policy_stock = state.policy_stock;
+    let deliberation_noise = Normal::new(0.0, 0.1).unwrap().sample(&mut context.rand);
+    log::info!(
+        "[DEBUG] Run RNG: region={}, year={}, deliberation_noise={}",
+        context.config.raw_law_quality,
+        year,
+        deliberation_noise
+    );
+    let legislative_efficiency = state.legislative_efficiency;
+    let stability_multiplier = state.stability_multiplier;
+    let base_crisis_capability = legislative_competence * 0.20
+        + judicial_competence * 0.24
+        + avg_leadership * 0.13
+        + expert_support_effectiveness * 0.16
+        + policy_stock * 0.11
+        + deliberation_noise * 0.22;
+    let crisis_response =
+        (base_crisis_capability * legislative_efficiency * stability_multiplier).clamp(0.0, 1.0);
+    (
+        avg_leadership,
+        policy_stock,
+        legislative_efficiency,
+        crisis_response,
+    )
 }
 
 // Public Trust (CurrentUsSystem)
