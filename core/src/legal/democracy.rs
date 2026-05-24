@@ -23,11 +23,11 @@ impl LegalSystemModel for DemocracyModel {
     ) -> YearOutcome {
         // --- Democratic Legislative Session Simulation ---
         let proposals = propose_laws(system, state, context);
-        let reviewed = committee_review(&proposals, system, state);
-        let debated = debate_and_amend(&reviewed, system, state);
+        let reviewed = committee_review(&proposals, system, state, context);
+        let debated = debate_and_amend(&reviewed, system, state, context);
         let passed = vote_in_chambers(&debated, system, state, context);
-        let enacted = executive_veto(&passed, system, state);
-        let final_laws = judicial_review(&enacted, system, state);
+        let enacted = executive_veto(&passed, system, state, context);
+        let final_laws = judicial_review(&enacted, system, state, context);
 
         compute_year_outcome(&final_laws, system, state)
     }
@@ -87,6 +87,7 @@ fn committee_review(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
     _state: &mut SimulationState,
+    _context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals.to_vec()
 }
@@ -95,6 +96,7 @@ fn debate_and_amend(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
     _state: &mut SimulationState,
+    _context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals
         .iter()
@@ -150,6 +152,7 @@ fn executive_veto(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
     _state: &mut SimulationState,
+    _context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals.to_vec()
 }
@@ -158,6 +161,7 @@ fn judicial_review(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
     _state: &mut SimulationState,
+    _context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals.to_vec()
 }
