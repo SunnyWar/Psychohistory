@@ -88,7 +88,11 @@ impl App {
 
     pub fn summarize_state(&self) {
         println!("[core] Final state keys:");
-        let keys: Vec<_> = self.state.keys().map(std::string::ToString::to_string).collect();
+        let keys: Vec<_> = self
+            .state
+            .keys()
+            .map(std::string::ToString::to_string)
+            .collect();
         for key in &keys {
             println!("  - {key}");
         }
