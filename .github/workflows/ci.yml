@@ -1,0 +1,52 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  verify:
+    name: Verify & Test
+    strategy:
+      matrix:
+        # Cross-testing Linux (x86_64) and macOS (ARM64) for floating-point invariance
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    # Crucial Precursor for pyo3 compilation in the 'lab' crate
+    - name: Set up Python Runtime
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' # Choose your target research lab baseline environment
+
+    - name: Install Stable Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+
+    - name: Rust Cache Integration
+      uses: swatinem/rust-cache@v2
+      with:
+        # Simplified: Native key generation automatically isolates by OS and Cargo.lock hash
+        prefix-key: "v1-rust"
+
+    - name: Enforce Formatting
+      run: cargo fmt --all -- --check
+
+    - name: Workspace Dependency Check
+      run: cargo check --workspace --all-targets
+
+    - name: Run Clippy Lints (Fail on Warnings)
+      run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+    - name: Execute Deterministic Test Suite
+      run: cargo test --workspace --all-targets --all-features
