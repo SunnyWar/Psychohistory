@@ -13,7 +13,10 @@ rayon = "1.12.0"
 serde = { version = "1.0", features = ["derive"] }
 rand = { version = "0.10.1", features = ["std"] }
 rand_distr = "0.6.0"
-chrono = "0.4"
+chrono = { version = "0.4", default-features = false, features = [
+    "std",
+    "clock",
+] }
 flexi_logger = "0.31.8"
 log = "0.4"
 serde_json = "1.0"
