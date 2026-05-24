@@ -74,6 +74,11 @@ Psychohistory/
 │   └── src/
 │       ├── app.rs     # App struct, state diffing/reporting
 │       ├── scheduler.rs
+│       ├── legal/     # Legal domains
+│       │   ├── autocracy.rs
+│       │   ├── demoncracy.rs
+│       │   ├── monoarchy.rs
+│       │   └── other.rs
 │       ├── state.rs
 │       ├── plugin.rs
 │       └── system.rs
