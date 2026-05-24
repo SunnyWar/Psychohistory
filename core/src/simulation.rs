@@ -293,7 +293,7 @@ fn adaptability(
     let partisan_polarization = context.config.partisan_polarization;
     let challenge_happened = state.challenge_happened;
     let faction_formation = state.faction_formation;
-    let adaptability = (avg_competence * 0.24
+    (avg_competence * 0.24
         + policy_stock * 0.14
         + (1.0 - partisan_polarization) * 0.12
         + avg_leadership * 0.10
@@ -301,8 +301,7 @@ fn adaptability(
         - faction_formation * 0.10
         - bad_law_drag * 0.08
         - if is_gridlocked { 0.08 } else { 0.0 })
-    .clamp(0.0, 1.0);
-    adaptability
+    .clamp(0.0, 1.0)
 }
 
 // Crisis Response (FederalSensorumSystem)

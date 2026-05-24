@@ -151,6 +151,7 @@ impl SimulationState {
                 (**existing).type_id()
             );
         }
+
         self.current.insert(key, Box::new(value.clone()));
         self.next.insert(key, Box::new(value));
 
@@ -158,14 +159,20 @@ impl SimulationState {
         self.cloners.insert(
             key,
             Box::new(|src_boxed, target| {
-                let src_concrete = src_boxed.downcast_ref::<T>().unwrap();
-                if let Some(target_boxed) = target {
-                    let dst_concrete = target_boxed.downcast_mut::<T>().unwrap();
-                    dst_concrete.clone_from(src_concrete);
-                    None
-                } else {
-                    Some(Box::new(src_concrete.clone()))
-                }
+                let src = src_boxed.downcast_ref::<T>().unwrap();
+
+                target.map_or_else(
+                    || {
+                        // EXPLICIT COERCION REQUIRED HERE
+                        let boxed: Box<dyn Any + Send + Sync> = Box::new(src.clone());
+                        Some(boxed)
+                    },
+                    |tgt| {
+                        let dst = tgt.downcast_mut::<T>().unwrap();
+                        dst.clone_from(src);
+                        None
+                    },
+                )
             }),
         );
     }
