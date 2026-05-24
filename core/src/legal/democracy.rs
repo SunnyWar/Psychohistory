@@ -1,6 +1,8 @@
+use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
 use crate::simulation::SimulationState;
+use rand::Rng;
 
 pub struct DemocracyModel;
 
@@ -17,12 +19,13 @@ impl LegalSystemModel for DemocracyModel {
         system: &GovernanceSystem,
         state: &mut SimulationState,
         _year: usize,
+        context: &mut SimulationContext,
     ) -> YearOutcome {
         // --- Democratic Legislative Session Simulation ---
         let proposals = propose_laws(system, state);
         let reviewed = committee_review(&proposals, system, state);
         let debated = debate_and_amend(&reviewed, system, state);
-        let passed = vote_in_chambers(&debated, system, state);
+        let passed = vote_in_chambers(&debated, system, state, context);
         let enacted = executive_veto(&passed, system, state);
         let final_laws = judicial_review(&enacted, system, state);
 
@@ -99,6 +102,7 @@ fn vote_in_chambers(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
     _state: &SimulationState,
+    context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     let member_count = system.members.len() as f64;
 
@@ -116,7 +120,12 @@ fn vote_in_chambers(
                 .mul_add(leg.faction_affinity, base_support)
                 .clamp(0.0, 1.0);
 
-            if rand::random::<f64>() < p {
+            let raw_u64 = context.rand.next_u64();
+
+            // Normalize u64 into a f64 in the range [0.0, 1.0)
+            let random_f64 = (raw_u64 as f64) / (u64::MAX as f64);
+
+            if random_f64 < p {
                 yes_votes += 1.0;
             }
         }

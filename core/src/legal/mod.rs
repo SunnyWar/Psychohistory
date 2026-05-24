@@ -5,6 +5,7 @@ pub mod democracy;
 pub mod monarchy;
 pub mod other;
 
+use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::simulation::SimulationState;
 
@@ -20,5 +21,6 @@ pub trait LegalSystemModel {
         system: &GovernanceSystem,
         state: &mut SimulationState,
         year: usize,
+        context: &mut SimulationContext,
     ) -> YearOutcome;
 }

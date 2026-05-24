@@ -1,6 +1,7 @@
+use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
-use crate::simulation::SimulationState; // <-- Add this line
+use crate::simulation::SimulationState;
 
 pub struct MonarchyModel;
 
@@ -10,6 +11,7 @@ impl LegalSystemModel for MonarchyModel {
         _system: &GovernanceSystem,
         _state: &mut SimulationState,
         _year: usize,
+        _context: &mut SimulationContext,
     ) -> YearOutcome {
         // TODO: Implement monarchy process
         YearOutcome::default()

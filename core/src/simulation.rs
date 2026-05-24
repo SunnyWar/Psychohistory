@@ -3,6 +3,7 @@ use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::experiment::ExperimentResult;
 use crate::run_experiment;
 use crate::run_result::RunResult;
+
 /// # Governance Simulation Core
 ///
 /// This module implements the main simulation logic for governance systems, including:
@@ -501,7 +502,7 @@ pub fn run_simulation(
         // Main simulation logic (restored)
         let outcome = simulate_year(&system, &mut state, context, year, plugins);
         // Optionally: call legal system model here for hooks/side effects
-        // let _ = system.legal_model(&GovType::Democracy).simulate_legislative_session(&system, &mut state, year);
+        // let _ = system.legal_model(&GovType::Democracy).simulate_legislative_session(&system, &mut state, year, context);
         state.year_outcomes.push(outcome.clone());
         outcomes.push(outcome);
     }

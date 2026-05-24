@@ -1,6 +1,7 @@
+use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
-use crate::simulation::SimulationState; // <-- Ensure it points to simulation
+use crate::simulation::SimulationState;
 
 pub struct OtherModel;
 
@@ -10,6 +11,7 @@ impl LegalSystemModel for OtherModel {
         _system: &GovernanceSystem,
         _state: &mut SimulationState,
         _year: usize,
+        _context: &mut SimulationContext,
     ) -> YearOutcome {
         // TODO: Implement custom/other process
         YearOutcome::default()
