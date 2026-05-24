@@ -307,8 +307,8 @@ pub fn simulate_year(
 
 // Public Trust (CurrentUsSystem)
 fn public_trust(
-    state: &mut SimulationState,
-    context: &mut SimulationContext,
+    state: &SimulationState,
+    context: &SimulationContext,
     law_quality: f64,
     corruption_level: f64,
 ) -> (f64, bool, f64, f64) {
@@ -338,7 +338,7 @@ fn public_trust(
 
 // Example: Corruption Level (CurrentUsSystem)
 fn corruption_level(
-    state: &mut SimulationState,
+    state: &SimulationState,
     context: &mut SimulationContext,
     year: usize,
     lobbying_pressure: f64,
@@ -372,7 +372,7 @@ fn corruption_level(
 }
 
 // Example: Law Quality (CurrentUsSystem)
-fn law_quality(state: &mut SimulationState, context: &mut SimulationContext) -> (f64, f64, f64) {
+fn law_quality(state: &SimulationState, context: &SimulationContext) -> (f64, f64, f64) {
     let lobbying_pressure = state.lobbying_pressure;
     let donor_pressure = state.donor_pressure;
     let media_impact = state.media_impact;
