@@ -145,10 +145,10 @@ impl SimulationState {
             && (**existing).type_id() != std::any::TypeId::of::<T>()
         {
             panic!(
-                "Type mismatch for key '{}': tried to insert {} but existing type is {:?}",
-                key,
-                std::any::type_name::<T>(),
-                (**existing).type_id()
+                "Type mismatch for key '{key}': tried to insert {inserted} but existing type is {existing:?}",
+                key = key,
+                inserted = std::any::type_name::<T>(),
+                existing = (**existing).type_id(),
             );
         }
 

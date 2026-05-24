@@ -14,10 +14,10 @@ pub struct ExperimentResult {
 impl ExperimentResult {
     #[must_use]
     pub fn confidence_interval(stddev: f64, n: usize, z: f64) -> f64 {
-        if n == 0 {
-            0.0
-        } else {
+        if n != 0 {
             z * stddev / (n as f64).sqrt()
+        } else {
+            0.0
         }
     }
 }
