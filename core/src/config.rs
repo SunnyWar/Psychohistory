@@ -47,10 +47,7 @@ pub struct SimulationContext {
 impl SimulationContext {
     #[must_use]
     pub fn new(config: SimulationConfig, seed: Option<u64>) -> Self {
-        let rand = match seed {
-            Some(s) => StdRng::seed_from_u64(s),
-            None => rand::make_rng(),
-        };
+        let rand = seed.map_or_else(rand::make_rng, StdRng::seed_from_u64);
         Self { config, rand }
     }
 }

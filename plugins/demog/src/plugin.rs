@@ -39,15 +39,16 @@ impl SimulationPlugin for DemogPlugin {
 
         let dt = time.delta_years();
 
-        // If you need the key, pass it via the system runner or store in state.
-        // For now, fallback to single-country logic or refactor as needed.
-        let stability_modifier = if let Some(gov) = world.get::<GovState>("gov") {
-            gov.tax_rate.min(0.5)
-        } else {
-            0.0
-        };
+        // stability_modifier = gov.tax_rate.min(0.5) or 0.0 if no gov state
+        let stability_modifier = world
+            .get::<GovState>("gov")
+            .map_or(0.0, |g| g.tax_rate.min(0.5));
 
-        demog.birth_rate = 0.015 - stability_modifier * 0.01;
-        demog.population = (demog.population as f64 * (1.0 + demog.birth_rate * dt)) as u64;
+        // birth_rate = 0.015 - 0.01 * stability_modifier
+        demog.birth_rate = 0.01f64.mul_add(-stability_modifier, 0.015);
+
+        // population = population * (1.0 + birth_rate * dt)
+        let growth_factor = 1.0f64.mul_add(demog.birth_rate * dt, 1.0);
+        demog.population = (demog.population as f64 * growth_factor) as u64;
     }
 }
