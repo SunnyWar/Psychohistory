@@ -1,3 +1,11 @@
+/// Represents a member of the elite cohort in an autocracy.
+#[derive(Clone, Debug)]
+pub struct Elite {
+    pub id: String,
+    pub loyalty: f64,    // [0,1] loyalty to the autocrat
+    pub influence: f64,  // [0,1] influence over policy
+    pub is_active: bool, // false if purged
+}
 use rand::RngExt;
 
 use crate::config::SimulationContext;
@@ -29,6 +37,25 @@ pub struct EconomicDecree {
 
 pub struct AutocracyModel;
 
+/// Update elite loyalty and simulate purges.
+fn update_elites(elites: &mut [Elite], context: &mut SimulationContext, _year: usize) -> usize {
+    let mut purged = 0;
+    for elite in elites.iter_mut() {
+        if !elite.is_active {
+            continue;
+        }
+        // Loyalty drifts randomly, but regime actions can increase/decrease
+        let drift = 0.05 * (context.rand.random::<f64>() - 0.5);
+        elite.loyalty = (elite.loyalty + drift).clamp(0.0, 1.0);
+        // Purge if loyalty falls below threshold
+        if elite.loyalty < 0.2 && context.rand.random::<f64>() < 0.5 {
+            elite.is_active = false;
+            purged += 1;
+        }
+    }
+    purged
+}
+
 impl LegalSystemModel for AutocracyModel {
     /// Simulate an autocratic legislative session: the leader issues direct economic decrees.
     ///
@@ -41,24 +68,73 @@ impl LegalSystemModel for AutocracyModel {
     ///
     /// # Theory
     /// "Dictatorship and Economic Policy" (Acemoglu, 2005); "The Political Economy of Autocracy" (Gandhi & Przeworski, 2007)
+    ///
+    /// # Math (Extended)
+    /// Elite loyalty $L_i$ evolves as:
+    /// $$
+    /// L_i(t+1) = L_i(t) + \epsilon,\ \epsilon \sim \mathcal{U}(-0.025, 0.025)
+    /// $$
+    /// Purge if $L_i < 0.2$ with 50% chance. Elite influence $I_i$ affects decree targets:
+    /// $$
+    /// x^* = x^*_{autocrat} + \sum_i I_i \cdot (\eta_i - 0.5)
+    /// $$
+    /// where $\eta_i \sim \mathcal{U}(0,1)$ for each active elite.
+    ///
+    /// # Theory
+    /// "Dictatorship, Repression, and Elite Purges" (Svolik, 2012); "The Logic of Political Survival" (Bueno de Mesquita et al., 2003)
     fn simulate_legislative_session(
         &self,
         _system: &GovernanceSystem,
-        _state: &mut SimulationState,
+        state: &mut SimulationState,
         year: usize,
         context: &mut SimulationContext,
     ) -> YearOutcome {
+        // --- Elite cohort (initialize if needed) ---
+        // use std::collections::hash_map::Entry;
+        // Initialize elites if needed
+        if state.elites.is_empty() {
+            state.elites = (0..8)
+                .map(|i| Elite {
+                    id: format!("E{}", i),
+                    loyalty: 0.7 + 0.2 * context.rand.random::<f64>(),
+                    influence: 0.08 + 0.12 * context.rand.random::<f64>(),
+                    is_active: true,
+                })
+                .collect();
+        }
+        let purged = update_elites(&mut state.elites, context, year);
+        let active_elites: Vec<_> = state.elites.iter().filter(|e| e.is_active).collect();
+
+        // --- Elite influence on decree targets ---
+        let mut target_tax = 0.6;
+        let mut target_capital = 0.8;
+        let mut target_trade = 0.7;
+        let mut target_industry = 0.9;
+        let mut target_currency = 0.95;
+        let mut target_resource = 0.85;
+        for elite in &active_elites {
+            let eta = context.rand.random::<f64>();
+            target_tax += elite.influence * (eta - 0.5) * 0.1;
+            target_capital += elite.influence * (eta - 0.5) * 0.1;
+            target_trade += elite.influence * (eta - 0.5) * 0.1;
+            target_industry += elite.influence * (eta - 0.5) * 0.1;
+            target_currency += elite.influence * (eta - 0.5) * 0.1;
+            target_resource += elite.influence * (eta - 0.5) * 0.1;
+        }
+        target_tax = target_tax.clamp(0.0, 1.0);
+        target_capital = target_capital.clamp(0.0, 1.0);
+        target_trade = target_trade.clamp(0.0, 1.0);
+        target_industry = target_industry.clamp(0.0, 1.0);
+        target_currency = target_currency.clamp(0.0, 1.0);
+        target_resource = target_resource.clamp(0.0, 1.0);
+
+        // --- Regime stability penalty for purges ---
+        let stability_penalty = 0.03 * (purged as f64);
         // Parameters for regime inertia and noise
         let inertia = 0.8;
         let noise_std = 0.02;
 
-        // Leader's targets (could be made dynamic or scenario-driven)
-        let target_tax = 0.6;
-        let target_capital = 0.8;
-        let target_trade = 0.7;
-        let target_industry = 0.9;
-        let target_currency = 0.95;
-        let target_resource = 0.85;
+        // Leader's targets now include elite influence (see above)
 
         // Previous values (could be tracked in state for realism)
         let prev_tax = 0.5;
@@ -99,17 +175,17 @@ impl LegalSystemModel for AutocracyModel {
             year,
         };
 
-        // Output metrics: autocracy prioritizes speed, but may harm adaptability, trust, and representation
+        // Output metrics: autocracy prioritizes speed, but purges harm stability, trust, and adaptability
         YearOutcome {
-            law_quality: 0.5 + 0.2 * (1.0 - tax_rate), // simplistic: high tax may reduce quality
-            corruption_level: 0.7,                     // high baseline
-            public_trust: 0.3,                         // low trust
-            crisis_response: 0.6 + 0.1 * industrial_policy,
-            adaptability: 0.3 + 0.1 * (1.0 - capital_controls),
-            representation_accuracy: 0.1, // minimal
-            legislative_speed: 0.95,      // maximal
-            economic_outcome: 0.4 + 0.2 * (1.0 - resource_allocation),
-            composite_score: 0.5, // placeholder
+            law_quality: 0.5 + 0.2 * (1.0 - tax_rate) - 0.05 * (purged as f64),
+            corruption_level: 0.7 + 0.04 * (purged as f64),
+            public_trust: 0.3 - 0.05 * (purged as f64),
+            crisis_response: 0.6 + 0.1 * industrial_policy - stability_penalty,
+            adaptability: 0.3 + 0.1 * (1.0 - capital_controls) - stability_penalty,
+            representation_accuracy: 0.1,
+            legislative_speed: 0.95 - 0.02 * (purged as f64),
+            economic_outcome: 0.4 + 0.2 * (1.0 - resource_allocation) - stability_penalty,
+            composite_score: 0.5 - 0.03 * (purged as f64),
         }
     }
 }

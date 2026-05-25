@@ -42,6 +42,8 @@ pub struct SimulationState {
     pub year_outcomes: Vec<YearOutcome>,
     /// History of economic decrees (autocracy only)
     pub decrees: Vec<crate::legal::autocracy::EconomicDecree>,
+    /// Elite cohort for autocracy (purges, loyalty, influence)
+    pub elites: Vec<crate::legal::autocracy::Elite>,
     pub prior_trust: f64,
     pub policy_stock: f64,
     pub avg_competence: f64,
@@ -75,6 +77,7 @@ impl Default for SimulationState {
         Self {
             year_outcomes: Vec::new(),
             decrees: Vec::new(),
+            elites: Vec::new(),
             prior_trust: 0.5,
             policy_stock: 0.0,
             avg_competence: 0.0,
