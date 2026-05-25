@@ -139,13 +139,13 @@ fn propose_laws(
 /// # Gridlock
 /// Gridlock is flagged if more than half of proposals fail to pass:
 /// $$
-/// 	ext{Gridlock} = \frac{\text{failed}}{\text{total}} > 0.5
+///     ext{Gridlock} = \frac{\text{failed}}{\text{total}} > 0.5
 /// $$
 ///
 /// # Filibuster
 /// If controversy is high ($c > 0.6$), a supermajority (60%) is required to pass (Senate-style filibuster):
 /// $$
-/// 	ext{Threshold} =
+///     ext{Threshold} =
 /// \begin{cases}
 ///   0.6 & c > 0.6 \\
 ///   0.5 & \text{otherwise}
@@ -155,7 +155,7 @@ fn propose_laws(
 /// # Coalition-building
 /// If controversy is high, factions with similar affinity may form a coalition, boosting passage odds:
 /// $$
-/// 	ext{Coalition boost} =
+///     ext{Coalition boost} =
 /// \begin{cases}
 ///   0.12 & \text{largest coalition} > 40\% \\
 ///   0 & \text{otherwise}
@@ -236,7 +236,7 @@ fn vote_in_chambers(
 /// Vetoed laws can be overridden by a legislative supermajority (2/3) in a re-vote:
 ///
 /// $$
-/// 	ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
+///     ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
 /// $$
 ///
 /// Theory: U.S. Constitution, Article I, Section 7; "Presidential Vetoes and Congressional Overrides" (Rohde & Simon, 1985).
@@ -278,7 +278,7 @@ fn executive_veto(
 /// Requires a 2/3 supermajority in a re-vote:
 ///
 /// $$
-/// 	ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
+///     ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
 /// $$
 ///
 /// Theory: U.S. Constitution, Article I, Section 7; "Presidential Vetoes and Congressional Overrides" (Rohde & Simon, 1985).

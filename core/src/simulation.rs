@@ -5,6 +5,7 @@ use crate::run_experiment;
 use crate::run_result::RunResult;
 
 use crate::legal::democracy::LawProposal;
+// use crate::legal::autocracy::EconomicDecree;
 /// # Governance Simulation Core
 ///
 /// This module implements the main simulation logic for governance systems, including:
@@ -39,6 +40,8 @@ use serde_json::Value;
 
 pub struct SimulationState {
     pub year_outcomes: Vec<YearOutcome>,
+    /// History of economic decrees (autocracy only)
+    pub decrees: Vec<crate::legal::autocracy::EconomicDecree>,
     pub prior_trust: f64,
     pub policy_stock: f64,
     pub avg_competence: f64,
@@ -71,6 +74,7 @@ impl Default for SimulationState {
     fn default() -> Self {
         Self {
             year_outcomes: Vec::new(),
+            decrees: Vec::new(),
             prior_trust: 0.5,
             policy_stock: 0.0,
             avg_competence: 0.0,
