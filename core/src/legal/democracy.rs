@@ -167,14 +167,21 @@ fn vote_in_chambers(
 
 /// Simulate executive veto and legislative override.
 ///
-/// Each law has a probability of being vetoed based on controversy and public opinion.
-/// Vetoed laws can be overridden by a supermajority (2/3) in a second vote.
+/// # Veto Model
+/// Each law has a non-linear probability of being vetoed by the executive, based on controversy and public opinion:
 ///
-/// Veto Model:
-///   \[
-///   P(\text{veto}) = \alpha \cdot \text{controversy} + \beta \cdot (1 - \text{public opinion})
-///   \]
-/// Override requires 2/3 majority.
+/// $$
+/// P(\text{veto}) = \alpha \cdot \text{controversy} + \beta \cdot (1 - \text{public opinion})
+/// $$
+/// where $\alpha = 0.7$, $\beta = 0.3$ (tunable parameters).
+///
+/// # Override Model
+/// Vetoed laws can be overridden by a legislative supermajority (2/3) in a re-vote:
+///
+/// $$
+/// 	ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
+/// $$
+///
 /// Theory: U.S. Constitution, Article I, Section 7; "Presidential Vetoes and Congressional Overrides" (Rohde & Simon, 1985).
 fn executive_veto(
     proposals: &[LawProposal],
@@ -189,6 +196,7 @@ fn executive_veto(
     let beta = 0.3; // public opinion weight
 
     for law in proposals {
+        // Non-linear veto probability
         let p_veto = (alpha * law.controversy + beta * (1.0 - public_opinion)).clamp(0.0, 1.0);
         let roll: f64 = context.rand.random();
         if roll < p_veto {
@@ -205,7 +213,15 @@ fn executive_veto(
 }
 
 /// Simulate legislative override of executive veto.
-/// Requires 2/3 majority in a re-vote.
+///
+/// # Override Threshold
+/// Requires a 2/3 supermajority in a re-vote:
+///
+/// $$
+/// 	ext{Override if:}\quad \frac{\text{yes votes}}{N} > \frac{2}{3}
+/// $$
+///
+/// Theory: U.S. Constitution, Article I, Section 7; "Presidential Vetoes and Congressional Overrides" (Rohde & Simon, 1985).
 fn legislative_override(
     vetoed: &[LawProposal],
     system: &GovernanceSystem,

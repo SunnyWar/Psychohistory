@@ -18,7 +18,7 @@ This file tracks the work required to implement detailed, type-specific simulati
 
 - [x] Simulate proposal, debate, amendment, and voting processes.
 
-- [ ] Include party/faction dynamics, lobbying, media, and public opinion.
+- [x] Include party/faction dynamics, lobbying, media, and public opinion. (Modeled in proposal, debate, and voting phases)
 
 - [ ] Model veto/override (executive/legislative interaction).
 
