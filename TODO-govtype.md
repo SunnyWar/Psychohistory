@@ -26,6 +26,7 @@ This file tracks the work required to implement detailed, type-specific simulati
 
 - [x] Simulate judicial review and constitutional checks. (Immediate and delayed review via queue: see `pending_judicial_review` in `SimulationState`, `judicial_review`)
 
+
 ## 3. Autocracy Simulation
 
 - [x] Centralize legislative power (e.g., leader or ruling council). (see EconomicDecree, simulate_legislative_session in autocracy.rs)
@@ -34,7 +35,7 @@ This file tracks the work required to implement detailed, type-specific simulati
 
 - [x] Simulate purges, loyalty checks, and elite influence. (see Elite struct, update_elites, and simulate_legislative_session in autocracy.rs)
 
-- [ ] Track censorship, repression, and legal unpredictability.
+- [x] Track censorship, repression, and legal unpredictability. (see SimulationState fields and simulate_legislative_session in autocracy.rs)
 
 - [ ] Model limited or absent judicial independence.
 

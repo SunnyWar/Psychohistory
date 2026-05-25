@@ -44,6 +44,12 @@ pub struct SimulationState {
     pub decrees: Vec<crate::legal::autocracy::EconomicDecree>,
     /// Elite cohort for autocracy (purges, loyalty, influence)
     pub elites: Vec<crate::legal::autocracy::Elite>,
+    /// Censorship level [0,1] (autocracy only)
+    pub censorship_level: f64,
+    /// Repression level [0,1] (autocracy only)
+    pub repression_level: f64,
+    /// Legal unpredictability [0,1] (autocracy only)
+    pub legal_unpredictability: f64,
     pub prior_trust: f64,
     pub policy_stock: f64,
     pub avg_competence: f64,
@@ -78,6 +84,9 @@ impl Default for SimulationState {
             year_outcomes: Vec::new(),
             decrees: Vec::new(),
             elites: Vec::new(),
+            censorship_level: 0.5,
+            repression_level: 0.5,
+            legal_unpredictability: 0.2,
             prior_trust: 0.5,
             policy_stock: 0.0,
             avg_competence: 0.0,
