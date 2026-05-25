@@ -27,10 +27,7 @@ impl Scheduler {
     }
 
     pub fn run(&mut self, state: &mut SimulationState, steps: u64, granularity: TimeGranularity) {
-        info!(
-            "Scheduler run starting: steps={steps}, granularity={:?}",
-            granularity
-        );
+        info!("Scheduler run starting: steps={steps}, granularity={granularity:?}");
         let pb = ProgressBar::new(steps);
         pb.set_style(
             ProgressStyle::with_template(

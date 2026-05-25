@@ -218,7 +218,7 @@ fn vote_in_chambers(
             gridlock_count += 1;
         }
     }
-    let gridlock = gridlock_count as f64 > (proposals.len() as f64 * 0.5);
+    let gridlock = f64::from(gridlock_count) > (proposals.len() as f64 * 0.5);
     (passed, gridlock)
 }
 

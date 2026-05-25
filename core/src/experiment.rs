@@ -13,6 +13,7 @@ pub struct ExperimentResult {
 }
 impl ExperimentResult {
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn confidence_interval(stddev: f64, n: usize, z: f64) -> f64 {
         if n != 0 {
             z * stddev / (n as f64).sqrt()

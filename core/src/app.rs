@@ -157,10 +157,7 @@ impl App {
             if any_change {
                 println!("\n[{key}]");
                 if cross_domain {
-                    println!(
-                        "  {YELLOW}[cross-domain effect]{RESET} changes in: {:?}",
-                        changes
-                    );
+                    println!("  {YELLOW}[cross-domain effect]{RESET} changes in: {changes:?}");
                 }
             }
         }

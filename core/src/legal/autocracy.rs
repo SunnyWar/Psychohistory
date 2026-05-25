@@ -58,28 +58,9 @@ fn update_elites(elites: &mut [Elite], context: &mut SimulationContext, _year: u
 
 impl LegalSystemModel for AutocracyModel {
     /// Simulate an autocratic legislative session: the leader issues direct economic decrees.
-    ///
-    /// # Math
-    /// Each lever is set by the autocrat, possibly with noise or regime inertia:
-    /// $$
-    /// x_{t+1} = \alpha x_t + (1-\alpha) x^* + \epsilon
-    /// $$
-    /// where $x^*$ is the leader's target, $\alpha$ is inertia, $\epsilon$ is noise.
-    ///
+    /// The elite cohort influences decree targets, but purges can occur, harming stability and trust.
     /// # Theory
     /// "Dictatorship and Economic Policy" (Acemoglu, 2005); "The Political Economy of Autocracy" (Gandhi & Przeworski, 2007)
-    ///
-    /// # Math (Extended)
-    /// Elite loyalty $L_i$ evolves as:
-    /// $$
-    /// L_i(t+1) = L_i(t) + \epsilon,\ \epsilon \sim \mathcal{U}(-0.025, 0.025)
-    /// $$
-    /// Purge if $L_i < 0.2$ with 50% chance. Elite influence $I_i$ affects decree targets:
-    /// $$
-    /// x^* = x^*_{autocrat} + \sum_i I_i \cdot (\eta_i - 0.5)
-    /// $$
-    /// where $\eta_i \sim \mathcal{U}(0,1)$ for each active elite.
-    ///
     /// # Theory
     /// "Dictatorship, Repression, and Elite Purges" (Svolik, 2012); "The Logic of Political Survival" (Bueno de Mesquita et al., 2003)
     fn simulate_legislative_session(
@@ -95,7 +76,7 @@ impl LegalSystemModel for AutocracyModel {
         if state.elites.is_empty() {
             state.elites = (0..8)
                 .map(|i| Elite {
-                    id: format!("E{}", i),
+                    id: format!("E{i}"),
                     loyalty: 0.7 + 0.2 * context.rand.random::<f64>(),
                     influence: 0.08 + 0.12 * context.rand.random::<f64>(),
                     is_active: true,

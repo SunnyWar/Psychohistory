@@ -69,7 +69,7 @@ pub struct SimulationState {
     pub legislative_competence: f64,
     pub judicial_competence: f64,
     pub expert_support_effectiveness: f64,
-    /// Laws awaiting judicial review: (LawProposal, scheduled_review_year)
+    /// Laws awaiting judicial review: (`LawProposal`, `scheduled_review_year`)
     pub pending_judicial_review: Vec<(LawProposal, usize)>,
 }
 impl Default for SimulationState {
@@ -532,13 +532,13 @@ extern crate serde_json;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::SimulationContext;
+    use crate::config::{SimulationConfig, SimulationContext};
     use crate::entities::GovernanceSystem;
 
     #[test]
     fn test_simulate_year_metrics_deterministic() {
         let mut state = SimulationState::default();
-        let mut context = SimulationContext::new(Default::default(), None);
+        let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         let outcome = simulate_year(&system, &mut state, &mut context, 42, &plugins);
@@ -557,7 +557,7 @@ mod tests {
     #[test]
     fn test_extreme_inputs() {
         let mut state = SimulationState::default();
-        let mut context = SimulationContext::new(Default::default(), None);
+        let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         // Set extreme values for state and config
@@ -618,7 +618,7 @@ mod tests {
     #[test]
     fn test_cross_domain_dependency() {
         let mut state = SimulationState::default();
-        let mut context = SimulationContext::new(Default::default(), None);
+        let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         // Set corruption high, expect public trust and economic outcome to be lower
@@ -640,7 +640,7 @@ mod tests {
     #[test]
     fn test_policy_stock_and_adaptability() {
         let mut state = SimulationState::default();
-        let mut context = SimulationContext::new(Default::default(), None);
+        let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
         let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         state.policy_stock = 1.0;

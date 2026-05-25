@@ -12,7 +12,6 @@ This file tracks the work required to implement detailed, type-specific simulati
 
 - [x] Implement a plugin or strategy pattern to select the correct model for each `GovType`.
 
-
 ## 2. Democracy Simulation
 
 - [x] Model bicameral/parliamentary structures (e.g., House/Senate, committees).
@@ -26,8 +25,6 @@ This file tracks the work required to implement detailed, type-specific simulati
 - [x] Track legislative gridlock, filibuster, and coalition-building. (Explicitly modeled and documented in `vote_in_chambers`)
 
 - [x] Simulate judicial review and constitutional checks. (Immediate and delayed review via queue: see `pending_judicial_review` in `SimulationState`, `judicial_review`)
-
-
 
 ## 3. Autocracy Simulation
 
