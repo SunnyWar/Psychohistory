@@ -36,7 +36,6 @@ impl LegalSystemModel for DemocracyModel {
 
 // --- Democratic Process Step Stubs ---
 
-// BUG: these use the global random generator, which can cause non-determinism in multi-threaded contexts. Should use a thread-local RNG seeded from the main seed for full determinism.
 fn propose_laws(
     system: &GovernanceSystem,
     _state: &SimulationState,
@@ -170,7 +169,6 @@ fn debate_and_amend(
         .collect()
 }
 
-// BUG: the uses the global random generator, which can cause non-determinism in multi-threaded contexts. Should use a thread-local RNG seeded from the main seed for full determinism.
 fn vote_in_chambers(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
@@ -218,13 +216,71 @@ fn vote_in_chambers(
     passed
 }
 
+/// Simulate executive veto and legislative override.
+///
+/// Each law has a probability of being vetoed based on controversy and public opinion.
+/// Vetoed laws can be overridden by a supermajority (2/3) in a second vote.
+///
+/// Veto Model:
+///   \[
+///   P(\text{veto}) = \alpha \cdot \text{controversy} + \beta \cdot (1 - \text{public opinion})
+///   \]
+/// Override requires 2/3 majority.
+/// Theory: U.S. Constitution, Article I, Section 7; "Presidential Vetoes and Congressional Overrides" (Rohde & Simon, 1985).
 fn executive_veto(
     proposals: &[LawProposal],
-    _system: &GovernanceSystem,
-    _state: &mut SimulationState,
-    _context: &mut SimulationContext,
+    system: &GovernanceSystem,
+    state: &mut SimulationState,
+    context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
-    proposals.to_vec()
+    let public_opinion = context.config.baseline_public_trust;
+    let mut passed = Vec::new();
+    let mut vetoed = Vec::new();
+    let alpha = 0.7; // controversy weight
+    let beta = 0.3; // public opinion weight
+
+    for law in proposals {
+        let p_veto = (alpha * law.controversy + beta * (1.0 - public_opinion)).clamp(0.0, 1.0);
+        let roll: f64 = context.rand.random();
+        if roll < p_veto {
+            vetoed.push(law.clone());
+        } else {
+            passed.push(law.clone());
+        }
+    }
+
+    // Attempt override for vetoed laws
+    let override_laws = legislative_override(&vetoed, system, state, context);
+    passed.extend(override_laws);
+    passed
+}
+
+/// Simulate legislative override of executive veto.
+/// Requires 2/3 majority in a re-vote.
+fn legislative_override(
+    vetoed: &[LawProposal],
+    system: &GovernanceSystem,
+    _state: &mut SimulationState,
+    context: &mut SimulationContext,
+) -> Vec<LawProposal> {
+    let member_count = system.members.len() as f64;
+    let mut overridden = Vec::new();
+    for prop in vetoed {
+        let mut yes_votes = 0.0;
+        // Use same voting logic as before, but require 2/3 majority
+        let base_support = prop.support;
+        for leg in &system.members {
+            let p = (0.2f64.mul_add(leg.faction_affinity, base_support)).clamp(0.0, 1.0);
+            let random_f64: f64 = context.rand.random();
+            if random_f64 < p {
+                yes_votes += 1.0;
+            }
+        }
+        if yes_votes > member_count * (2.0 / 3.0) {
+            overridden.push(prop.clone());
+        }
+    }
+    overridden
 }
 
 fn judicial_review(
