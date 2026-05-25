@@ -26,7 +26,9 @@ impl LegalSystemModel for DemocracyModel {
         let proposals = propose_laws(system, state, context);
         let reviewed = committee_review(&proposals, system, state, context);
         let debated = debate_and_amend(&reviewed, system, state, context);
-        let passed = vote_in_chambers(&debated, system, state, context);
+        let (passed, gridlock) = vote_in_chambers(&debated, system, context);
+        state.is_gridlocked = gridlock;
+        state.is_gridlocked = gridlock;
         let enacted = executive_veto(&passed, system, state, context);
         let final_laws = judicial_review(&enacted, system, state, context);
 
@@ -104,116 +106,63 @@ fn propose_laws(
     proposals
 }
 
-fn committee_review(
-    proposals: &[LawProposal],
-    _system: &GovernanceSystem,
-    _state: &mut SimulationState,
-    _context: &mut SimulationContext,
-) -> Vec<LawProposal> {
-    proposals.to_vec()
-}
-
-/// Simulate legislative debate and amendment process.
-///
-/// Debate can shift support and controversy, and amendments can nonlinearly affect law quality.
-///
-/// Debate/Amendment Model:
-///   [
-///         ext{new\_support} = \sigma(s + \Delta_{debate})
-///         ext{new\_quality} = q \cdot (1 + \alpha_{amend} - \beta_{controversy})
-///         ext{new\_controversy} = c + \gamma_{debate}
-///   ]
-/// Where $\sigma$ is a sigmoid, $\Delta_{debate}$ is a random/faction-driven shift, $\alpha_{amend}$ is amendment effect, $\beta_{controversy}$ is penalty for controversy, $\gamma_{debate}$ is debate noise.
-/// Theory: Deliberative democracy (Habermas, 1996); see also "Legislative Bargaining and Amendment Dynamics" (Baron & Ferejohn, 1989).
-fn debate_and_amend(
-    proposals: &[LawProposal],
-    system: &GovernanceSystem,
-    _state: &mut SimulationState,
-    context: &mut SimulationContext,
-) -> Vec<LawProposal> {
-    proposals
-        .iter()
-        .map(|p| {
-            // Debate shift: random + average faction affinity
-            let avg_faction: f64 = system
-                .members
-                .iter()
-                .map(|l| l.faction_affinity)
-                .sum::<f64>()
-                / (system.members.len() as f64).max(1.0);
-            let debate_noise = (context.rand.random::<f64>() - 0.5) * 0.1;
-            let delta_debate = 0.05 * avg_faction + debate_noise;
-
-            // Amendment effect: random, can be positive or negative, scaled by controversy
-            let amend_effect = (context.rand.random::<f64>() - 0.5) * 0.08 * (1.0 - p.controversy);
-
-            // Controversy penalty: higher controversy reduces quality
-            let controversy_penalty = 0.04 * p.controversy;
-
-            // New support: sigmoid of original plus debate shift
-            let new_support = 1.0 / (1.0 + (-((p.support + delta_debate) * 3.0 - 1.5)).exp());
-
-            // New quality: non-linear effect of amendment and controversy
-            let new_quality =
-                (p.quality * (1.0 + amend_effect - controversy_penalty)).clamp(0.0, 1.0);
-
-            // New controversy: add debate noise
-            let new_controversy = (p.controversy + debate_noise).clamp(0.0, 1.0);
-
-            LawProposal {
-                quality: new_quality,
-                support: new_support,
-                controversy: new_controversy,
-            }
-        })
-        .collect()
-}
-
 fn vote_in_chambers(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
-    _state: &SimulationState,
     context: &mut SimulationContext,
-) -> Vec<LawProposal> {
+) -> (Vec<LawProposal>, bool) {
     let member_count = system.members.len() as f64;
-
     let mut passed = Vec::with_capacity(proposals.len());
-
-    // Gather global influences
+    let mut gridlock_count = 0;
     let lobbying_strength = context.config.lobbying_strength;
     let media_strength = context.config.media_influence_strength;
     let partisan_polarization = context.config.partisan_polarization;
     let public_opinion = context.config.baseline_public_trust;
-
     for prop in proposals {
         let mut yes_votes = 0.0;
-
-        // base_support = prop.support - 0.1 * prop.controversy + 0.08 * media_strength + 0.08 * public_opinion
+        // --- Coalition-building: if controversy is high, check for a coalition of similar faction_affinity ---
+        let mut coalition_boost = 0.0;
+        if prop.controversy > 0.6 {
+            let mut max_coalition = 0;
+            for i in 0..system.members.len() {
+                let base_affinity = system.members[i].faction_affinity;
+                let coalition_size = system
+                    .members
+                    .iter()
+                    .filter(|l| (l.faction_affinity - base_affinity).abs() < 0.2)
+                    .count();
+                if coalition_size > max_coalition {
+                    max_coalition = coalition_size;
+                }
+            }
+            if max_coalition as f64 > member_count * 0.4 {
+                coalition_boost = 0.12;
+            }
+        }
         let base_support = (0.1f64.mul_add(-prop.controversy, prop.support)
             + 0.08 * media_strength
-            + 0.08 * public_opinion)
+            + 0.08 * public_opinion
+            + coalition_boost)
             .clamp(0.0, 1.0);
-
         for leg in &system.members {
-            // p = base_support + 0.2 * leg.faction_affinity - 0.08 * partisan_polarization + 0.08 * lobbying_strength
             let p = (0.2f64.mul_add(leg.faction_affinity, base_support)
                 - 0.08 * partisan_polarization
                 + 0.08 * lobbying_strength)
                 .clamp(0.0, 1.0);
-
             let random_f64: f64 = context.rand.random();
-
             if random_f64 < p {
                 yes_votes += 1.0;
             }
         }
-
-        if yes_votes > member_count * 0.5 {
+        let filibuster_threshold = if prop.controversy > 0.6 { 0.6 } else { 0.5 };
+        if yes_votes > member_count * filibuster_threshold {
             passed.push(prop.clone());
+        } else {
+            gridlock_count += 1;
         }
     }
-
-    passed
+    let gridlock = gridlock_count as f64 > (proposals.len() as f64 * 0.5);
+    (passed, gridlock)
 }
 
 /// Simulate executive veto and legislative override.
@@ -304,4 +253,62 @@ fn compute_year_outcome(
         legislative_speed: final_laws.len() as f64 / 10.0,
         ..YearOutcome::default()
     }
+}
+
+// Pass-through stub for committee review
+fn committee_review(
+    proposals: &[LawProposal],
+    _system: &GovernanceSystem,
+    _state: &mut SimulationState,
+    _context: &mut SimulationContext,
+) -> Vec<LawProposal> {
+    proposals.to_vec()
+}
+
+/// Debate and amendment phase for democratic lawmaking.
+///
+/// Debate can shift support and controversy, and amendments can nonlinearly affect law quality.
+///
+/// Debate/Amendment Model:
+///   [
+///         \text{new\_support} = \sigma(s + \Delta_{debate})
+///         \text{new\_quality} = q \cdot (1 + \alpha_{amend} - \beta_{controversy})
+///         \text{new\_controversy} = c + \gamma_{debate}
+///   ]
+/// Where $\sigma$ is a sigmoid, $\Delta_{debate}$ is a random/faction-driven shift, $\alpha_{amend}$ is amendment effect, $\beta_{controversy}$ is penalty for controversy, $\gamma_{debate}$ is debate noise.
+/// Theory: Deliberative democracy (Habermas, 1996); see also "Legislative Bargaining and Amendment Dynamics" (Baron & Ferejohn, 1989).
+fn debate_and_amend(
+    proposals: &[LawProposal],
+    system: &GovernanceSystem,
+    _state: &mut SimulationState,
+    context: &mut SimulationContext,
+) -> Vec<LawProposal> {
+    let mut debated = Vec::with_capacity(proposals.len());
+    let partisan_polarization = context.config.partisan_polarization;
+    let amendment_effect = 0.08;
+    let controversy_penalty = 0.12;
+    for prop in proposals {
+        // Debate: random/faction-driven shift in support
+        let mut debate_shift = 0.0;
+        for leg in &system.members {
+            let alignment = 1.0 - (leg.faction_affinity - prop.support).abs();
+            debate_shift += (alignment - 0.5) * (0.04 - 0.02 * partisan_polarization);
+        }
+        debate_shift /= system.members.len() as f64;
+        // Amendment: random effect
+        let amend = amendment_effect * (context.rand.random::<f64>() - 0.5);
+        // Controversy penalty
+        let penalty = controversy_penalty * prop.controversy;
+        // Sigmoid for support
+        let new_support = 1.0 / (1.0 + (-((prop.support + debate_shift) * 4.0 - 2.0)).exp());
+        let new_quality = (prop.quality * (1.0 + amend - penalty)).clamp(0.0, 1.0);
+        let new_controversy =
+            (prop.controversy + 0.04 * (context.rand.random::<f64>() - 0.5)).clamp(0.0, 1.0);
+        debated.push(LawProposal {
+            quality: new_quality,
+            support: new_support,
+            controversy: new_controversy,
+        });
+    }
+    debated
 }
