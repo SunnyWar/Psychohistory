@@ -7,11 +7,13 @@ use rand::RngExt;
 
 pub struct DemocracyModel;
 
-#[derive(Clone)]
-struct LawProposal {
-    quality: f64,     // [0,1] quality of the law
-    support: f64,     // [0,1] support in legislature
-    controversy: f64, // [0,1] how controversial
+#[derive(Clone, Debug, PartialEq)]
+pub struct LawProposal {
+    pub quality: f64,                         // [0,1] quality of the law
+    pub support: f64,                         // [0,1] support in legislature
+    pub controversy: f64,                     // [0,1] how controversial
+    pub enactment_year: Option<usize>,        // Year law was enacted
+    pub scheduled_review_year: Option<usize>, // Year law is scheduled for judicial review
 }
 
 impl LegalSystemModel for DemocracyModel {
@@ -19,7 +21,7 @@ impl LegalSystemModel for DemocracyModel {
         &self,
         system: &GovernanceSystem,
         state: &mut SimulationState,
-        _year: usize,
+        year: usize,
         context: &mut SimulationContext,
     ) -> YearOutcome {
         // --- Democratic Legislative Session Simulation ---
@@ -29,10 +31,32 @@ impl LegalSystemModel for DemocracyModel {
         let (passed, gridlock) = vote_in_chambers(&debated, system, context);
         state.is_gridlocked = gridlock;
         state.is_gridlocked = gridlock;
-        let enacted = executive_veto(&passed, system, state, context);
-        let final_laws = judicial_review(&enacted, system, state, context);
+        let enacted = executive_veto(&passed, system, state, context, year);
 
-        compute_year_outcome(&final_laws, system, state)
+        // Queue enacted laws for delayed judicial review
+        for mut law in enacted.clone() {
+            law.enactment_year = Some(year);
+            // Schedule review 5-40 years in the future (randomized)
+            let delay = 5 + (context.rand.random::<f64>() * 35.0).floor() as usize;
+            law.scheduled_review_year = Some(year + delay);
+            state.pending_judicial_review.push((law, year + delay));
+        }
+
+        // Each year, review laws whose scheduled_review_year == year
+        let (to_review, keep): (Vec<_>, Vec<_>) = state
+            .pending_judicial_review
+            .drain(..)
+            .partition(|(_, scheduled_year)| *scheduled_year == year);
+        state.pending_judicial_review = keep;
+        let mut all_laws = enacted;
+        if !to_review.is_empty() {
+            let laws_for_review: Vec<_> = to_review.into_iter().map(|(law, _)| law).collect();
+            let reviewed = judicial_review(&laws_for_review, system, state, context);
+            // Only keep laws that survive review
+            all_laws.retain(|law| reviewed.contains(law));
+        }
+
+        compute_year_outcome(&all_laws, system, state)
     }
 }
 
@@ -91,6 +115,8 @@ fn propose_laws(
                 quality,
                 support,
                 controversy,
+                enactment_year: None,
+                scheduled_review_year: None,
             });
         }
     }
@@ -100,12 +126,43 @@ fn propose_laws(
             quality: 0.5,
             support: 0.5,
             controversy: 0.5,
+            enactment_year: None,
+            scheduled_review_year: None,
         });
     }
 
     proposals
 }
 
+/// Simulate chamber voting, gridlock, filibuster, and coalition-building.
+///
+/// # Gridlock
+/// Gridlock is flagged if more than half of proposals fail to pass:
+/// $$
+/// 	ext{Gridlock} = \frac{\text{failed}}{\text{total}} > 0.5
+/// $$
+///
+/// # Filibuster
+/// If controversy is high ($c > 0.6$), a supermajority (60%) is required to pass (Senate-style filibuster):
+/// $$
+/// 	ext{Threshold} =
+/// \begin{cases}
+///   0.6 & c > 0.6 \\
+///   0.5 & \text{otherwise}
+/// \end{cases}
+/// $$
+///
+/// # Coalition-building
+/// If controversy is high, factions with similar affinity may form a coalition, boosting passage odds:
+/// $$
+/// 	ext{Coalition boost} =
+/// \begin{cases}
+///   0.12 & \text{largest coalition} > 40\% \\
+///   0 & \text{otherwise}
+/// \end{cases}
+/// $$
+///
+/// Theory: "Legislative Gridlock and Coalition Formation" (Krehbiel, 1998); "Filibuster and Supermajority Rules" (Binder & Smith, 1997).
 fn vote_in_chambers(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
@@ -135,7 +192,7 @@ fn vote_in_chambers(
                     max_coalition = coalition_size;
                 }
             }
-            if max_coalition as f64 > member_count * 0.4 {
+            if max_coalition as f64 > 0.4 * member_count {
                 coalition_boost = 0.12;
             }
         }
@@ -188,21 +245,24 @@ fn executive_veto(
     system: &GovernanceSystem,
     state: &mut SimulationState,
     context: &mut SimulationContext,
+    year: usize,
 ) -> Vec<LawProposal> {
     let public_opinion = context.config.baseline_public_trust;
     let mut passed = Vec::new();
     let mut vetoed = Vec::new();
     let alpha = 0.7; // controversy weight
     let beta = 0.3; // public opinion weight
-
     for law in proposals {
         // Non-linear veto probability
         let p_veto = (alpha * law.controversy + beta * (1.0 - public_opinion)).clamp(0.0, 1.0);
         let roll: f64 = context.rand.random();
+        let mut law = law.clone();
+        law.enactment_year = Some(year);
+        law.scheduled_review_year = None; // Will be set after passage
         if roll < p_veto {
-            vetoed.push(law.clone());
+            vetoed.push(law);
         } else {
-            passed.push(law.clone());
+            passed.push(law);
         }
     }
 
@@ -248,13 +308,42 @@ fn legislative_override(
     overridden
 }
 
+/// Simulate judicial review and constitutional checks.
+///
+/// # Judicial Review Model (Immediate & Delayed)
+/// Each law is subject to review by an independent judiciary. Most laws are queued for review years/decades after enactment (see `pending_judicial_review` in `SimulationState`). Each year, only laws whose `scheduled_review_year` matches the current year are reviewed, simulating real-world judicial delay.
+///
+/// Probability of being struck down increases with controversy and decreases with quality and public trust:
+///
+/// $$
+/// P(\text{strike}) = \gamma \cdot \text{controversy} + \delta \cdot (1 - \text{quality}) + \epsilon \cdot (1 - \text{public trust})
+/// $$
+/// where $\gamma = 0.5$, $\delta = 0.3$, $\epsilon = 0.2$ (tunable parameters).
+///
+/// Theory: "Constitutional Courts as Guardians of Democracy" (Stone Sweet, 2000); "Judicial Review and the Rule of Law" (Shapiro, 2002); "Judicial Review and Constitutional Politics" (Vanberg, 2005); "The Political Foundations of Judicial Independence" (Ramseyer & Rasmusen, 2001)
 fn judicial_review(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
     _state: &mut SimulationState,
-    _context: &mut SimulationContext,
+    context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
-    proposals.to_vec()
+    let public_trust = context.config.baseline_public_trust;
+    let gamma = 0.5; // controversy weight
+    let delta = 0.3; // quality penalty
+    let epsilon = 0.2; // public trust penalty
+    let mut upheld = Vec::new();
+    for law in proposals {
+        let p_strike = (gamma * law.controversy
+            + delta * (1.0 - law.quality)
+            + epsilon * (1.0 - public_trust))
+            .clamp(0.0, 1.0);
+        let roll: f64 = context.rand.random();
+        if roll > p_strike {
+            upheld.push(law.clone());
+        }
+        // else: struck down, not included
+    }
+    upheld
 }
 
 fn compute_year_outcome(
@@ -324,6 +413,8 @@ fn debate_and_amend(
             quality: new_quality,
             support: new_support,
             controversy: new_controversy,
+            enactment_year: None,
+            scheduled_review_year: None,
         });
     }
     debated

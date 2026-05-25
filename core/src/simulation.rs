@@ -4,6 +4,7 @@ use crate::experiment::ExperimentResult;
 use crate::run_experiment;
 use crate::run_result::RunResult;
 
+use crate::legal::democracy::LawProposal;
 /// # Governance Simulation Core
 ///
 /// This module implements the main simulation logic for governance systems, including:
@@ -63,6 +64,8 @@ pub struct SimulationState {
     pub legislative_competence: f64,
     pub judicial_competence: f64,
     pub expert_support_effectiveness: f64,
+    /// Laws awaiting judicial review: (LawProposal, scheduled_review_year)
+    pub pending_judicial_review: Vec<(LawProposal, usize)>,
 }
 impl Default for SimulationState {
     fn default() -> Self {
@@ -93,6 +96,7 @@ impl Default for SimulationState {
             legislative_competence: 0.0,
             judicial_competence: 0.0,
             expert_support_effectiveness: 0.0,
+            pending_judicial_review: Vec::new(),
         }
     }
 }
