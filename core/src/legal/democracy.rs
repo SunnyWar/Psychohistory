@@ -44,25 +44,47 @@ fn propose_laws(
 ) -> Vec<LawProposal> {
     let mut proposals = Vec::with_capacity(system.members.len());
 
+    // Gather global influences
+    let lobbying_strength = context.config.lobbying_strength;
+    let media_strength = context.config.media_influence_strength;
+    let partisan_polarization = context.config.partisan_polarization;
+    // For now, public opinion is proxied by public_trust (could be extended)
+    let public_opinion = context.config.baseline_public_trust;
+
     for leg in &system.members {
-        // prop_chance = 0.2 + 0.3 * competence + 0.2 * leadership_quality
-        let prop_chance = 0.3f64
-            .mul_add(leg.competence, 0.2f64.mul_add(leg.leadership_quality, 0.2))
-            .min(0.9);
+        // prop_chance = 0.2 + 0.3 * competence + 0.2 * leadership_quality + 0.1 * faction_affinity + 0.08 * lobbying_strength + 0.08 * media_strength + 0.08 * public_opinion
+        let prop_chance = 0.3f64.mul_add(
+            leg.competence,
+            0.2f64.mul_add(
+                leg.leadership_quality,
+                0.1f64.mul_add(leg.faction_affinity, 0.2),
+            ),
+        ) + 0.08 * lobbying_strength
+            + 0.08 * media_strength
+            + 0.08 * public_opinion;
+        let prop_chance = prop_chance.min(0.98);
 
         let random_f64: f64 = context.rand.random();
 
         if random_f64 < prop_chance {
-            // quality = 0.5 + 0.5 * competence
-            let quality = 0.5f64.mul_add(leg.competence, 0.5);
+            // quality = 0.5 + 0.5 * competence + 0.08 * media_strength - 0.05 * lobbying_strength
+            let quality = (0.5f64.mul_add(leg.competence, 0.5) + 0.08 * media_strength
+                - 0.05 * lobbying_strength)
+                .clamp(0.0, 1.0);
 
-            // support = 0.4 + 0.3 * representativeness
-            let support = 0.3f64.mul_add(leg.representativeness, 0.4);
+            // support = 0.4 + 0.3 * representativeness + 0.1 * faction_affinity + 0.08 * public_opinion
+            let support = (0.3f64.mul_add(leg.representativeness, 0.4)
+                + 0.1 * leg.faction_affinity
+                + 0.08 * public_opinion)
+                .clamp(0.0, 1.0);
 
-            // controversy = 0.5 - 0.3 * integrity + 0.2 * (rand - 0.5)
+            // controversy = 0.5 - 0.3 * integrity + 0.2 * (rand - 0.5) + 0.08 * partisan_polarization + 0.08 * lobbying_strength
             let raw_u64 = context.rand.next_u64();
             let noise = (raw_u64 as f64) / (u64::MAX as f64) - 0.5;
-            let controversy = 0.3f64.mul_add(-leg.integrity, 0.2f64.mul_add(noise, 0.5));
+            let controversy = (0.3f64.mul_add(-leg.integrity, 0.2f64.mul_add(noise, 0.5))
+                + 0.08 * partisan_polarization
+                + 0.08 * lobbying_strength)
+                .clamp(0.0, 1.0);
 
             proposals.push(LawProposal {
                 quality,
@@ -114,7 +136,12 @@ fn debate_and_amend(
         .iter()
         .map(|p| {
             // Debate shift: random + average faction affinity
-            let avg_faction: f64 = system.members.iter().map(|l| l.faction_affinity).sum::<f64>() / (system.members.len() as f64).max(1.0);
+            let avg_faction: f64 = system
+                .members
+                .iter()
+                .map(|l| l.faction_affinity)
+                .sum::<f64>()
+                / (system.members.len() as f64).max(1.0);
             let debate_noise = (context.rand.random::<f64>() - 0.5) * 0.1;
             let delta_debate = 0.05 * avg_faction + debate_noise;
 
@@ -128,7 +155,8 @@ fn debate_and_amend(
             let new_support = 1.0 / (1.0 + (-((p.support + delta_debate) * 3.0 - 1.5)).exp());
 
             // New quality: non-linear effect of amendment and controversy
-            let new_quality = (p.quality * (1.0 + amend_effect - controversy_penalty)).clamp(0.0, 1.0);
+            let new_quality =
+                (p.quality * (1.0 + amend_effect - controversy_penalty)).clamp(0.0, 1.0);
 
             // New controversy: add debate noise
             let new_controversy = (p.controversy + debate_noise).clamp(0.0, 1.0);
@@ -153,16 +181,26 @@ fn vote_in_chambers(
 
     let mut passed = Vec::with_capacity(proposals.len());
 
+    // Gather global influences
+    let lobbying_strength = context.config.lobbying_strength;
+    let media_strength = context.config.media_influence_strength;
+    let partisan_polarization = context.config.partisan_polarization;
+    let public_opinion = context.config.baseline_public_trust;
+
     for prop in proposals {
         let mut yes_votes = 0.0;
 
-        // base_support = prop.support - 0.1 * prop.controversy
-        let base_support = 0.1f64.mul_add(-prop.controversy, prop.support);
+        // base_support = prop.support - 0.1 * prop.controversy + 0.08 * media_strength + 0.08 * public_opinion
+        let base_support = (0.1f64.mul_add(-prop.controversy, prop.support)
+            + 0.08 * media_strength
+            + 0.08 * public_opinion)
+            .clamp(0.0, 1.0);
 
         for leg in &system.members {
-            // p = base_support + 0.2 * leg.faction_affinity
-            let p = 0.2f64
-                .mul_add(leg.faction_affinity, base_support)
+            // p = base_support + 0.2 * leg.faction_affinity - 0.08 * partisan_polarization + 0.08 * lobbying_strength
+            let p = (0.2f64.mul_add(leg.faction_affinity, base_support)
+                - 0.08 * partisan_polarization
+                + 0.08 * lobbying_strength)
                 .clamp(0.0, 1.0);
 
             let random_f64: f64 = context.rand.random();

@@ -14,9 +14,9 @@ This file tracks the work required to implement detailed, type-specific simulati
 
 ## 2. Democracy Simulation
 
-- [ ] Model bicameral/parliamentary structures (e.g., House/Senate, committees).
+- [x] Model bicameral/parliamentary structures (e.g., House/Senate, committees).
 
-- [ ] Simulate proposal, debate, amendment, and voting processes.
+- [x] Simulate proposal, debate, amendment, and voting processes.
 
 - [ ] Include party/faction dynamics, lobbying, media, and public opinion.
 
