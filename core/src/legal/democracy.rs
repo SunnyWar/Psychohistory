@@ -92,17 +92,52 @@ fn committee_review(
     proposals.to_vec()
 }
 
+/// Simulate legislative debate and amendment process.
+///
+/// Debate can shift support and controversy, and amendments can nonlinearly affect law quality.
+///
+/// Debate/Amendment Model:
+///   [
+///         ext{new\_support} = \sigma(s + \Delta_{debate})
+///         ext{new\_quality} = q \cdot (1 + \alpha_{amend} - \beta_{controversy})
+///         ext{new\_controversy} = c + \gamma_{debate}
+///   ]
+/// Where $\sigma$ is a sigmoid, $\Delta_{debate}$ is a random/faction-driven shift, $\alpha_{amend}$ is amendment effect, $\beta_{controversy}$ is penalty for controversy, $\gamma_{debate}$ is debate noise.
+/// Theory: Deliberative democracy (Habermas, 1996); see also "Legislative Bargaining and Amendment Dynamics" (Baron & Ferejohn, 1989).
 fn debate_and_amend(
     proposals: &[LawProposal],
-    _system: &GovernanceSystem,
+    system: &GovernanceSystem,
     _state: &mut SimulationState,
-    _context: &mut SimulationContext,
+    context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals
         .iter()
-        .map(|p| LawProposal {
-            quality: p.quality * 0.98,
-            ..*p
+        .map(|p| {
+            // Debate shift: random + average faction affinity
+            let avg_faction: f64 = system.members.iter().map(|l| l.faction_affinity).sum::<f64>() / (system.members.len() as f64).max(1.0);
+            let debate_noise = (context.rand.random::<f64>() - 0.5) * 0.1;
+            let delta_debate = 0.05 * avg_faction + debate_noise;
+
+            // Amendment effect: random, can be positive or negative, scaled by controversy
+            let amend_effect = (context.rand.random::<f64>() - 0.5) * 0.08 * (1.0 - p.controversy);
+
+            // Controversy penalty: higher controversy reduces quality
+            let controversy_penalty = 0.04 * p.controversy;
+
+            // New support: sigmoid of original plus debate shift
+            let new_support = 1.0 / (1.0 + (-((p.support + delta_debate) * 3.0 - 1.5)).exp());
+
+            // New quality: non-linear effect of amendment and controversy
+            let new_quality = (p.quality * (1.0 + amend_effect - controversy_penalty)).clamp(0.0, 1.0);
+
+            // New controversy: add debate noise
+            let new_controversy = (p.controversy + debate_noise).clamp(0.0, 1.0);
+
+            LawProposal {
+                quality: new_quality,
+                support: new_support,
+                controversy: new_controversy,
+            }
         })
         .collect()
 }
