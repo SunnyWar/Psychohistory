@@ -31,7 +31,7 @@ pub fn run_econ_system(
     workspace: &mut HashMap<&'static str, Box<dyn Any + Send + Sync>>,
     time: sdk::SimulationTime,
 ) {
-    let tax_rate = snapshot.get::<f64>("gov:tax_rate").copied().unwrap_or(0.2);
+    let _tax_rate = snapshot.get::<f64>("gov:tax_rate").copied().unwrap_or(0.2);
     let stability = snapshot.get::<f64>("gov:stability").copied().unwrap_or(1.0);
     let population = snapshot
         .get::<u64>("demog:population")
