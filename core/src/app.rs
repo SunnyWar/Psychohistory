@@ -1,63 +1,50 @@
-// core/src/app.rs
-use crate::plugin::Plugin;
-use crate::{scheduler::Scheduler, state::SimulationState};
-use log::{debug, info};
-use sdk::TimeGranularity;
-// use std::collections::HashMap;
 
-// Color helpers (used in println macros below)
-// const YELLOW: &str = "\x1b[33m";
-// const RESET: &str = "\x1b[0m";
+use legion::{World, Resources, Schedule, systems::Builder as ScheduleBuilder};
+use sdk::influence::InfluenceRegistry;
+use sdk::SimulationTime;
+use sdk::SimulationPlugin;
 
 pub struct App {
-    pub state: SimulationState,
-    pub scheduler: Scheduler,
+    pub world: World,
+    pub resources: Resources,
+    pub schedule_builder: ScheduleBuilder,
+    pub schedule: Option<Schedule>,
 }
+
 
 impl App {
-    /// Safely modifies an initialized component state across both data planes before a run execution.
-    pub fn update_state<T: 'static>(&mut self, key: &'static str, mutator: impl FnMut(&mut T)) {
-        debug!("Updating state for key: {key}");
-        let mut mutator = mutator;
-        self.state.update_initial_state::<T>(key, &mut mutator);
-    }
+    pub fn new(registry: InfluenceRegistry, sim_time: SimulationTime) -> Self {
+        let world = World::default();
+        let mut resources = Resources::default();
 
-    #[must_use]
-    pub fn new() -> Self {
-        debug!("Creating new App instance");
-        let state = SimulationState::new();
-        let scheduler = Scheduler::new();
-        Self { state, scheduler }
-    }
+        resources.insert(registry);
+        resources.insert(sim_time);
 
-    pub fn add_plugin<P: Plugin>(&mut self, plugin: &P) {
-        info!("Loading plugin: {}", P::NAME);
-        plugin.build(self);
-        debug!("Plugin {} built and registered", P::NAME);
-    }
-
-    pub fn run(&mut self, steps: u64, granularity: TimeGranularity) {
-        info!("Simulation run starting: steps={steps}, granularity={granularity:?}");
-        self.scheduler.run(&mut self.state, steps, granularity);
-        info!("Simulation run completed");
-    }
-
-    pub fn summarize_state(&self) {
-        println!("[core] Final state keys:");
-        let keys: Vec<_> = self
-            .state
-            .keys()
-            .map(std::string::ToString::to_string)
-            .collect();
-        for key in &keys {
-            println!("  - {key}");
+        App {
+            world,
+            resources,
+            schedule_builder: Schedule::builder(),
+            schedule: None,
         }
-        // State diffing and system transition reporting removed as part of plugin state decoupling
     }
-}
 
-impl Default for App {
-    fn default() -> Self {
-        Self::new()
+    /// Plugins call this to register their ECS systems.
+    pub fn add_plugin<P: SimulationPlugin>(&mut self, plugin: P) {
+        plugin.register_systems(&mut self.schedule_builder);
+    }
+
+    /// Finalize the schedule after all plugins are registered.
+    pub fn finalize_schedule(&mut self) {
+        self.schedule = Some(self.schedule_builder.build());
+    }
+
+    pub fn advance_tick(&mut self) {
+        if let Some(schedule) = &mut self.schedule {
+            schedule.execute(&mut self.world, &mut self.resources);
+            let mut sim_time = self.resources.get_mut::<SimulationTime>().expect("SimulationTime missing");
+            sim_time.step += 1;
+        } else {
+            panic!("Schedule not finalized! Call finalize_schedule() after registering plugins.");
+        }
     }
 }

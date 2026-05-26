@@ -8,6 +8,6 @@ legion = "0.4.0"
 models = { workspace = true }
 
 [dev-dependencies]
-gov = { path = "../plugins/gov" }
-econ = { path = "../plugins/econ" }
-demog = { path = "../plugins/demog" }
+plugins-gov = { path = "../plugins/gov" }
+plugins-econ = { path = "../plugins/econ" }
+plugins-demog = { path = "../plugins/demog" }

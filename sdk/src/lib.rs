@@ -44,6 +44,8 @@ impl<'a> ReadSnapshot<'a> {
     // All plugin-specific field extraction logic removed. Only generic get<T> is supported.
 }
 
+use legion::systems::Builder as ScheduleBuilder;
+
 pub trait SimulationPlugin: Send + Sync {
     fn name(&self) -> &'static str;
     fn step(
@@ -52,4 +54,7 @@ pub trait SimulationPlugin: Send + Sync {
         my_state: &mut Box<dyn Any + Send + Sync>,
         time: SimulationTime,
     );
+
+    /// Register all ECS systems for this plugin into the kernel schedule.
+    fn register_systems(&self, schedule: &mut ScheduleBuilder);
 }

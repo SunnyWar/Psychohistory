@@ -293,13 +293,13 @@ dependencies = [
  "clap",
  "comfy-table",
  "core",
- "demog",
- "econ",
  "flexi_logger",
- "gov",
  "log",
  "models",
  "num-format",
+ "plugins-demog",
+ "plugins-econ",
+ "plugins-gov",
  "rust_decimal",
  "rust_decimal_macros",
  "sdk",
@@ -430,17 +430,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "demog"
-version = "0.1.0"
-dependencies = [
- "core",
- "legion",
- "models",
- "sdk",
- "serde",
-]
-
-[[package]]
 name = "document-features"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -454,17 +443,6 @@ name = "downcast-rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
-
-[[package]]
-name = "econ"
-version = "0.1.0"
-dependencies = [
- "core",
- "legion",
- "models",
- "sdk",
- "serde",
-]
 
 [[package]]
 name = "either"
@@ -587,17 +565,6 @@ dependencies = [
  "rand_core 0.10.1",
  "wasip2",
  "wasip3",
-]
-
-[[package]]
-name = "gov"
-version = "0.1.0"
-dependencies = [
- "core",
- "legion",
- "models",
- "sdk",
- "serde",
 ]
 
 [[package]]
@@ -1002,6 +969,39 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
+name = "plugins-demog"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "legion",
+ "models",
+ "sdk",
+ "serde",
+]
+
+[[package]]
+name = "plugins-econ"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "legion",
+ "models",
+ "sdk",
+ "serde",
+]
+
+[[package]]
+name = "plugins-gov"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "legion",
+ "models",
+ "sdk",
+ "serde",
+]
+
+[[package]]
 name = "portable-atomic"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1324,11 +1324,11 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 name = "sdk"
 version = "0.1.0"
 dependencies = [
- "demog",
- "econ",
- "gov",
  "legion",
  "models",
+ "plugins-demog",
+ "plugins-econ",
+ "plugins-gov",
 ]
 
 [[package]]

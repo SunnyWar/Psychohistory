@@ -1,6 +1,5 @@
-sdk = { path = "../../sdk" }
 [package]
-name = "econ"
+name = "plugins-econ"
 version = "0.1.0"
 edition = "2024"
 

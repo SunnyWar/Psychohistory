@@ -1,6 +1,5 @@
-sdk = { path = "../../sdk" }
 [package]
-name = "demog"
+name = "plugins-demog"
 version = "0.1.0"
 edition = "2024"
 
