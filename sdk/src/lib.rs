@@ -1,7 +1,7 @@
 pub mod components;
 pub mod influence;
 use std::any::Any;
-use std::collections::HashMap;
+// (already imported above if needed)
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TimeGranularity {
@@ -20,6 +20,57 @@ pub struct SimulationTime {
 pub struct ReadSnapshot<'a> {
     inner: &'a HashMap<&'static str, Box<dyn Any + Send + Sync>>,
 }
+
+use std::collections::HashMap;
+use std::sync::RwLock;
+
+/// Blackboard: Open, thread-safe, dynamic key-value metric store for inter-model communication.
+/// This enables arbitrary metric passing between models and systems.
+///
+/// _[Theory: See open blackboard architectures in distributed AI and system dynamics literature]_
+#[derive(Debug, Default)]
+pub struct Blackboard {
+    /// Thread-safe dynamic string-to-f64 storage
+    metrics: RwLock<HashMap<String, f64>>,
+}
+
+impl Blackboard {
+    /// Create a new, empty blackboard
+    pub fn new() -> Self {
+        Self {
+            metrics: RwLock::new(HashMap::new()),
+        }
+    }
+
+    /// Sets or updates a dynamic metric value
+    pub fn set(&self, key: &str, value: f64) {
+        if let Ok(mut map) = self.metrics.write() {
+            map.insert(key.to_string(), value);
+        }
+    }
+
+    /// Retrieves a metric value, safely defaulting to 0.0 if not initialized
+    pub fn get(&self, key: &str) -> f64 {
+        self.metrics.read()
+            .ok()
+            .and_then(|map| map.get(key).copied())
+            .unwrap_or(0.0)
+    }
+}
+
+// Make sure Blackboard is safely cloneable using Arc internally or implement explicit clone
+impl Clone for Blackboard {
+    fn clone(&self) -> Self {
+        if let Ok(map) = self.metrics.read() {
+            Self {
+                metrics: RwLock::new(map.clone()),
+            }
+        } else {
+            Self::new()
+        }
+    }
+}
+
 
 impl SimulationTime {
     /// Returns the fractional portion of a calendar year represented by a single simulation step.
