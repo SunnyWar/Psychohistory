@@ -1,5 +1,5 @@
 use crate::config::SimulationContext;
-use crate::entities::GovernanceSystem;
+
 use crate::run_result::RunResult;
 use crate::simulation::run_simulation;
 use ndarray::ArrayView1;
@@ -37,7 +37,7 @@ fn mean_stddev(values: &[f64]) -> (f64, f64) {
 
 /// Run multiple simulations and aggregate results (mean, stddev).
 pub fn run_experiment(
-    system: &GovernanceSystem,
+    // system: &GovernanceSystem,
     years: usize,
     context: &mut SimulationContext,
     // Plugins fully removed; macro logic must be registered as Systems.
@@ -48,7 +48,7 @@ pub fn run_experiment(
     for i in 0..runs {
         let seed = seeds.and_then(|s| s.get(i)).copied();
         let mut run_context = SimulationContext::new(context.config.clone(), seed);
-        let result = run_simulation(system, years, &mut run_context);
+        let result = run_simulation(years, &mut run_context);
         results.push(result);
     }
     // Aggregate means and stddevs for each metric
@@ -102,11 +102,11 @@ mod tests {
     use crate::entities::GovernanceSystem;
     #[test]
     fn test_run_experiment_basic() {
-        let system = GovernanceSystem::default();
+        let _system = GovernanceSystem::default();
         let mut context = SimulationContext::new(Default::default(), None);
         let runs = 5;
         let years = 10;
-        let result = run_experiment(&system, years, &mut context, runs, None);
+        let result = run_experiment(years, &mut context, runs, None);
         assert_eq!(result.runs.len(), runs);
         assert_eq!(result.n, runs);
         // Means and stddevs should be in [0, 1] or 0

@@ -1,7 +1,7 @@
 use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
-use crate::simulation::SimulationState;
+use sdk::Blackboard;
 
 pub struct OtherModel;
 
@@ -9,7 +9,7 @@ impl LegalSystemModel for OtherModel {
     fn simulate_legislative_session(
         &self,
         _system: &GovernanceSystem,
-        _state: &mut SimulationState,
+        _blackboard: &Blackboard,
         _year: usize,
         _context: &mut SimulationContext,
     ) -> YearOutcome {

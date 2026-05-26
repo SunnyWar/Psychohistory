@@ -1,9 +1,9 @@
 // plugins/gov/src/plugin.rs
 use crate::state::GovState;
-use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
-use legion::systems::Builder as ScheduleBuilder;
-use std::any::Any;
 use crate::system::gov_system_system;
+use legion::systems::Builder as ScheduleBuilder;
+use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
+use std::any::Any;
 
 pub struct GovPlugin;
 
@@ -33,8 +33,9 @@ impl SimulationPlugin for GovPlugin {
         };
         let inflation_friction = inflation * 0.2 * dt;
         let public_spending_stimulus = (gov.budget / gdp).min(0.05) * dt;
-        gov.stability = (gov.stability + public_spending_stimulus - tax_friction - inflation_friction)
-            .clamp(0.0, 1.0);
+        gov.stability =
+            (gov.stability + public_spending_stimulus - tax_friction - inflation_friction)
+                .clamp(0.0, 1.0);
         gov.budget -= gov.budget * 0.08 * dt;
     }
 

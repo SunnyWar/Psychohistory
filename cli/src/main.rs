@@ -8,7 +8,7 @@ use clap::Parser;
 use cli_args::CliArgs;
 use log::{error, info, warn};
 use psychohistory_core::init_logger;
-use psychohistory_core::simulation::simulate_region_tree;
+use psychohistory_core::run_experiment;
 
 fn main() {
     use csv_export::{write_per_run_csv, write_summary_csv};
@@ -39,7 +39,7 @@ fn main() {
     match root_data.get("regions").and_then(|r| r.as_object()) {
         Some(regions) if !regions.is_empty() => {
             info!("Found {} regions in config.", regions.len());
-            for (region_name, region_node) in regions {
+            for (region_name, _region_node) in regions {
                 let seeds = generate_seeds(top_seed, args.runs);
                 // Closure to print and export results
                 let output_results = |region_name: &str, result: &psychohistory_core::experiment::ExperimentResult| {
@@ -47,14 +47,12 @@ fn main() {
                     let _ = write_summary_csv("simulation-summary.csv", region_name, result);
                     let _ = write_per_run_csv("per-run-results.csv", region_name, &result.runs);
                 };
-                simulate_region_tree(
-                    region_name,
-                    region_node,
-                    args.years,
-                    args.runs,
-                    &output_results,
-                    Some(&seeds),
-                );
+                // TODO: Adapt region_node to SimulationContext/config as needed
+                // For now, assume each region uses the same config
+                let mut context =
+                    psychohistory_core::config::SimulationContext::new(Default::default(), None);
+                let result = run_experiment(args.years, &mut context, args.runs, Some(&seeds));
+                output_results(region_name, &result);
             }
         }
         Some(_) => {

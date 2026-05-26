@@ -51,7 +51,8 @@ impl Blackboard {
 
     /// Retrieves a metric value, safely defaulting to 0.0 if not initialized
     pub fn get(&self, key: &str) -> f64 {
-        self.metrics.read()
+        self.metrics
+            .read()
             .ok()
             .and_then(|map| map.get(key).copied())
             .unwrap_or(0.0)
@@ -70,7 +71,6 @@ impl Clone for Blackboard {
         }
     }
 }
-
 
 impl SimulationTime {
     /// Returns the fractional portion of a calendar year represented by a single simulation step.

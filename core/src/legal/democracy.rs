@@ -1,9 +1,9 @@
 use crate::config::SimulationContext;
 use crate::entities::{GovernanceSystem, YearOutcome};
 use crate::legal::LegalSystemModel;
-use crate::simulation::SimulationState;
 use rand::Rng;
 use rand::RngExt;
+use sdk::Blackboard;
 
 pub struct DemocracyModel;
 
@@ -20,43 +20,20 @@ impl LegalSystemModel for DemocracyModel {
     fn simulate_legislative_session(
         &self,
         system: &GovernanceSystem,
-        state: &mut SimulationState,
+        blackboard: &Blackboard,
         year: usize,
         context: &mut SimulationContext,
     ) -> YearOutcome {
         // --- Democratic Legislative Session Simulation ---
-        let proposals = propose_laws(system, state, context);
-        let reviewed = committee_review(&proposals, system, state, context);
-        let debated = debate_and_amend(&reviewed, system, state, context);
+        let proposals = propose_laws(system, blackboard, context);
+        let reviewed = committee_review(&proposals, system, blackboard, context);
+        let debated = debate_and_amend(&reviewed, system, blackboard, context);
         let (passed, gridlock) = vote_in_chambers(&debated, system, context);
-        state.is_gridlocked = gridlock;
-        state.is_gridlocked = gridlock;
-        let enacted = executive_veto(&passed, system, state, context, year);
+        blackboard.set("is_gridlocked", if gridlock { 1.0 } else { 0.0 });
+        let enacted = executive_veto(&passed, system, blackboard, context, year);
 
-        // Queue enacted laws for delayed judicial review
-        for mut law in enacted.clone() {
-            law.enactment_year = Some(year);
-            // Schedule review 5-40 years in the future (randomized)
-            let delay = 5 + (context.rand.random::<f64>() * 35.0).floor() as usize;
-            law.scheduled_review_year = Some(year + delay);
-            state.pending_judicial_review.push((law, year + delay));
-        }
-
-        // Each year, review laws whose scheduled_review_year == year
-        let (to_review, keep): (Vec<_>, Vec<_>) = state
-            .pending_judicial_review
-            .drain(..)
-            .partition(|(_, scheduled_year)| *scheduled_year == year);
-        state.pending_judicial_review = keep;
-        let mut all_laws = enacted;
-        if !to_review.is_empty() {
-            let laws_for_review: Vec<_> = to_review.into_iter().map(|(law, _)| law).collect();
-            let reviewed = judicial_review(&laws_for_review, system, state, context);
-            // Only keep laws that survive review
-            all_laws.retain(|law| reviewed.contains(law));
-        }
-
-        compute_year_outcome(&all_laws, system, state)
+        // NOTE: Judicial review queue logic removed. If needed, implement with blackboard or external queue.
+        compute_year_outcome(&enacted, system, blackboard)
     }
 }
 
@@ -64,7 +41,7 @@ impl LegalSystemModel for DemocracyModel {
 
 fn propose_laws(
     system: &GovernanceSystem,
-    _state: &SimulationState,
+    _blackboard: &Blackboard,
     context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     let mut proposals = Vec::with_capacity(system.members.len());
@@ -243,7 +220,7 @@ fn vote_in_chambers(
 fn executive_veto(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
-    state: &mut SimulationState,
+    blackboard: &Blackboard,
     context: &mut SimulationContext,
     year: usize,
 ) -> Vec<LawProposal> {
@@ -267,7 +244,7 @@ fn executive_veto(
     }
 
     // Attempt override for vetoed laws
-    let override_laws = legislative_override(&vetoed, system, state, context);
+    let override_laws = legislative_override(&vetoed, system, blackboard, context);
     passed.extend(override_laws);
     passed
 }
@@ -285,7 +262,7 @@ fn executive_veto(
 fn legislative_override(
     vetoed: &[LawProposal],
     system: &GovernanceSystem,
-    _state: &mut SimulationState,
+    _blackboard: &Blackboard,
     context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     let member_count = system.members.len() as f64;
@@ -308,48 +285,10 @@ fn legislative_override(
     overridden
 }
 
-/// Simulate judicial review and constitutional checks.
-///
-/// # Judicial Review Model (Immediate & Delayed)
-/// Each law is subject to review by an independent judiciary. Most laws are queued for review years/decades after enactment (see `pending_judicial_review` in `SimulationState`). Each year, only laws whose `scheduled_review_year` matches the current year are reviewed, simulating real-world judicial delay.
-///
-/// Probability of being struck down increases with controversy and decreases with quality and public trust:
-///
-/// $$
-/// P(\text{strike}) = \gamma \cdot \text{controversy} + \delta \cdot (1 - \text{quality}) + \epsilon \cdot (1 - \text{public trust})
-/// $$
-/// where $\gamma = 0.5$, $\delta = 0.3$, $\epsilon = 0.2$ (tunable parameters).
-///
-/// Theory: "Constitutional Courts as Guardians of Democracy" (Stone Sweet, 2000); "Judicial Review and the Rule of Law" (Shapiro, 2002); "Judicial Review and Constitutional Politics" (Vanberg, 2005); "The Political Foundations of Judicial Independence" (Ramseyer & Rasmusen, 2001)
-fn judicial_review(
-    proposals: &[LawProposal],
-    _system: &GovernanceSystem,
-    _state: &mut SimulationState,
-    context: &mut SimulationContext,
-) -> Vec<LawProposal> {
-    let public_trust = context.config.baseline_public_trust;
-    let gamma = 0.5; // controversy weight
-    let delta = 0.3; // quality penalty
-    let epsilon = 0.2; // public trust penalty
-    let mut upheld = Vec::new();
-    for law in proposals {
-        let p_strike = (gamma * law.controversy
-            + delta * (1.0 - law.quality)
-            + epsilon * (1.0 - public_trust))
-            .clamp(0.0, 1.0);
-        let roll: f64 = context.rand.random();
-        if roll > p_strike {
-            upheld.push(law.clone());
-        }
-        // else: struck down, not included
-    }
-    upheld
-}
-
 fn compute_year_outcome(
     final_laws: &[LawProposal],
     _system: &GovernanceSystem,
-    _state: &mut SimulationState,
+    _blackboard: &Blackboard,
 ) -> YearOutcome {
     let quality =
         final_laws.iter().map(|l| l.quality).sum::<f64>() / (final_laws.len() as f64).max(1.0);
@@ -364,7 +303,7 @@ fn compute_year_outcome(
 fn committee_review(
     proposals: &[LawProposal],
     _system: &GovernanceSystem,
-    _state: &mut SimulationState,
+    _blackboard: &Blackboard,
     _context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     proposals.to_vec()
@@ -385,7 +324,7 @@ fn committee_review(
 fn debate_and_amend(
     proposals: &[LawProposal],
     system: &GovernanceSystem,
-    _state: &mut SimulationState,
+    _blackboard: &Blackboard,
     context: &mut SimulationContext,
 ) -> Vec<LawProposal> {
     let mut debated = Vec::with_capacity(proposals.len());

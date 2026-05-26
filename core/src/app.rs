@@ -1,8 +1,7 @@
-
-use legion::{World, Resources, Schedule, systems::Builder as ScheduleBuilder};
-use sdk::influence::InfluenceRegistry;
-use sdk::SimulationTime;
+use legion::{Resources, Schedule, World, systems::Builder as ScheduleBuilder};
 use sdk::SimulationPlugin;
+use sdk::SimulationTime;
+use sdk::influence::InfluenceRegistry;
 
 pub struct App {
     pub world: World,
@@ -10,7 +9,6 @@ pub struct App {
     pub schedule_builder: ScheduleBuilder,
     pub schedule: Option<Schedule>,
 }
-
 
 impl App {
     pub fn new(registry: InfluenceRegistry, sim_time: SimulationTime) -> Self {
@@ -41,7 +39,10 @@ impl App {
     pub fn advance_tick(&mut self) {
         if let Some(schedule) = &mut self.schedule {
             schedule.execute(&mut self.world, &mut self.resources);
-            let mut sim_time = self.resources.get_mut::<SimulationTime>().expect("SimulationTime missing");
+            let mut sim_time = self
+                .resources
+                .get_mut::<SimulationTime>()
+                .expect("SimulationTime missing");
             sim_time.step += 1;
         } else {
             panic!("Schedule not finalized! Call finalize_schedule() after registering plugins.");

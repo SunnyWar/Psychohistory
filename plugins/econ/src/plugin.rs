@@ -1,9 +1,9 @@
 // plugins/econ/src/plugin.rs
 use crate::state::EconState;
-use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
-use legion::systems::Builder as ScheduleBuilder;
-use std::any::Any;
 use crate::system::econ_system_system;
+use legion::systems::Builder as ScheduleBuilder;
+use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
+use std::any::Any;
 
 pub struct EconPlugin;
 

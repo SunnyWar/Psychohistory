@@ -1,9 +1,9 @@
 // plugins/demog/src/plugin.rs
 use crate::state::DemogState;
-use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
-use legion::systems::Builder as ScheduleBuilder;
-use std::any::Any;
 use crate::system::demog_system_system;
+use legion::systems::Builder as ScheduleBuilder;
+use sdk::{ReadSnapshot, SimulationPlugin, SimulationTime};
+use std::any::Any;
 
 pub struct DemogPlugin;
 
