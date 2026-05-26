@@ -434,6 +434,7 @@ name = "demog"
 version = "0.1.0"
 dependencies = [
  "core",
+ "legion",
  "models",
  "sdk",
  "serde",
@@ -459,6 +460,7 @@ name = "econ"
 version = "0.1.0"
 dependencies = [
  "core",
+ "legion",
  "models",
  "sdk",
  "serde",
@@ -592,6 +594,7 @@ name = "gov"
 version = "0.1.0"
 dependencies = [
  "core",
+ "legion",
  "models",
  "sdk",
  "serde",

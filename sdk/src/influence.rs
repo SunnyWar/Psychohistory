@@ -1,3 +1,8 @@
+impl Default for InfluenceRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 use std::collections::HashMap;
 use std::sync::RwLock;
 
@@ -24,7 +29,9 @@ impl InfluenceRegistry {
     /// Get the influence weight from source to target. Returns 0.0 if not set.
     pub fn get_influence(&self, source: &str, target: &str) -> f64 {
         let edges = self.edges.read().unwrap();
-        *edges.get(&(source.to_string(), target.to_string())).unwrap_or(&0.0)
+        *edges
+            .get(&(source.to_string(), target.to_string()))
+            .unwrap_or(&0.0)
     }
 }
 

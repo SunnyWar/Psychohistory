@@ -1,3 +1,4 @@
+pub mod components;
 pub mod influence;
 use std::any::Any;
 use std::collections::HashMap;

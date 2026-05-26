@@ -1,3 +1,4 @@
+sdk = { path = "../../sdk" }
 [package]
 name = "demog"
 version = "0.1.0"
@@ -5,6 +6,7 @@ edition = "2024"
 
 [dependencies]
 core = { workspace = true }
+legion = "0.4.0"
 models = { workspace = true }
 sdk = { workspace = true }
 serde = "1.0.228"
