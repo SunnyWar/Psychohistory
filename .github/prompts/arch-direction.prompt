@@ -1,19 +1,64 @@
-You are an expert systems architect, applied mathematician, and low-level Rust systems engineer. You are directing the design of "Psychohistory", a high-performance simulation engine designed to model world dynamics, emergent state shifts, and global counterfactual scenarios.
+# AGENTS.md
 
-### Core Philosophy & Shift in Direction
-The current codebase relies too heavily on linear statistical metrics and shallow Monte Carlo variations. To simulate macro-level structural shifts (like changing an entire system of government), we must pivot toward non-linear system dynamics, feedback-loop networks, and structural state-space models. 
+This document provides persistent instructions, structural mapping, and behavioral guardrails for AI coding agents and Copilot assistants working in the Psychohistory Rust workspace.
 
-When writing or refactoring code for this project, you must adhere to these architectural mandates:
-1. **Diverge from Linear Math:** Reject simple incremental changes (e.g., `metric += adjustment`). Implement differential-like update loops, state-space representations, and non-linear thresholds (sigmoid or step functions for structural tipping points).
-2. **First-Principles Composition:** Components must model physical and systemic resource pools (capital, energy, demographics, informational entropy) rather than vague, subjective abstractions like "Law Quality."
-3. **Explicit Cross-Domain Coupling:** High-performance, zero-cost abstractions must connect plugins. The economy, governance, and demography domains must interact through shared-memory state vectors, not isolated, delayed boundaries.
-4. **Strict Low-Level Optimization:** Write clean, deterministic, data-oriented Rust. Maximize cache locality, utilize flat arrays/vectors where applicable, and ensure state diffing uses zero-copy primitives.
-5. **No Hallucinated Boilerplate:** Do not write placeholder `todo!()` blocks or arbitrary mock data unless explicitly requested. Every structure must be mathematically sound and ready for real-world empirical calibration.
+---
 
-### Extensibility Mandates
-When generating or refactoring code, always maintain a strict decoupling between the engine core (`core/`) and the research interfaces (`sdk/`, `lab/`).
+## Project Purpose & Identity
 
-1. **Keep the Core Invisible:** Academics should never need to touch `core/src/scheduler.rs` or `app.rs` to write a new model or run an experiment. 
-2. **Ergonomic SDK:** The `sdk/` crate must provide clean, high-level, mathematically expressive traits for plugins. Use clear domain terminology rather than computer science jargon (e.g., use `StateVector` or `TransitionMatrix` instead of `DoubleBufferedMemorySlice`).
-3. **First-Class Python Bindings via `lab/`:** Treat the Python bindings (`pyo3`) as a primary interface, not an afterthought. Economists and data scientists work in Python/Jupyter. Ensure that entire scenario states can be exported to NumPy arrays or Pandas DataFrames seamlessly.
-4. **Pedantic Documentation:** Every public struct, trait, and function in `sdk/` and `lab/` must be documented with explicit mathematical equations (using LaTeX notation) and real-world examples.
+Psychohistory is a public-utility, open-science system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of global systems.
+
+* **Target Audience:** Academic researchers, macroeconomists, and domain scientists.
+* **Licensing Enforcement:** PolyForm Noncommercial License 1.0.0. Do not write or suggest code patterns dependent on proprietary enterprise crates or closed ecosystems. Everything must remain open-source and modular.
+
+---
+
+## Architectural Mandates & Open Blackboard Integration
+
+When generating, modifying, or refactoring code, you must reject generic web engineering paradigms and adopt a scientific-computing framework with a strict separation of concerns:
+
+1. **The Shared Blackboard System:** The monolithic, hardcoded domain attributes are obsolete. Systems interoperate dynamically using the thread-safe `Blackboard` container defined in the `sdk` crate.
+2. **Data Consumption & Modification Contract:** - Systems and sub-models must read state metrics globally via string keys: `blackboard.get("metric_name")`.
+   - Systems must write or update metrics via: `blackboard.set("metric_name", value)`.
+   - **Do not** attempt to modify variables by introducing hardcoded parameter fields onto the core execution structs. Keep the interaction boundary entirely decoupled and dynamic.
+3. **Reject Naive Linear Logic:** Never use simple incremental modifications (e.g., `metric += adjustment`) for domain loops. Implement non-linear representations, state-space models, and explicit threshold/bifurcation functions (such as sigmoids for system tipping points).
+4. **Explicit Floating-Point Typing:** When declaring numerical literals or target bounds for variables inside calculation blocks (e.g., applying bounds via `.clamp(0.0, 1.0)`), you must explicitly type bindings as `f64` (e.g., `let mut target: f64 = 0.6;`) to prevent compiler type ambiguity errors.
+5. **Double-Buffered State Safety:** The engine core utilizes `SimulationState` to drive isolated execution fields via `ReadSnapshot` instances. Never generate code that introduces shared mutable state or violates the strict read-only guarantees of the active execution snapshot.
+6. **Theory-Driven Documentation:** Every state transition formula or blackboard update rule you write must include triple-slash (`///`) documentation containing explicit mathematical equations (using LaTeX) and a placeholder referencing the peer-reviewed economic or sociological theory it models.
+
+---
+
+## Workspace Layout Guidance
+
+Before writing code, match your generation against the true structure of the workspace crates:
+* **`sdk`**: Holds base structural components, the influence weights registry, and the thread-safe `Blackboard` matrix.
+* **`core`**: Contains the simulation engine, the double-buffered `SimulationState` manager, regional execution models, and the core legislative submodules (`core/src/legal/`).
+* **`plugins-gov` / `plugins-econ` / `plugins-demog`**: Domain-specific plugins executing over isolated timeline blocks.
+
+---
+
+## Exploration Workflow (Critical)
+
+Prefer `ast-outline` for efficient navigation to minimize context bloating and prevent stale code references:
+
+* Unfamiliar directory — `ast-outline digest .` (or `<dir>`)
+* Single file structure — `ast-outline <file.rs>`
+* Specific item — `ast-outline show <file.rs> SymbolName`
+* Implementors — `ast-outline implements <Trait> .`
+
+Only read full file contents when you need implementation details beyond signatures. Never dump entire large files into context unless requested.
+
+---
+
+## Development & Verification Commands
+
+Always verify changes locally with this precise sequence before considering a task complete:
+
+```bash
+cargo check --workspace --all-targets
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo test --workspace --all-targets --all-features
+cargo fmt --all -- --check
+```
+
+
