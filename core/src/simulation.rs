@@ -161,8 +161,7 @@ pub fn simulate_region_tree<F>(
     if let (Some(system), Some(config)) = (system, config) {
         // Plugins fully removed; macro logic must be registered as Systems.
         let mut context = SimulationContext::new(config, None);
-        let result: ExperimentResult =
-            run_experiment(&system, years, &mut context, runs, seeds);
+        let result: ExperimentResult = run_experiment(&system, years, &mut context, runs, seeds);
         info!("Completed region: {region_name}");
         print_results(region_name, &result);
     } else {
@@ -219,11 +218,11 @@ pub struct EconomicInputs {
 /// # Returns
 /// * `YearOutcome` - The computed metrics for the year
 pub fn simulate_year(
-    system: &GovernanceSystem,
+    _system: &GovernanceSystem,
     state: &mut SimulationState,
     context: &mut SimulationContext,
     year: usize,
-        // Plugins fully removed; macro logic must be registered as Systems.
+    // Plugins fully removed; macro logic must be registered as Systems.
 ) -> YearOutcome {
     let (lobbying_pressure, donor_pressure, law_quality) = law_quality(state, context);
 
@@ -295,11 +294,11 @@ pub fn simulate_year(
         composite_score,
     };
     #[allow(deprecated)]
-        // Plugins deprecated, use Systems
-        // DEPRECATED: Remove this block after migration to System-based pipeline
-        // for plugin in plugins {
-        //     plugin.modify_outcome(system, state, year, &mut outcome);
-        // }
+    // Plugins deprecated, use Systems
+    // DEPRECATED: Remove this block after migration to System-based pipeline
+    // for plugin in plugins {
+    //     plugin.modify_outcome(system, state, year, &mut outcome);
+    // }
     outcome
 }
 

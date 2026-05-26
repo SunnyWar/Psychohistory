@@ -7,3 +7,4 @@ edition = "2024"
 core = { workspace = true }
 models = { workspace = true }
 sdk = { workspace = true }
+serde = "1.0.228"

@@ -1,7 +1,7 @@
 // plugins/econ/src/plugin.rs
+use crate::state::EconState;
 use core::app::App;
 use core::plugin::Plugin;
-use models::{DemogState, EconState, GovState};
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
@@ -40,27 +40,20 @@ impl SimulationPlugin for EconPlugin {
 
         let dt = time.delta_years();
 
-        let population = world.get::<DemogState>("demog").map_or(0, |d| d.population);
-
-        let stability = world.get::<GovState>("gov").map_or(1.0, |g| g.stability);
+        let population = world.get::<u64>("demog:population").copied().unwrap_or(0);
+        let stability = world.get::<f64>("gov:stability").copied().unwrap_or(1.0);
 
         if population > 10_000_000 {
             // growth_potential = population * base_per_capita_productivity * 0.001 * dt
             let growth_potential = (population as f64) * 50.0 * 0.001 * dt;
-
             let stability_drag = stability.clamp(0.1, 1.0);
             let inflation_drag = 1.0 - econ.inflation;
-
             econ.gdp += growth_potential * stability_drag * inflation_drag;
         }
 
         // inflation = 0.015 + econ.gdp * 0.000_000_000_01 * dt
         econ.inflation = 0.000_000_000_01f64.mul_add(econ.gdp * dt, 0.015);
 
-        // Example cross-country lookup (left unchanged)
-        // if let Some(china_econ) = world.get::<EconState>("cn:econ") {
-        //     let import_drag = china_econ.inflation * 0.05;
-        //     econ.gdp -= econ.gdp * import_drag;
-        // }
+        // No direct workspace mutation here; kernel is responsible for publishing econ state
     }
 }

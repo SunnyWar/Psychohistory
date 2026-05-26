@@ -38,6 +38,8 @@ impl<'a> ReadSnapshot<'a> {
     pub fn get<T: 'static>(&self, key: &'static str) -> Option<&T> {
         self.inner.get(key)?.downcast_ref::<T>()
     }
+
+    // All plugin-specific field extraction logic removed. Only generic get<T> is supported.
 }
 
 pub trait SimulationPlugin: Send + Sync {

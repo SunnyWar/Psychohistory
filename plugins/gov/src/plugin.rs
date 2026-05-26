@@ -1,7 +1,7 @@
 // plugins/gov/src/plugin.rs
+use crate::state::GovState;
 use core::app::App;
 use core::plugin::Plugin;
-use models::{EconState, GovState};
 use sdk::{ReadSnapshot, SimulationPlugin};
 use std::any::Any;
 
@@ -39,30 +39,35 @@ impl SimulationPlugin for GovPlugin {
 
         let dt = time.delta_years();
 
-        if let Some(econ) = world.get::<EconState>("econ") {
-            // Tax collection increments the treasury budget
-            let tax_revenue = econ.gdp * gov.tax_rate * dt;
-            gov.budget += tax_revenue;
+        let gdp = world.get::<f64>("econ:gdp").copied().unwrap_or(0.0);
+        let inflation = world.get::<f64>("econ:inflation").copied().unwrap_or(0.0);
 
-            // Stability changes dynamically based on structural factors:
-            // 1. High tax rates cause public friction (e.g., taxes > 25% degrade stability)
-            let tax_friction = if gov.tax_rate > 0.25 {
-                (gov.tax_rate - 0.25) * 0.5 * dt
-            } else {
-                0.0
-            };
+        // Tax collection increments the treasury budget
+        let tax_revenue = gdp * gov.tax_rate * dt;
+        gov.budget += tax_revenue;
 
-            // 2. High inflation hurts quality of life
-            let inflation_friction = econ.inflation * 0.2 * dt;
+        // Stability changes dynamically based on structural factors:
+        // 1. High tax rates cause public friction (e.g., taxes > 25% degrade stability)
+        let tax_friction = if gov.tax_rate > 0.25 {
+            (gov.tax_rate - 0.25) * 0.5 * dt
+        } else {
+            0.0
+        };
 
-            // 3. Re-investing budget surplus boosts stability
-            let public_spending_stimulus = (gov.budget / econ.gdp).min(0.05) * dt;
+        // 2. High inflation hurts quality of life
+        let inflation_friction = inflation * 0.2 * dt;
 
-            gov.stability =
-                (gov.stability + public_spending_stimulus - tax_friction - inflation_friction)
-                    .clamp(0.0, 1.0);
-            // Draw down some budget for societal maintenance costs
-            gov.budget -= gov.budget * 0.08 * dt;
-        }
+        // 3. Re-investing budget surplus boosts stability
+        let public_spending_stimulus = (gov.budget / gdp).min(0.05) * dt;
+
+        gov.stability =
+            (gov.stability + public_spending_stimulus - tax_friction - inflation_friction)
+                .clamp(0.0, 1.0);
+
+        // Register gov primitives for cross-domain access
+        // No direct workspace mutation here; kernel is responsible for publishing gov state
+
+        // Draw down some budget for societal maintenance costs
+        gov.budget -= gov.budget * 0.08 * dt;
     }
 }

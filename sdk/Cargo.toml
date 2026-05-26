@@ -5,3 +5,8 @@ edition = "2024"
 
 [dependencies]
 models = { workspace = true }
+
+[dev-dependencies]
+gov = { path = "../plugins/gov" }
+econ = { path = "../plugins/econ" }
+demog = { path = "../plugins/demog" }
