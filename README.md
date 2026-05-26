@@ -2,7 +2,7 @@
 
 A modular, open-source, Rust-based system dynamics framework designed to model macro-level economic, institutional, demographic, and structural trajectories of regional and global systems.
 
-> **Research Objective:** Psychohistory aims to provide a computationally rigorous, non-linear alternative to traditional, static policy-forecasting models. By evaluating institutions as dynamic, multi-domain feedback networks rather than static parameters, the engine simulates complex counterfactual scenarios—ranging from micro-policy shocks to foundational transitions in governance systems.
+> **Research Objective:** Psychohistory aims to provide a computationally rigorous, non-linear alternative to traditional, static policy-forecasting models. By evaluating institutions as open, dynamic feedback networks rather than static parameters, the engine simulates complex counterfactual scenarios—ranging from micro-policy shocks to foundational transitions in governance systems.
 
 ---
 
@@ -17,14 +17,14 @@ Psychohistory is a public utility for humanity. Its development is guided by the
 
 **Psychohistory is currently in an active, pre-alpha prototyping phase. It is NOT ready for production simulations, academic citations, or institutional policy forecasting.**
 
-The underlying architecture is undergoing core structural refactoring. While the repository is public to encourage open-source review, it will not be considered "ready for prime time" or open for public announcement until the following milestones are comprehensively cleared:
+The underlying architecture has been refactored away from a hardcoded metrics struct to a fully decoupled, open blackboard pattern. While the repository is public to encourage open-source review, it will not be considered "ready for prime time" or open for public announcement until the following milestones are comprehensively cleared:
 
 ### 🟩 Crucial Pre-Announcement Milestones
 
-- [ ] **Mathematical Rigor (State-Space Transition):** Complete the replacement of all legacy, linear metric placeholders (e.g., subjective 0-100 scores) with strict, non-linear system dynamics equations and conserved resource-pool vectors.
+- [ ] **Mathematical Rigor (State-Space Transition):** Complete the replacement of all legacy, linear metric placeholders with strict, non-linear system dynamics equations and conserved resource-pool vectors.
 - [ ] **Robust Python Interface (`lab/`):** Fully expose the core execution loop and state data structures to Python via `pyo3`, enabling a researcher to run a complete simulation and extract Pandas DataFrames from a Jupyter Notebook without reading Rust code.
 - [ ] **Cross-Platform Determinism Verification:** Implement automated CI testing to verify that floating-point calculations match identically down to the final decimal place across both `x86_64` (Intel/AMD) and `aarch64` (Apple Silicon/ARM) hardware architectures.
-- [ ] **Zero-Warning Compilation & Audit:** Achieve a state of absolute compliance across the entire workspace workspace, passing `cargo clippy -- -D warnings` and strict deterministic regression testing under heavy multi-threaded workloads.
+- [ ] **Zero-Warning Compilation & Audit:** Achieve a state of absolute compliance across the entire workspace, passing `cargo clippy -- -D warnings` and strict deterministic regression testing under heavy multi-threaded workloads.
 - [ ] **Empirical Validation Blueprint:** Build one verified, end-to-end "Toy Scenario" that replicates a historical macroeconomic or demographic tipping point with documented, mathematically sound calibration data.
 
 *If you are an academic researcher or systems engineer interested in building these foundational pillars, please review our `AGENTS.md` and the roadmap below before opening a Pull Request.*
@@ -33,14 +33,14 @@ The underlying architecture is undergoing core structural refactoring. While the
 
 ## Features & Capabilities
 
-- **Multi-domain simulation**: Economy, governance, and demography as independent plugins.
-- **Hierarchical, multi-country scenarios**: Load and simulate nested regions (e.g., US, California, Los Angeles).
-- **Double-buffered state**: Deterministic, parallel-safe updates to maintain chronological consistency across domains.
-- **Plugin architecture**: Add new domains or swap evaluators without touching the simulation core.
-- **Automated scenario loading**: Ingests JSON scenario trees from `scenarios/`.
-- **Per-field, colorized state diffing**: Human-readable, colorized before/after diffs for every state entity.
-- **Deterministic output**: Stable, reproducible results across identical configurations.
-- **CLI runner**: Run, diff, and report multi-run simulations from the command line.
+- **Open Blackboard Architecture**: Eliminates brittle parameter wiring. Models register, write, and query dynamic variables via arbitrary string keys through a thread-safe blackboard layout.
+- **Multi-Domain Parallel Simulation**: Economy, governance, and demography run as independent plugins over an isolated snapshot system.
+- **Hierarchical, Multi-Country Scenarios**: Load and simulate nested regions (e.g., US, California, Los Angeles).
+- **Double-Buffered State Execution**: Double-buffered `SimulationState` provides parallel-safe updates, ensuring zero delayed tracking error or chronological drift across domains during a tick.
+- **Plugin Architecture**: Add new domains or swap evaluators by implementing high-level functional traits without touching the simulation kernel.
+- **Per-Field, Colorized State Diffing**: Human-readable, colorized before/after structural diffs for every tracked state entity.
+- **Deterministic Output**: Stable, reproducible results across identical configurations regardless of multi-threaded thread pool scheduling.
+- **CLI Runner**: Execute, aggregate, and report multi-run Monte Carlo simulations directly from the terminal.
 
 ---
 
@@ -48,11 +48,11 @@ The underlying architecture is undergoing core structural refactoring. While the
 
 Unlike PySD, Vensim, Stella, or Minsky, Psychohistory offers:
 
-- **Rust-native performance** with strict determinism
-- **Modular plugin architecture** for easy domain extension
-- **Native hierarchical regions** (country → state → city)
-- **Research-focused tools** (colorized diffs, policy shocks, Python bindings)
-- **Strong public-good license**
+- **Rust-native performance** with absolute mathematical determinism.
+- **A text-keyed Blackboard** allowing cross-domain data sharing without compile-time coupling or cyclic graph dependencies.
+- **Native hierarchical regions** (country → state → city) evaluated cleanly.
+- **Research-focused tools** (colorized diffs, policy shocks, Python bindings).
+- **Strong public-good license**.
 
 Built specifically for modeling complex institutional and civilizational dynamics.
 
@@ -66,61 +66,69 @@ Psychohistory/
 ├── AGENTS.md          # Agent instructions
 ├── LICENSE.md         # License
 ├── README.md          # Project documentation
-├── cli/               # Command-line runner
-│   ├── src/
-│   │   ├── main.rs    # Entrypoint, scenario loader, runner
-│   │   └── util.rs    # Formatting helpers
-├── core/              # Simulation kernel
+├── cli/               # Command-line runner crate
 │   └── src/
-│       ├── app.rs     # App struct, state diffing/reporting
-│       ├── scheduler.rs
-│       ├── legal/     # Legal domains
+│       ├── main.rs    # Entrypoint, scenario loader, runner
+│       └── util.rs    # Formatting and terminal layout helpers
+├── core/              # Simulation kernel crate
+│   └── src/
+│       ├── app.rs     # Main simulation driver loop, lifecycle execution
+│       ├── config.rs  # Context blocks, PRNG management, system configuration parameters
+│       ├── entities.rs# Concrete definitions (e.g., GovernanceSystem, Legislator, YearOutcome)
+│       ├── experiment.rs# Monte Carlo aggregator and stats engine
+│       ├── legal/     # Legal framework processing submodules
 │       │   ├── autocracy.rs
-│       │   ├── demoncracy.rs
-│       │   ├── monoarchy.rs
+│       │   ├── democracy.rs
+│       │   ├── mod.rs # LegalSystemModel trait abstraction
+│       │   ├── monarchy.rs
 │       │   └── other.rs
-│       ├── state.rs
-│       ├── plugin.rs
-│       └── system.rs
-├── lab/               # Python bindings (pyo3)
+│       ├── scheduler.rs # Thread-safe orchestration for domain execution
+│       ├── simulation.rs# Kernel pipeline driver and core pipeline functions
+│       ├── state.rs   # Double-buffered, type-erased state architecture
+│       └── system.rs  # Parallel execution definitions and snapshot captures
+├── lab/               # Python bindings crate (pyo3)
 │   └── src/lib.rs
-├── models/            # Domain state structs
+├── models/            # Core domain enum definitions
 │   └── src/lib.rs
-├── plugins/           # Domain plugins
-│   ├── demog/
-│   ├── econ/
-│   └── gov/
-├── scenarios/         # Scenario JSON files
+├── plugins/           # Custom domain simulation plugins
+│   ├── demog/         # Demographic state modeling
+│   ├── econ/          # Macroeconomic modeling
+│   └── gov/           # Operational regulatory tracking
+├── scenarios/         # Ingestion layout configurations
 │   ├── simulation_config.json
 │   ├── world_state.json
 │   └── countries.json
-├── sdk/               # Shared SDK for plugins
-│   └── src/lib.rs
-├── target/            # Build output
-└── timebase/          # (Reserved for future time series features)
+└── sdk/               # Shared plugin SDK crate
+    └── src/
+        ├── components.rs # Base components
+        ├── influence.rs  # Cross-variable influence weights registry
+        └── lib.rs        # Global Blackboard definition, traits, and Time types
 ```
-
----
 
 ## Developer & Researcher Interfaces
 
 To ensure accessibility for both systems engineers and domain scientists, the workspace enforces a strict separation of concerns across three layers:
 
-1. **The Kernel (`core/`):** A data-oriented, double-buffered execution loop optimized for thread-safe, parallel region updates and deterministic state-space evaluation.
-2. **The Research SDK (`sdk/`):** A high-level, declarative Rust interface. Researchers can implement custom domain plugins by writing pure mathematical state-transition functions without managing memory allocation, concurrency, or serialization.
-3. **The Simulation Lab (`lab/`):** Native Python bindings powered by `pyo3`. This allows data scientists and macroeconomists to configure scenarios, schedule policy shocks programmatically, run massive Monte Carlo parameter sweeps, and ingest output directly into Jupyter Notebooks as NumPy arrays or Pandas DataFrames.
+- **The Kernel (`core/`):** A data-oriented, double-buffered execution loop mapping type-erased maps (`HashMap<&'static str, Box<dyn Any + Send + Sync>>`) to concurrent workers via isolated `ReadSnapshot` instances.
 
----
+- **The Research SDK (`sdk/`):** A high-level, declarative Rust interface. Contains the thread-safe, `RwLock`-backed `Blackboard` container. Researchers can query or mutate cross-domain variables inside sub-models via `blackboard.get("key")` and `blackboard.set("key", value)` without managing lock acquisition or compilation ordering.
 
-## Methodological State Tracking (V1 Placeholders vs. Target State)
+- **The Simulation Lab (`lab/`):** Native Python bindings powered by `pyo3`. This allows data scientists and macroeconomists to configure scenarios, schedule policy shocks programmatically, run massive Monte Carlo parameter sweeps, and ingest output directly into Jupyter Notebooks as NumPy arrays or Pandas DataFrames.
 
-The baseline simulation engine tracks a cross-domain array of metrics for each region and time-step.
+### Methodological State Tracking (Open Blackboard Layout)
 
-> ⚠️ **Note to Researchers:** The active V1 implementation utilizes linear, statistical placeholder parameters (e.g., *Law Quality*, *Corruption Level*, *Public Trust*, *Legislative Speed*) to verify the parallel scheduler and diffing engines. Per the roadmap below, these are actively being replaced by conserved, empirical state-space vector representations.
+The engine tracks civilizational trajectories dynamically. Instead of static struct values passed through function signatures, systems utilize the shared `Blackboard` matrix during an execution tick.
 
-- **Scenario-Driven Ingestion:** The architecture reads structural configurations from nested JSON inputs, defining initial parameters and systemic constraints for nations down to municipalities.
-- **Cross-Domain Coupling:** Outcomes in one plugin domain dynamically feed into the state vectors of adjacent domains, preventing delayed tracking error and allowing real feedback loops.
-- **Transition Logic:** The core loop supports real-time, scheduled or conditional institutional adjustments (e.g., sudden shifts in a region's regulatory or allocation systems) to track emergent trajectory changes.
+#### Standard Processing Contract
+
+Systems extract baseline conditions or parameters calculated by preceding plugins, perform non-linear operations, and broadcast outputs instantly back to the environment.
+
+Key metric variables actively utilized by the historical pipeline include:
+
+- `law_quality`: Evaluated from current organizational structures (`lobbying_pressure`, `donor_pressure`).
+- `corruption_level`: Tracked using institutional integrity limits (`avg_integrity`, `reelection_pressure`, `normalized_wealth_influence`, `faction_formation`).
+- `public_trust`: Tracks social cohesion based on output stability and systemic performance (`prior_trust`, `is_gridlocked`, `external_shock`, `media_impact`).
+- `economic_outcome`: Aggregates the drag of structural policy outcomes on production metrics.
 
 ---
 
@@ -132,23 +140,24 @@ The CLI runner supports flexible simulation configuration:
 psychohistory-cli [OPTIONS]
 ```
 
-**Key options:**
+Key options:
 
 - `--years <N>`: Number of years to simulate (default: 10)
 - `--runs <N>`: Number of Monte Carlo runs per region (default: 10)
-- `--scenario-dir <DIR>`: Path to scenario JSON directory (default: scenarios)
-- `--log-dir <DIR>`: Log file output directory (default: logs)
+- `--scenario-dir <DIR>`: Path to scenario JSON directory (default: `scenarios`)
+- `--log-dir <DIR>`: Log file output directory (default: `logs`)
 - `-v, --verbose`: Increase logging verbosity
 
 ### Typical Workflow
 
 1. Define or modify initial parameters in `scenarios/simulation_config.json`.
-2. Execute the runner command: `cargo run --bin cli -- --years 20 --runs 100`
+2. Execute the runner:  
+   ```bash
+   cargo run --bin cli -- --years 20 --runs 100
+   ```
 3. Analyze aggregate mean and standard deviation outputs alongside colorized field diffs to examine the trajectory.
 
----
-
-## Example Scenario JSON
+### Example Scenario JSON
 
 ```json
 {
@@ -186,7 +195,7 @@ psychohistory-cli [OPTIONS]
 ### ⚡ Priority 2 — Cross-Domain Coupling & SDK Architecture
 
 - [ ] **Zero-Copy State Ingestion:** Optimize `sdk/` traits to allow plugins instantaneous, read-only access to the comprehensive matrix of the previous time-step's world state.
-- [ ] **Feedback Loop Validation:** Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., econ ↔ gov loops).
+- [ ] **Feedback Loop Validation:** Implement compile-time or initialization-time verification to prevent deadlocks or ordering bias when plugins depend recursively on cross-domain parameters (e.g., `econ ↔ gov` loops).
 
 ### 📊 Priority 3 — The Research Lab (Python & Jupyter Integration)
 
@@ -204,5 +213,7 @@ psychohistory-cli [OPTIONS]
 This project is licensed under the **PolyForm Noncommercial License 1.0.0** — see `LICENSE.md` for details.
 
 > **Notice to Contributors and Institutional Researchers:**  
-> While receiving external or corporate research funding does not inherently disqualify you from using this framework, **proprietary capture is strictly prohibited**.  
-> If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community. We simulate open systems; we do not tolerate closed science.
+> While receiving external or corporate research funding does not inherently disqualify you from using this framework, proprietary capture is strictly prohibited.
+>
+> If your funding comes with "strings attached" that require non-disclosure agreements (NDAs), delayed public release, or the restriction of source code as proprietary intellectual property, you are explicitly barred from using this engine. Any architecture, plugins, models, or scenarios developed using Psychohistory must be made fully, transparently, and publicly available to the global community.  
+> *We simulate open systems; we do not tolerate closed science.*

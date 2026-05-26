@@ -34,12 +34,6 @@ pub struct EconomicDecree {
 pub struct AutocracyModel;
 
 impl LegalSystemModel for AutocracyModel {
-    /// Simulate an autocratic legislative session: the leader issues direct economic decrees.
-    /// The elite cohort influences decree targets, but purges can occur, harming stability and trust.
-    /// # Theory
-    /// "Dictatorship and Economic Policy" (Acemoglu, 2005); "The Political Economy of Autocracy" (Gandhi & Przeworski, 2007)
-    /// # Theory
-    /// "Dictatorship, Repression, and Elite Purges" (Svolik, 2012); "The Logic of Political Survival" (Bueno de Mesquita et al., 2003)
     fn simulate_legislative_session(
         &self,
         _system: &GovernanceSystem,
@@ -48,7 +42,6 @@ impl LegalSystemModel for AutocracyModel {
         _context: &mut SimulationContext,
     ) -> YearOutcome {
         // TODO: Migrate to blackboard model. For now, this is a stub to satisfy the trait.
-        // Stub: return a default YearOutcome
         crate::entities::YearOutcome::default()
     }
 }
