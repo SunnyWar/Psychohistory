@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+legion = "0.4.0"
 models = { workspace = true }
 
 [dev-dependencies]
