@@ -81,9 +81,9 @@ pub struct SimulationState {
 impl Default for SimulationState {
     fn default() -> Self {
         Self {
-            year_outcomes: Vec::new(),
             decrees: Vec::new(),
             elites: Vec::new(),
+            year_outcomes: Vec::new(),
             censorship_level: 0.5,
             repression_level: 0.5,
             legal_unpredictability: 0.2,
@@ -116,15 +116,7 @@ impl Default for SimulationState {
         }
     }
 }
-pub trait SimulationPlugin {
-    fn modify_outcome(
-        &self,
-        system: &GovernanceSystem,
-        state: &SimulationState,
-        year: usize,
-        outcome: &mut YearOutcome,
-    );
-}
+// DEPRECATED: SimulationPlugin trait removed. All macro logic must be implemented as System and registered with Scheduler. See AGENTS.md for migration notes.
 /// Recursively traverse regions in a scenario tree and run experiments for each region.
 ///
 /// This utility loads the governance system and simulation config for each region node,
@@ -167,10 +159,10 @@ pub fn simulate_region_tree<F>(
     };
 
     if let (Some(system), Some(config)) = (system, config) {
-        let plugins: Vec<Box<dyn crate::simulation::SimulationPlugin>> = vec![];
+        // Plugins fully removed; macro logic must be registered as Systems.
         let mut context = SimulationContext::new(config, None);
         let result: ExperimentResult =
-            run_experiment(&system, years, &mut context, &plugins, runs, seeds);
+            run_experiment(&system, years, &mut context, runs, seeds);
         info!("Completed region: {region_name}");
         print_results(region_name, &result);
     } else {
@@ -231,7 +223,7 @@ pub fn simulate_year(
     state: &mut SimulationState,
     context: &mut SimulationContext,
     year: usize,
-    plugins: &[Box<dyn SimulationPlugin>],
+        // Plugins fully removed; macro logic must be registered as Systems.
 ) -> YearOutcome {
     let (lobbying_pressure, donor_pressure, law_quality) = law_quality(state, context);
 
@@ -291,7 +283,7 @@ pub fn simulate_year(
         acc / weight_total
     };
 
-    let mut outcome = YearOutcome {
+    let outcome = YearOutcome {
         law_quality,
         corruption_level,
         public_trust,
@@ -302,9 +294,12 @@ pub fn simulate_year(
         economic_outcome,
         composite_score,
     };
-    for plugin in plugins {
-        plugin.modify_outcome(system, state, year, &mut outcome);
-    }
+    #[allow(deprecated)]
+        // Plugins deprecated, use Systems
+        // DEPRECATED: Remove this block after migration to System-based pipeline
+        // for plugin in plugins {
+        //     plugin.modify_outcome(system, state, year, &mut outcome);
+        // }
     outcome
 }
 
@@ -343,7 +338,6 @@ const fn representation_accuracy(state: &SimulationState, donor_pressure: f64) -
 
     acc.clamp(0.0, 1.0)
 }
-
 // Adaptability (CurrentUsSystem)
 fn adaptability(
     state: &SimulationState,
@@ -511,7 +505,7 @@ pub fn run_simulation(
     system: &GovernanceSystem,
     years: usize,
     context: &mut SimulationContext,
-    plugins: &[Box<dyn SimulationPlugin>],
+    // Plugins fully removed; macro logic must be registered as Systems.
 ) -> RunResult {
     let mut state = SimulationState::default();
     let mut outcomes = Vec::with_capacity(years);
@@ -520,7 +514,7 @@ pub fn run_simulation(
         // Membership rotation stub (implement logic as needed)
         rotate_membership(&mut system, year);
         // Main simulation logic (restored)
-        let outcome = simulate_year(&system, &mut state, context, year, plugins);
+        let outcome = simulate_year(&system, &mut state, context, year);
         // Optionally: call legal system model here for hooks/side effects
         // let _ = system.legal_model(&GovType::Democracy).simulate_legislative_session(&system, &mut state, year, context);
         state.year_outcomes.push(outcome.clone());
@@ -549,8 +543,7 @@ mod tests {
         let mut state = SimulationState::default();
         let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
-        let outcome = simulate_year(&system, &mut state, &mut context, 42, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 42);
         // All metrics should be in [0, 1]
         assert!((0.0..=1.0).contains(&outcome.law_quality));
         assert!((0.0..=1.0).contains(&outcome.corruption_level));
@@ -568,7 +561,7 @@ mod tests {
         let mut state = SimulationState::default();
         let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        // Plugins fully removed; macro logic must be registered as Systems.
         // Set extreme values for state and config
         state.avg_integrity = 0.0;
         state.lobbying_pressure = 5.0;
@@ -611,7 +604,7 @@ mod tests {
         c.raw_law_quality = 0.0;
         c.representative_efficiency = 0.0;
         c.raw_speed = 0.0;
-        let outcome = simulate_year(&system, &mut state, &mut context, 1, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 1);
         // All metrics should still be clamped to [0, 1]
         assert!((0.0..=1.0).contains(&outcome.law_quality));
         assert!((0.0..=1.0).contains(&outcome.corruption_level));
@@ -629,7 +622,7 @@ mod tests {
         let mut state = SimulationState::default();
         let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        // Plugins fully removed; macro logic must be registered as Systems.
         // Set corruption high, expect public trust and economic outcome to be lower
         state.avg_integrity = 0.0;
         state.lobbying_pressure = 5.0;
@@ -639,7 +632,7 @@ mod tests {
         state.faction_formation = 5.0;
         state.bad_law_drag = 5.0;
         context.config.us_corruption_base = 1.0;
-        let outcome = simulate_year(&system, &mut state, &mut context, 2, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 2);
         // Corruption should be high, public trust and economic outcome should be low
         assert!(outcome.corruption_level > 0.8);
         assert!(outcome.public_trust < 0.5);
@@ -651,12 +644,12 @@ mod tests {
         let mut state = SimulationState::default();
         let mut context = SimulationContext::new(SimulationConfig::default(), None);
         let system = GovernanceSystem::default();
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
+        // Plugins fully removed; macro logic must be registered as Systems.
         state.policy_stock = 1.0;
         state.avg_competence = 1.0;
         state.avg_leadership = 1.0;
         state.challenge_happened = true;
-        let outcome = simulate_year(&system, &mut state, &mut context, 3, &plugins);
+        let outcome = simulate_year(&system, &mut state, &mut context, 3);
         // Adaptability should be relatively high
         assert!(outcome.adaptability > 0.5);
     }

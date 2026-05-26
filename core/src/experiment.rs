@@ -1,7 +1,7 @@
 use crate::config::SimulationContext;
 use crate::entities::GovernanceSystem;
 use crate::run_result::RunResult;
-use crate::simulation::{SimulationPlugin, run_simulation};
+use crate::simulation::run_simulation;
 use ndarray::ArrayView1;
 
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub fn run_experiment(
     system: &GovernanceSystem,
     years: usize,
     context: &mut SimulationContext,
-    plugins: &[Box<dyn SimulationPlugin>],
+    // Plugins fully removed; macro logic must be registered as Systems.
     runs: usize,
     seeds: Option<&[u64]>,
 ) -> ExperimentResult {
@@ -48,7 +48,7 @@ pub fn run_experiment(
     for i in 0..runs {
         let seed = seeds.and_then(|s| s.get(i)).copied();
         let mut run_context = SimulationContext::new(context.config.clone(), seed);
-        let result = run_simulation(system, years, &mut run_context, plugins);
+        let result = run_simulation(system, years, &mut run_context);
         results.push(result);
     }
     // Aggregate means and stddevs for each metric
@@ -100,15 +100,13 @@ mod tests {
     use super::*;
     use crate::config::SimulationContext;
     use crate::entities::GovernanceSystem;
-    use crate::simulation::SimulationPlugin;
     #[test]
     fn test_run_experiment_basic() {
         let system = GovernanceSystem::default();
         let mut context = SimulationContext::new(Default::default(), None);
-        let plugins: Vec<Box<dyn SimulationPlugin>> = vec![];
         let runs = 5;
         let years = 10;
-        let result = run_experiment(&system, years, &mut context, &plugins, runs, None);
+        let result = run_experiment(&system, years, &mut context, runs, None);
         assert_eq!(result.runs.len(), runs);
         assert_eq!(result.n, runs);
         // Means and stddevs should be in [0, 1] or 0
