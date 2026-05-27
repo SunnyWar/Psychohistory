@@ -18,7 +18,7 @@ Psychohistory is a public-utility, open-science system dynamics framework design
 When generating, modifying, or refactoring code, you must discard standard web engineering paradigms and adopt a scientific-computing framework with a strict separation of concerns:
 
 1. **The Shared Blackboard System:** The monolithic, hardcoded state structures are obsolete. All systems and domain plugins and extension modules interoperate dynamically via the thread-safe `Blackboard` container defined in the `sdk` crate.
-2. **Data Consumption & Modification Contract:** 
+2. **Data Consumption & Modification Contract:**
    - Systems and models must read metrics globally using string keys: `blackboard.get("metric_name")`[cite: 4].
    - Systems must write or update metrics via: `blackboard.set("metric_name", value)`.
    - **Do not** attempt to pass fields via explicit struct fields or invent concrete parameters on `SimulationState`[cite: 4]. Keep the blackboard dynamic and decoupled.
@@ -65,10 +65,13 @@ cargo fmt --all -- --check
 ```
 
 ## Prompt Engineering & Context Layering
+
 When navigating or generating code for complex engineering tasks, always pull context from our localized architectural prompt files:
 
-### Macro System Architecture:
+### Macro System Architecture
+
  Refer to .github/prompts/arch-direction.prompt for explicit mandates regarding non-linear system dynamics, state-space representations, and cross-domain coupling abstractions.
 
 ### Context Anchoring
+
 Use the #file:.github/prompts/arch-direction.prompt syntax in the chat interface when initiating major refactors of the engine kernel or domain plugins to ensure strict alignment with our mathematical standards.

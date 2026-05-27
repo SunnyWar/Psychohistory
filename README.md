@@ -149,10 +149,10 @@ psychohistory-cli [OPTIONS]
 
 Key configuration flags:
 
-* `--years <N>`: Total simulation steps (ticks) to advance (default: 10)
-* `--runs <N>`: Iterations to process via Monte Carlo sweeps (default: 10)
-* `--scenario-dir <DIR>`: Path to targeting data directory (default: `scenarios`)
-* `-v, --verbose`: Toggle internal logging verbosity levels
+- `--years <N>`: Total simulation steps (ticks) to advance (default: 10)
+- `--runs <N>`: Iterations to process via Monte Carlo sweeps (default: 10)
+- `--scenario-dir <DIR>`: Path to targeting data directory (default: `scenarios`)
+- `-v, --verbose`: Toggle internal logging verbosity levels
 
 ### Sample Agnostic Scenario JSON
 
@@ -186,17 +186,17 @@ Key configuration flags:
 
 ### 🔥 Priority 1 — Core Execution Rigor
 
-* [ ] **Strict Determinism Integration:** Lock down mathematical verification tests across tracking targets to squash sub-decimal cross-platform calculation variations in multi-threaded loops.
-* [ ] **Advanced State-Space Topologies:** Provide unified multidimensional matrix utilities in the SDK layer for processing higher-order differential models out of the box.
+- [ ] **Strict Determinism Integration:** Lock down mathematical verification tests across tracking targets to squash sub-decimal cross-platform calculation variations in multi-threaded loops.
+- [ ] **Advanced State-Space Topologies:** Provide unified multidimensional matrix utilities in the SDK layer for processing higher-order differential models out of the box.
 
 ### ⚡ Priority 2 — State Optimization & Vectorization
 
-* [ ] **Zero-Copy Frame Interrogation:** Optimize snapshot retrieval layers inside `ReadSnapshot` to maximize hardware cache spatial locality during concurrent evaluation runs.
-* [ ] **Order Dependency Validation:** Implement structural check passes during setup phases to capture cyclical calculation deadlocks across independent runtime plugins.
+- [ ] **Zero-Copy Frame Interrogation:** Optimize snapshot retrieval layers inside `ReadSnapshot` to maximize hardware cache spatial locality during concurrent evaluation runs.
+- [ ] **Order Dependency Validation:** Implement structural check passes during setup phases to capture cyclical calculation deadlocks across independent runtime plugins.
 
 ### 📊 Priority 3 — Research Lab Bindings
 
-* [ ] **Comprehensive Crate Marshalling:** Wrap type-erased maps cleanly into native `pyo3` reference markers so external scientific work tools can stream internal tracking state directly.
+- [ ] **Comprehensive Crate Marshalling:** Wrap type-erased maps cleanly into native `pyo3` reference markers so external scientific work tools can stream internal tracking state directly.
 
 ---
 
