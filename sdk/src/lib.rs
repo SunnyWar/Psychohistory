@@ -98,13 +98,11 @@ impl<'a> ReadSnapshot<'a> {
 use legion::systems::Builder as ScheduleBuilder;
 
 pub trait SimulationPlugin: Send + Sync {
+    /// Returns the plugin's name
     fn name(&self) -> &'static str;
-    fn step(
-        &self,
-        world: &ReadSnapshot,
-        my_state: &mut Box<dyn Any + Send + Sync>,
-        time: SimulationTime,
-    );
+
+    /// Domain-blind execution method for open-blackboard simulation
+    fn execute(&self, snapshot: &ReadSnapshot, blackboard: &Blackboard);
 
     /// Register all ECS systems for this plugin into the kernel schedule.
     fn register_systems(&self, schedule: &mut ScheduleBuilder);

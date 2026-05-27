@@ -3,7 +3,7 @@ pub mod app;
 pub mod config;
 pub mod entities;
 pub mod experiment;
-pub mod legal;
+// legal module removed for domain-agnostic refactor
 pub mod logging;
 pub mod plugin;
 pub mod run_result;
