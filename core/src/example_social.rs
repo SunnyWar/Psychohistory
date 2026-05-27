@@ -1,7 +1,7 @@
 //! Example: Social Cohesion Plugin for Psychohistory Core
 //! Demonstrates a domain plugin using the open-blackboard architecture
 
-use sdk::{Blackboard, SimulationPlugin, ReadSnapshot};
+use sdk::{Blackboard, ReadSnapshot, SimulationPlugin};
 
 /// SocialCohesionPlugin: Demonstrates a non-linear social system plugin
 pub struct SocialCohesionPlugin;

@@ -1,20 +1,50 @@
 [
   {
     "code": "us",
-    "econ": { "gdp": 27000000000000.0, "inflation": 0.024 },
-    "gov": { "tax_rate": 0.21, "budget": 1000000000000.0, "stability": 0.9 },
-    "demog": { "population": 331000000, "growth_rate": 0.005 }
+    "econ": {
+      "gdp": 27000000000000.0,
+      "inflation": 0.024
+    },
+    "gov": {
+      "tax_rate": 0.21,
+      "budget": 1000000000000.0,
+      "stability": 0.9
+    },
+    "demog": {
+      "population": 331000000,
+      "growth_rate": 0.005
+    }
   },
   {
     "code": "cn",
-    "econ": { "gdp": 17000000000000.0, "inflation": 0.018 },
-    "gov": { "tax_rate": 0.19, "budget": 800000000000.0, "stability": 0.85 },
-    "demog": { "population": 1400000000, "growth_rate": 0.003 }
+    "econ": {
+      "gdp": 17000000000000.0,
+      "inflation": 0.018
+    },
+    "gov": {
+      "tax_rate": 0.19,
+      "budget": 800000000000.0,
+      "stability": 0.85
+    },
+    "demog": {
+      "population": 1400000000,
+      "growth_rate": 0.003
+    }
   },
   {
     "code": "de",
-    "econ": { "gdp": 4200000000000.0, "inflation": 0.017 },
-    "gov": { "tax_rate": 0.23, "budget": 300000000000.0, "stability": 0.92 },
-    "demog": { "population": 83000000, "growth_rate": 0.001 }
+    "econ": {
+      "gdp": 4200000000000.0,
+      "inflation": 0.017
+    },
+    "gov": {
+      "tax_rate": 0.23,
+      "budget": 300000000000.0,
+      "stability": 0.92
+    },
+    "demog": {
+      "population": 83000000,
+      "growth_rate": 0.001
+    }
   }
 ]

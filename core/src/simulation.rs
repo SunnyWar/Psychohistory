@@ -1,8 +1,8 @@
 //! Domain-agnostic simulation runner for Psychohistory core
 //! Strictly follows open-blackboard architecture and parallel plugin execution
 
-use sdk::{Blackboard, SimulationPlugin, ReadSnapshot, SimulationTime};
 use rayon::prelude::*;
+use sdk::{Blackboard, ReadSnapshot, SimulationPlugin, SimulationTime};
 
 /// Advances the simulation by one tick (domain-blind)
 ///

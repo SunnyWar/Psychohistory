@@ -1,7 +1,7 @@
-use legion::{system, Write, Read};
+use crate::state::{EconState, GovState};
+use legion::{system, Read, Write};
 use sdk::influence::InfluenceRegistry;
 use sdk::SimulationTime;
-use crate::state::{GovState, EconState};
 
 #[derive(Default, Clone, Copy, Debug)]
 pub struct PublicTrustMetric(pub f64);
@@ -27,14 +27,38 @@ pub fn public_trust_system(
     let gridlock_penalty = if is_gridlocked { 0.04 } else { 0.0 };
     let mut acc = -gridlock_penalty;
 
-    acc = prior_trust.mul_add(registry.get_influence("gov:prior_trust", "gov:public_trust"), acc);
-    acc = law_quality.mul_add(registry.get_influence("law:quality", "gov:public_trust"), acc);
-    acc = crisis_response.mul_add(registry.get_influence("gov:crisis_response", "gov:public_trust"), acc);
-    acc = legislative_speed.mul_add(registry.get_influence("gov:legislative_speed", "gov:public_trust"), acc);
-    acc = corruption_level.mul_add(registry.get_influence("gov:corruption_level", "gov:public_trust"), acc);
-    acc = bad_law_drag.mul_add(registry.get_influence("law:bad_law_drag", "gov:public_trust"), acc);
-    acc = external_shock.mul_add(registry.get_influence("external:shock", "gov:public_trust"), acc);
-    acc = media_impact.mul_add(registry.get_influence("media:impact", "gov:public_trust"), acc);
+    acc = prior_trust.mul_add(
+        registry.get_influence("gov:prior_trust", "gov:public_trust"),
+        acc,
+    );
+    acc = law_quality.mul_add(
+        registry.get_influence("law:quality", "gov:public_trust"),
+        acc,
+    );
+    acc = crisis_response.mul_add(
+        registry.get_influence("gov:crisis_response", "gov:public_trust"),
+        acc,
+    );
+    acc = legislative_speed.mul_add(
+        registry.get_influence("gov:legislative_speed", "gov:public_trust"),
+        acc,
+    );
+    acc = corruption_level.mul_add(
+        registry.get_influence("gov:corruption_level", "gov:public_trust"),
+        acc,
+    );
+    acc = bad_law_drag.mul_add(
+        registry.get_influence("law:bad_law_drag", "gov:public_trust"),
+        acc,
+    );
+    acc = external_shock.mul_add(
+        registry.get_influence("external:shock", "gov:public_trust"),
+        acc,
+    );
+    acc = media_impact.mul_add(
+        registry.get_influence("media:impact", "gov:public_trust"),
+        acc,
+    );
 
     trust.0 = acc.clamp(0.0, 1.0);
 }

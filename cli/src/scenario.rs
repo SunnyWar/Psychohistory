@@ -3,6 +3,7 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
 
+
 /// Loads and parses the scenario JSON file at the given directory path.
 /// Returns the root `serde_json::Value` on success.
 pub fn load_scenario(scenario_dir: &str) -> Result<Value, String> {

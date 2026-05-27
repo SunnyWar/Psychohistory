@@ -13,7 +13,10 @@ impl RunResult {
     pub fn from_outcomes(outcomes: Vec<Vec<f64>>) -> Self {
         let n = outcomes.len() as f64;
         if n == 0.0 {
-            return Self { averages: vec![], outcomes };
+            return Self {
+                averages: vec![],
+                outcomes,
+            };
         }
         let metric_count = outcomes[0].len();
         let mut sums = vec![0.0; metric_count];

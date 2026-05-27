@@ -1,7 +1,7 @@
-use legion::{Resources, Schedule, World, systems::Builder as ScheduleBuilder};
+use legion::{systems::Builder as ScheduleBuilder, Resources, Schedule, World};
+use sdk::influence::InfluenceRegistry;
 use sdk::SimulationPlugin;
 use sdk::SimulationTime;
-use sdk::influence::InfluenceRegistry;
 
 pub struct App {
     pub world: World,
