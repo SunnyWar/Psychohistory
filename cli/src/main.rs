@@ -1,65 +1,80 @@
-mod cli_args;
-mod csv_export;
-mod result_output;
-mod scenario;
-mod util;
-
-use clap::Parser;
-use cli_args::CliArgs;
-use log::{error, info, warn};
-use psychohistory_core::init_logger;
-use psychohistory_core::run_experiment;
+use clap::{Arg, Command};
+use psychohistory_core::SocialCohesionPlugin;
+use psychohistory_core::experiment::run_experiment;
+use psychohistory_core::sdk;
+use psychohistory_core::state::SimulationState;
+use std::sync::Arc;
 
 fn main() {
-    use csv_export::{write_per_run_csv, write_summary_csv};
-    use psychohistory_core::seed_util::generate_seeds;
+    let matches = Command::new("psychohistory")
+        .version("1.0")
+        .about("Run generic Monte Carlo system dynamics experiments")
+        .arg(
+            Arg::new("ticks")
+                .short('y')
+                .long("ticks")
+                .value_name("TICKS")
+                .help("Number of time steps (ticks)")
+                .default_value("10"),
+        )
+        .arg(
+            Arg::new("runs")
+                .short('r')
+                .long("runs")
+                .value_name("RUNS")
+                .help("Number of Monte Carlo runs")
+                .default_value("5"),
+        )
+        .arg(
+            Arg::new("delta_t")
+                .short('d')
+                .long("delta-t")
+                .value_name("DELTA_T")
+                .help("Time step increment (delta t)")
+                .default_value("1.0"),
+        )
+        .get_matches();
 
-    let args = CliArgs::parse();
-    if std::env::args().len() == 1 {
-        <CliArgs as clap::CommandFactory>::command()
-            .print_help()
-            .unwrap();
-        println!();
-        return;
-    }
-    init_logger(&args.log_dir, "psychohistory", args.verbose);
-    info!("Simulation CLI started");
+    let ticks: usize = matches
+        .get_one::<String>("ticks")
+        .unwrap()
+        .parse()
+        .expect("Invalid ticks");
+    let runs: usize = matches
+        .get_one::<String>("runs")
+        .unwrap()
+        .parse()
+        .expect("Invalid runs");
+    let delta_t: f64 = matches
+        .get_one::<String>("delta_t")
+        .unwrap()
+        .parse()
+        .expect("Invalid delta_t");
 
-    // Top-level seed for reproducibility (could be made a CLI arg)
-    let top_seed = None;
-    // Load scenario file using helper
-    let root_data = match scenario::load_scenario(&args.scenario_dir) {
-        Ok(val) => val,
-        Err(msg) => {
-            error!("{msg}");
-            return;
-        }
+    // Instantiate the reference plugin
+    let plugins: Vec<Arc<dyn sdk::SimulationPlugin>> = vec![Arc::new(SocialCohesionPlugin)];
+
+    // State factory: create SimulationState and pre-allocate SocialCohesionState
+    let state_factory = || {
+        let state = SimulationState::default();
+        // If SocialCohesionState is needed, insert it here (example):
+        // state.insert("SocialCohesionState", SocialCohesionState::default());
+        state
     };
 
-    match root_data.get("regions").and_then(|r| r.as_object()) {
-        Some(regions) if !regions.is_empty() => {
-            info!("Found {} regions in config.", regions.len());
-            for (region_name, _region_node) in regions {
-                let seeds = generate_seeds(top_seed, args.runs);
-                // Closure to print and export results
-                let output_results = |region_name: &str, result: &psychohistory_core::experiment::ExperimentResult| {
-                    result_output::print_experiment_results(region_name, result);
-                    let _ = write_summary_csv("simulation-summary.csv", region_name, result);
-                    let _ = write_per_run_csv("per-run-results.csv", region_name, &result.runs);
-                };
-                // TODO: Adapt region_node to SimulationContext/config as needed
-                // For now, assume each region uses the same config
-                let mut context =
-                    psychohistory_core::config::SimulationContext::new(Default::default(), None);
-                let result = run_experiment(args.years, &mut context, args.runs, Some(&seeds));
-                output_results(region_name, &result);
-            }
-        }
-        Some(_) => {
-            warn!("No regions found in simulation_config.json.");
-        }
-        None => {
-            error!("'regions' key missing or not an object in simulation_config.json.");
-        }
+    // Track only "systemic_stability"
+    let tracked_keys = vec!["systemic_stability".to_string()];
+
+    let result = run_experiment(&plugins, ticks, runs, delta_t, &tracked_keys, state_factory);
+
+    // Print mean and stddev timeline
+    println!(
+        "\nMonte Carlo Results (mean ± stddev) for '{}':",
+        tracked_keys[0]
+    );
+    for step in 0..result.steps {
+        let mean = result.mean[step][0];
+        let stddev = result.stddev[step][0];
+        println!("Step {:>3}: {:>8.4} ± {:>8.4}", step, mean, stddev);
     }
 }

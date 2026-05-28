@@ -1,3 +1,4 @@
+pub use legion::systems::Builder;
 pub mod components;
 pub mod influence;
 use std::any::Any;

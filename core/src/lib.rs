@@ -19,3 +19,7 @@ pub use logging::init_logger;
 pub use plugin::Plugin;
 pub use state::SimulationState;
 pub use system::System;
+
+pub mod example_social;
+pub use ::sdk;
+pub use example_social::SocialCohesionPlugin;

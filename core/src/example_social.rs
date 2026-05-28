@@ -24,18 +24,7 @@ impl SimulationPlugin for SocialCohesionPlugin {
         blackboard.set("systemic_stability", systemic_stability);
     }
 
-    fn register_systems(&self, _schedule: &mut sdk::legion::systems::Builder) {
+    fn register_systems(&self, _schedule: &mut sdk::Builder) {
         // No ECS systems for this simple demonstration
     }
 }
-
-///
-/// Mathematical model:
-///
-/// $$
-/// S = \frac{1}{1 + e^{10(f - 0.7)}} \cdot B
-/// $$
-///
-/// Where $S$ is systemic stability, $f$ is social friction, $B$ is baseline cohesion.
-///
-/// [Theory: Social tipping points, see Scheffer et al. (2009)]
