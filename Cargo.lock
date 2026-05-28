@@ -946,9 +946,6 @@ name = "sdk"
 version = "0.1.0"
 dependencies = [
  "legion",
- "plugins-demog",
- "plugins-econ",
- "plugins-gov",
 ]
 
 [[package]]
