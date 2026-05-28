@@ -206,7 +206,6 @@ dependencies = [
  "clap",
  "comfy-table",
  "core",
- "flexi_logger",
  "log",
  "serde_json",
  "tempfile",
@@ -764,7 +763,6 @@ checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 name = "plugins-demog"
 version = "0.1.0"
 dependencies = [
- "core",
  "legion",
  "sdk",
  "serde",
@@ -774,7 +772,6 @@ dependencies = [
 name = "plugins-econ"
 version = "0.1.0"
 dependencies = [
- "core",
  "legion",
  "sdk",
  "serde",
@@ -784,7 +781,6 @@ dependencies = [
 name = "plugins-gov"
 version = "0.1.0"
 dependencies = [
- "core",
  "legion",
  "sdk",
  "serde",
