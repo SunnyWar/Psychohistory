@@ -14,7 +14,7 @@ pub mod state;
 pub mod system;
 
 pub use app::App;
-pub use experiment::{run_experiment, ExperimentResult};
+pub use experiment::{ExperimentResult, run_experiment};
 pub use logging::init_logger;
 pub use plugin::Plugin;
 pub use state::SimulationState;

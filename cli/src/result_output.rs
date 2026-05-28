@@ -1,5 +1,5 @@
 //! Output utilities for experiment results
-use comfy_table::{presets::UTF8_FULL, ContentArrangement, Table};
+use comfy_table::{ContentArrangement, Table, presets::UTF8_FULL};
 use psychohistory_core::experiment::ExperimentResult;
 
 /// Print experiment results to stdout

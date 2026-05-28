@@ -1,5 +1,5 @@
-use rand::rngs::StdRng;
 use rand::SeedableRng;
+use rand::rngs::StdRng;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize)]

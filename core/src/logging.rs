@@ -1,5 +1,5 @@
 use flexi_logger::{Cleanup, Criterion, Duplicate, FileSpec, Logger, Naming};
-use log::{debug, error, info, LevelFilter};
+use log::{LevelFilter, debug, error, info};
 
 /// Initialize logging with `flexi_logger`, mapping `verbose_level` to `LevelFilter`.
 /// Logs go to a file in `log_dir` with the given prefix, and are also duplicated to stderr.
