@@ -1,5 +1,6 @@
 use clap::Parser;
 mod cli_args;
+
 use psychohistory_core::SocialCohesionPlugin;
 use psychohistory_core::experiment::run_experiment;
 use psychohistory_core::sdk;
